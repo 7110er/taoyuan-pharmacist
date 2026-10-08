@@ -347,7 +347,95 @@ table.grid td{max-width:320px}
 .netnote{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + 12px + env(safe-area-inset-bottom));z-index:50;background:var(--ink);color:#fff;font-size:.86rem;padding:10px 16px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.2);max-width:calc(100% - 32px)}
 .linkbtn{border:0;background:none;color:var(--teal);cursor:pointer;font-size:.84rem;padding:6px 4px;text-decoration:underline;text-underline-offset:2px;min-height:36px}
 
-@media print{.top,.nav,.drawer-foot,.scrim,.searchbar,.dash-top{display:none}.drawer{position:static;box-shadow:none;max-height:none}}
+/* ===== 成效儀表板：報表頁籤＋切片器＋KPI 列＋視覺格（Power BI 式版面）＋總覽看板 ===== */
+.bi-head{display:flex;gap:8px;align-items:center;padding:14px 0 0;border-bottom:1px solid var(--rule)}
+.bi-pages{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin;-webkit-overflow-scrolling:touch;flex:1;min-width:0}
+.bi-page{flex:0 0 auto;border:0;background:none;padding:10px 14px 9px;font-size:.9rem;color:var(--ink-2);cursor:pointer;border-bottom:3px solid transparent;
+  display:flex;align-items:center;gap:7px;white-space:nowrap;border-radius:var(--r-sm) var(--r-sm) 0 0}
+.bi-page:hover{background:var(--wash-2);color:var(--ink)}
+.bi-page[aria-selected="true"]{color:var(--teal-deep);font-weight:700;border-bottom-color:var(--teal);background:var(--sheet)}
+.bi-page i{width:8px;height:8px;border-radius:2px;flex:0 0 8px;background:var(--teal)}
+.bi-page i.p{background:var(--seal)} .bi-page i.m{background:#4a3aa7} .bi-page i.o{background:var(--ink-3)}
+.bi-sep{flex:0 0 1px;background:var(--rule);margin:8px 4px}
+.bi-slicers{gap:10px 14px;padding:12px 0}
+.slicer{display:flex;flex-direction:column;gap:2px;flex:1 1 140px;min-width:0;max-width:260px}
+.slicer>span{font-size:.72rem;color:var(--ink-3);letter-spacing:.04em}
+.slicer select{width:100%;height:38px!important;font-size:.9rem!important;flex:none!important}
+.charts>.board,.charts>.metrics{grid-column:1/-1}
+.slicer:has(select[hidden]){display:none}
+.slicer.subj{max-width:340px;flex-basis:220px}
+.bi-crumb{flex:1 1 100%;font-family:var(--display);font-weight:700;font-size:1.3rem;color:var(--ink);letter-spacing:.02em;line-height:1.3}
+.bi-crumb small{font-family:var(--body);font-weight:400;font-size:.78rem;color:var(--ink-3);margin-left:8px;letter-spacing:0}
+.bi-reset{align-self:flex-end}
+.bi-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:0 0 12px}
+.bi-kpis:empty{display:none}
+.tile{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--teal);border-radius:var(--r-sm);padding:12px 14px;min-width:0;display:flex;flex-direction:column;gap:4px}
+.tile.self{border-left-color:var(--seal)}
+.tile.meta{border-left-color:var(--rule);background:var(--wash-2)}
+.tile h3{margin:0;font-size:.78rem;font-weight:600;color:var(--ink-2);line-height:1.35}
+.tile .kpi{font-size:2.1rem;margin-top:6px}
+.tile .kpi small{font-size:.74rem;margin-top:4px}
+.tile .tv{font-family:var(--display);font-weight:700;font-size:1.5rem;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.15;margin-top:6px;word-break:break-word}
+.tile .tv.sm{font-size:1rem}
+.tile small.note{font-size:.72rem;color:var(--ink-3)}
+.tile .state{font-size:.8rem;padding:0;border:0;background:none;text-align:left}
+@media(min-width:900px){
+  .bi-grid{grid-template-columns:repeat(12,minmax(0,1fr))!important}
+  .bi-grid>.chart{grid-column:span 6}
+  .bi-grid>.chart.wide{grid-column:1/-1}
+  .bi-grid>.chart.third{grid-column:span 4}
+}
+.chart{border-radius:var(--r-md);box-shadow:0 1px 2px rgba(10,63,75,.05);position:relative}
+.chart-head h3{font-size:.95rem}
+.chart-tools{display:flex;gap:2px;margin-left:auto}
+.chart-tools .iconbtn{min-width:34px;height:34px}
+.chart-tools .iconbtn svg{width:18px;height:18px}
+.chart.focused{position:fixed;inset:calc(var(--top-h) + 12px) 12px 12px 12px;z-index:60;overflow:auto;box-shadow:0 18px 48px rgba(10,30,40,.28)}
+.focus-scrim{position:fixed;inset:0;background:rgba(16,49,59,.42);z-index:55}
+@media(min-width:900px){.chart.focused{inset:calc(var(--top-h) + 24px) 6vw 24px 6vw}}
+/* 總覽看板 */
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;align-items:start}
+.board-col{background:var(--wash-2);border-radius:var(--r-md);padding:10px;min-width:0}
+.board-col>h3{margin:2px 4px 10px;font-size:.92rem;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.board-col>h3 i{width:10px;height:10px;border-radius:2px;background:var(--teal)}
+.board-col.p>h3 i{background:var(--seal)} .board-col.m>h3 i{background:#4a3aa7}
+.board-col>h3 em{margin-left:auto;font-style:normal;font-size:.78rem;color:var(--ink-3);background:var(--sheet);border-radius:999px;padding:0 8px}
+.bcard{display:block;width:100%;text-align:left;background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r-sm);padding:12px;margin-bottom:8px;cursor:pointer;
+  transition:transform .12s var(--ease),box-shadow .12s}
+.bcard:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(10,63,75,.10)}
+.bcard b{display:block;font-size:.98rem;line-height:1.35;margin-bottom:6px}
+.bcard .nums{display:flex;flex-wrap:wrap;gap:6px 14px;margin:6px 0}
+.bcard .nums span{display:flex;flex-direction:column;font-size:.72rem;color:var(--ink-3);line-height:1.3}
+.bcard .nums strong{font-family:var(--display);font-size:1.25rem;color:var(--teal-deep);font-variant-numeric:tabular-nums}
+.board-col.p .bcard .nums strong{color:var(--seal)}
+.bcard .chips{display:flex;flex-wrap:wrap;gap:4px}
+.bcard .chips span{font-size:.7rem;background:var(--wash-2);color:var(--ink-2);border-radius:4px;padding:1px 6px}
+.bcard .ld{font-size:.74rem;color:var(--ink-3)}
+.bcard .bar3{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--rule-2);margin-top:8px;gap:2px}
+.bcard .bar3 i{display:block;height:100%}
+.chips-row{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;color:var(--ink-2);background:var(--sheet);border:1px solid var(--rule);border-radius:999px;padding:3px 10px;line-height:1.4}
+.chip svg{width:13px;height:13px;flex:0 0 13px;color:var(--teal)}
+.chip.warn{background:var(--warn-soft);border-color:#F0D9B8;color:var(--warn)}
+.chip.warn svg{color:var(--warn)}
+.spark{display:block;width:100%;height:30px;margin-top:6px;overflow:visible}
+.spark polyline{fill:none;stroke:var(--teal);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.spark .area{fill:var(--teal-soft);opacity:.55;stroke:none}
+.tile.self .spark polyline{stroke:var(--seal)} .tile.self .spark .area{fill:var(--peach-wash)}
+.spark circle{fill:var(--teal);stroke:var(--sheet);stroke-width:2}
+.tile .spark-note{font-size:.7rem;color:var(--ink-3)}
+.skel{position:relative;overflow:hidden;background:var(--wash-2);border-radius:var(--r-md);border:1px solid var(--rule-2)}
+.skel::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);animation:shimmer 1.3s infinite}
+@keyframes shimmer{100%{transform:translateX(100%)}}
+.skel.t{height:104px}.skel.c{height:260px}
+.bi-grid>.chart,.bi-kpis>.tile,.board-col{animation:rise .38s var(--ease) both}
+.bi-grid>.chart:nth-child(2){animation-delay:.04s}.bi-grid>.chart:nth-child(3){animation-delay:.08s}.bi-grid>.chart:nth-child(n+4){animation-delay:.12s}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.chart .state{display:flex;flex-direction:column;align-items:center;gap:8px;padding:28px 16px;border-radius:var(--r-md);background:var(--wash-2);font-size:.88rem;line-height:1.55}
+.chart .state::before{content:"";width:28px;height:28px;border-radius:50%;background:var(--sheet) no-repeat center/16px;border:1px solid var(--rule);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E757D' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 8v5M12 16h.01'/%3E%3C/svg%3E")}
+.chart .state.supp-state::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230F5E6E' stroke-width='2' stroke-linecap='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E")}
+@media print{.top,.nav,.drawer-foot,.scrim,.searchbar,.dash-top,.bi-head{display:none}.drawer{position:static;box-shadow:none;max-height:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -433,18 +521,22 @@ table.grid td{max-width:320px}
       </section>
 
       <section id="dashPanel" role="tabpanel" aria-labelledby="tabDash" class="viz" hidden>
-        <div class="dash-top">
+        <div class="bi-head">
+          <div class="bi-pages" id="dashTabs" role="tablist" aria-label="儀表板頁面"></div>
           <label for="dashSel" class="sr-only">選擇儀表板</label>
-          <select id="dashSel" class="grow"></select>
-          <label for="yearSel" class="sr-only">年度</label>
-          <select id="yearSel"></select>
-          <label for="monthSel" class="sr-only">月份</label>
-          <select id="monthSel"></select>
-          <label for="subjSel" class="sr-only">對象</label>
-          <select id="subjSel" hidden></select>
+          <select id="dashSel" hidden></select>
         </div>
-        <div class="status" id="dashStatus" role="status" aria-live="polite"></div>
-        <div class="charts" id="charts"></div>
+        <div class="dash-top bi-slicers">
+          <div class="bi-crumb" id="dashCrumb"></div>
+          <label class="slicer"><span>年度</span><select id="yearSel"></select></label>
+          <label class="slicer"><span>月份</span><select id="monthSel"></select></label>
+          <label class="slicer subj"><span>對象（個人圖表）</span><select id="subjSel" hidden></select></label>
+          <button class="linkbtn bi-reset" id="slicerReset" type="button" hidden>清除篩選</button>
+        </div>
+        <div class="status sr-only" id="dashStatus" role="status" aria-live="polite"></div>
+        <div class="chips-row" id="dashChips"></div>
+        <div class="bi-kpis" id="dashKpis"></div>
+        <div class="charts bi-grid" id="charts"></div>
       </section>
 
       <section id="pagesPanel" role="tabpanel" aria-labelledby="tabPages" hidden>
@@ -498,7 +590,7 @@ table.grid td{max-width:320px}
  * 只需修改下面一行：貼上 Apps Script 部署後的「網頁應用程式網址」。
  * ===================================================================== */
 var CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbzReVtKW3c6VpvxC5GpZI1EVIuHUMnTjm805EKVUQ_vlGtIOlPIpZhNUMUwssrkQUYl_A/exec'
+  API_URL: 'https://script.google.com/macros/s/AKfycbzZGrcm6SWcJ5v4BbcC6kvl3FwM8EKAE1aD5gxY4NBEANwfaExjVSAK-QWkrey1LPh_2Q/exec'
 };
 /* ===================================================================== */
 
@@ -1069,6 +1161,7 @@ function selectTab(which) {
   $('searchbar').hidden = which !== 'data';
   $('progress').hidden = which !== 'data' || $('progress').dataset.done === '1';
   if (which === 'dash' && !S.dashId && $('dashSel').options.length) openDashboard($('dashSel').options[0].value);
+  if (which !== 'dash') unfocusChart();
   if (which === 'imp') loadImprovement();
 }
 $('tabImp').addEventListener('click', function () { selectTab('imp'); });
@@ -1495,6 +1588,45 @@ function buildDashList() {
     sel.appendChild(og);
   });
   $('tabDash').hidden = !n;
+  // 報表頁籤（Power BI 式頁面列）：總覽＋各儀表板
+  S.ovCache = {}; // 角色切換後重新計算，不沿用前一角色的結果
+  var tabs = $('dashTabs'); tabs.innerHTML = '';
+  var mk = function (id, name, kind) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'bi-page'; b.setAttribute('role', 'tab'); b.dataset.id = id;
+    b.setAttribute('aria-selected', String(S.dashId === id));
+    var i = document.createElement('i'); i.className = kind; i.setAttribute('aria-hidden', 'true'); b.appendChild(i); b.appendChild(document.createTextNode(name));
+    b.addEventListener('click', function () { openDashboard(id); });
+    tabs.appendChild(b);
+  };
+  if (n) {
+    var ov = document.createElement('option'); ov.value = OVERVIEW_ID; ov.textContent = '總覽'; sel.insertBefore(ov, sel.firstChild);
+    mk(OVERVIEW_ID, '總覽', 'o');
+  }
+  groups.forEach(function (g, gi) {
+    if (!g[1].length) return;
+    var sp = document.createElement('span'); sp.className = 'bi-sep'; sp.setAttribute('aria-hidden', 'true'); tabs.appendChild(sp);
+    g[1].forEach(function (d) { mk(d.id, d.name, gi === 0 ? 'p' : (gi === 2 ? 'm' : '')); });
+  });
+}
+var OVERVIEW_ID = 'overview';
+function markDashTab(id) {
+  Array.prototype.forEach.call($('dashTabs').children, function (b) {
+    if (!b.dataset) return;
+    var on = b.dataset.id === id; b.setAttribute('aria-selected', String(on));
+    if (on && b.scrollIntoView) b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  });
+}
+function dashName(id) {
+  if (id === OVERVIEW_ID) return '總覽';
+  var o = $('dashSel').querySelector('option[value="' + id + '"]');
+  return o ? o.textContent : '';
+}
+$('slicerReset').addEventListener('click', function () { if (S.dashId) openDashboard(S.dashId); });
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.querySelector('.chart.focused')) { e.stopPropagation(); unfocusChart(); } }, true);
+function unfocusChart() {
+  var f = document.querySelector('.chart.focused'); if (f) { f.classList.remove('focused'); var t = f.querySelector('[data-focus]'); if (t) { t.setAttribute('aria-pressed', 'false'); t.focus(); } }
+  var sc = document.querySelector('.focus-scrim'); if (sc) sc.remove();
+  document.body.style.overflow = '';
 }
 $('dashSel').addEventListener('change', function () { openDashboard(this.value); });
 $('yearSel').addEventListener('change', function () { loadDashboard(false); });
@@ -1502,13 +1634,19 @@ $('monthSel').addEventListener('change', function () { loadDashboard(false); });
 $('subjSel').addEventListener('change', function () { S.subject = this.value; loadDashboard(false); });
 
 function openDashboard(id) {
+  unfocusChart();
   S.dashId = id; $('dashSel').value = id; S.dash = null; S.filt = {}; S.subject = '';
   $('yearSel').innerHTML = ''; $('monthSel').innerHTML = '';
+  markDashTab(id);
+  var cr = $('dashCrumb'); cr.textContent = dashName(id);
+  $('dashKpis').innerHTML = '';
+  $('slicerReset').hidden = id === OVERVIEW_ID;
+  if (id === OVERVIEW_ID) { $('yearSel').hidden = $('monthSel').hidden = $('subjSel').hidden = true; renderOverview(); return; }
   loadDashboard(true);
 }
 function dashError(e, retry) {
   if (e.code === 'AUTH_REQUIRED' || e.code === 'ACCESS_DENIED') return;
-  $('dashStatus').textContent = '';
+  $('dashStatus').textContent = ''; $('dashKpis').innerHTML = ''; setChips([]);
   var box = $('charts'); box.innerHTML = '';
   var d = document.createElement('div'); d.className = 'panel state err'; d.textContent = (e.code === 'NO_PERMISSION' ? EMPTY_TEXT.NO_PERMISSION : '載入失敗：' + e.message);
   var b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.textContent = '重試'; b.addEventListener('click', retry);
@@ -1519,6 +1657,7 @@ function loadDashboard(first) {
   if (/^metrics:/.test(id)) { loadMetrics(id.slice(8), first); return; }
   var req = ++S.dashReq;
   $('dashStatus').textContent = '計算中…（每次改變條件都重新經過權限與隱私檢查）';
+  showDashSkeleton();
   api('dashboard', { id: id, year: first ? '' : $('yearSel').value, month: first ? '' : $('monthSel').value, filters: S.filt, subject: S.subject })
     .then(function (j) {
       if (req !== S.dashReq) return;
@@ -1586,16 +1725,168 @@ function aggregateChart(c) {
 
 function renderDashboard() {
   var d = S.dash; if (!d) return;
+  unfocusChart();
   var box = $('charts'); box.innerHTML = '';
+  var kp = $('dashKpis'); kp.innerHTML = '';
   $('dashStatus').textContent = '資料更新：' + (d.updatedAt || '') + '｜只顯示統計結果；人數不足的格子會標示「樣本數不足」';
+  var y = $('yearSel').value, m = $('monthSel').value;
+  $('slicerReset').hidden = !(y || m || S.subject && d.subjects && d.subjects[0] && S.subject !== d.subjects[0].pid || Object.keys(S.filt || {}).some(function (k) { return S.filt[k]; }));
+  var subjLabel = '';
+  (d.subjects || []).forEach(function (s) { if (s.pid === d.subject) subjLabel = s.label; });
+  var cr = $('dashCrumb'); cr.textContent = d.name || dashName(S.dashId);
+  var sm = document.createElement('small');
+  sm.textContent = [(y ? y + ' 年' : '全部年度') + (m ? ' ' + Number(m) + ' 月' : ''), subjLabel].filter(Boolean).join('｜');
+  cr.appendChild(sm);
   if (!d.charts.length) { box.innerHTML = '<div class="panel state">' + EMPTY_TEXT.NO_PERMISSION + '</div>'; return; }
-  d.charts.forEach(function (c) { box.appendChild(chartCard(c)); });
+  // KPI 列：數字卡（OK）＋本頁摘要
+  var personal = d.charts.some(function (c) { return c.scope === '個人'; });
+  var ts = trendSeries(d), sparkDone = false;
+  d.charts.forEach(function (c) {
+    if (c.type !== '數字卡' || c.status !== 'OK') return;
+    var t = kpiTile(c);
+    if (ts && !sparkDone && c.hasTime && isCount(c.agg)) { t.appendChild(sparkline(ts)); var n = document.createElement('small'); n.className = 'spark-note'; n.textContent = '近 ' + ts.periods.length + ' 個月走勢'; t.appendChild(n); sparkDone = true; }
+    kp.appendChild(t);
+  });
+  var nSupp = d.charts.filter(function (c) { return c.status === 'SUPPRESSED_PRIVACY'; }).length;
+  var nErr = d.charts.filter(function (c) { return c.status === 'DATA_ERROR'; }).length;
+  setChips([chip('clock', '資料更新 ' + (d.updatedAt || '—')), chip('lock', '人數不足自動隱藏'), nSupp ? chip('lock', nSupp + ' 張圖因樣本數不足未顯示') : null, nErr ? chip('alert', nErr + ' 張圖設定待修正', true) : null]);
+  var ok = d.charts.filter(function (c) { return c.status === 'OK'; }).length;
+  var maxN = null, maxSubj = null;
+  d.charts.forEach(function (c) {
+    var mm = c.meta || {};
+    if (typeof mm.assessment_n === 'number' && (maxN === null || mm.assessment_n > maxN)) maxN = mm.assessment_n;
+    if (typeof mm.unique_subject_n === 'number' && (maxSubj === null || mm.unique_subject_n > maxSubj)) maxSubj = mm.unique_subject_n;
+  });
+  kp.appendChild(metaTile('可顯示圖表', ok + '／' + d.charts.length, '其餘為無資料、樣本數不足或設定待修正'));
+  if (maxN !== null && !kp.querySelector('.tile:not(.meta)')) kp.appendChild(metaTile('紀錄筆數', maxN.toLocaleString('zh-TW'), '本頁紀錄最多之圖表'));
+  if (maxSubj !== null) kp.appendChild(metaTile('受評人數', maxSubj.toLocaleString('zh-TW'), '本頁人數最多之群體圖表（不同人）'));
+  if (personal && subjLabel) kp.appendChild(metaTile('檢視對象', subjLabel, '', true));
+  d.charts.forEach(function (c) { if (!(c.type === '數字卡' && c.status === 'OK')) box.appendChild(chartCard(c)); });
+}
+var ICON = {
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+  alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>'
+};
+function chip(icon, text, warn) { var c = document.createElement('span'); c.className = 'chip' + (warn ? ' warn' : ''); c.innerHTML = ICON[icon] || ''; c.appendChild(document.createTextNode(text)); return c; }
+function setChips(list) { var b = $('dashChips'); b.innerHTML = ''; list.forEach(function (x) { if (x) b.appendChild(x); }); }
+function showDashSkeleton() {
+  var kp = $('dashKpis'), box = $('charts');
+  if (box.querySelector('.chart')) return; // 已有內容時不閃爍，只更新數字
+  kp.innerHTML = ''; box.innerHTML = '';
+  for (var i = 0; i < 4; i++) { var t = document.createElement('div'); t.className = 'skel t'; t.setAttribute('aria-hidden', 'true'); kp.appendChild(t); }
+  for (var j = 0; j < 2; j++) { var c = document.createElement('div'); c.className = 'skel c chart'; c.setAttribute('aria-hidden', 'true'); box.appendChild(c); }
+}
+/** 趨勢小圖：取同頁第一張 OK 的趨勢圖，依月份合計（筆數類）或平均；最多 12 個月 */
+function trendSeries(d) {
+  var t = (d.charts || []).filter(function (c) { return c.type === '趨勢圖' && c.status === 'OK'; })[0];
+  if (!t) return null;
+  var per = {}, supp = false;
+  (t.cells || []).forEach(function (x) { if (!x[0]) return; if (x[11]) { supp = true; return; } per[x[0]] = combine(per[x[0]], x); });
+  if (supp) return null;
+  var ps = Object.keys(per).sort().slice(-12);
+  if (ps.length < 3) return null;
+  return { periods: ps, values: ps.map(function (p) { return num(aggValue(t.agg, per[p])); }), title: t.title };
+}
+function sparkline(ts) {
+  var NS = 'http://www.w3.org/2000/svg', W = 120, H = 30, max = Math.max.apply(null, ts.values), min = Math.min.apply(null, ts.values.concat([0]));
+  var x = function (i) { return i * W / (ts.values.length - 1); }, y = function (v) { return H - 2 - (H - 4) * (max > min ? (v - min) / (max - min) : .5); };
+  var pts = ts.values.map(function (v, i) { return x(i).toFixed(1) + ',' + y(v).toFixed(1); });
+  var svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('preserveAspectRatio', 'none'); svg.setAttribute('class', 'spark');
+  svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', ts.title + '：' + ts.periods[0] + ' 至 ' + ts.periods[ts.periods.length - 1] + '，最近一月 ' + fmt(ts.values[ts.values.length - 1], '筆數'));
+  var area = document.createElementNS(NS, 'polygon'); area.setAttribute('class', 'area'); area.setAttribute('points', '0,' + H + ' ' + pts.join(' ') + ' ' + W + ',' + H); svg.appendChild(area);
+  var pl = document.createElementNS(NS, 'polyline'); pl.setAttribute('points', pts.join(' ')); pl.setAttribute('vector-effect', 'non-scaling-stroke'); svg.appendChild(pl);
+  var tt = document.createElementNS(NS, 'title'); tt.textContent = ts.periods.map(function (p, i) { return p + '：' + fmt(ts.values[i], '筆數'); }).join('\n'); svg.appendChild(tt);
+  return svg;
+}
+function kpiTile(c) {
+  var t = document.createElement('section'); t.className = 'tile' + (c.scope === '個人' ? ' self' : '');
+  var h = document.createElement('h3'); h.textContent = c.title.replace(/（選擇[^）]*）/, ''); t.appendChild(h);
+  try { var A = aggregateChart(c); t.appendChild(A.groups.length ? drawKpi(c, A) : stateDiv(EMPTY_TEXT.NO_DATA)); } catch (e) { t.appendChild(stateDiv('數值計算失敗')); }
+  return t;
+}
+function metaTile(label, value, note, small) {
+  var t = document.createElement('section'); t.className = 'tile meta';
+  var h = document.createElement('h3'); h.textContent = label; t.appendChild(h);
+  var v = document.createElement('div'); v.className = 'tv' + (small ? ' sm' : ''); v.textContent = value; t.appendChild(v);
+  if (note) { var n = document.createElement('small'); n.className = 'note'; n.textContent = note; t.appendChild(n); }
+  return t;
+}
+function stateDiv(text) { var d = document.createElement('div'); d.className = 'state'; d.textContent = text; return d; }
+
+/* ---------- 總覽看板：每個儀表板一張卡（依類別分欄），卡片顯示主要數字與圖表狀態 ---------- */
+S.ovCache = {};
+function renderOverview() {
+  var box = $('charts'); box.innerHTML = ''; $('dashKpis').innerHTML = '';
+  $('dashStatus').textContent = '點選卡片進入該儀表板；數字依各儀表板預設期間（全部年度）計算，並經相同權限與隱私檢查';
+  setChips([chip('clock', '全部年度'), chip('lock', '與各儀表板相同的權限與隱私檢查')]);
+  var cr = $('dashCrumb'); cr.textContent = '總覽';
+  var list = (S.catalog.dashboards || []), caps = (S.user && S.user.capabilities) || {};
+  var cols = [['p', '個人成績', list.filter(function (d) { return d.personal; })], ['', '群體分析', list.filter(function (d) { return !d.personal; })], ['m', '教學評量指標', []]];
+  if (caps.can_read_trainee_aggregate) cols[2][2].push({ id: 'metrics:TRAINEE', name: '指標：學員', metrics: true });
+  if (caps.can_read_student_aggregate) cols[2][2].push({ id: 'metrics:STUDENT', name: '指標：學生', metrics: true });
+  var board = document.createElement('div'); board.className = 'board';
+  var queue = [];
+  cols.forEach(function (c) {
+    if (!c[2].length) return;
+    var col = document.createElement('section'); col.className = 'board-col ' + c[0];
+    var h = document.createElement('h3'); var i = document.createElement('i'); i.setAttribute('aria-hidden', 'true'); h.appendChild(i); h.appendChild(document.createTextNode(c[1]));
+    var em = document.createElement('em'); em.textContent = c[2].length; h.appendChild(em); col.appendChild(h);
+    c[2].forEach(function (d) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'bcard';
+      var t = document.createElement('b'); t.textContent = d.name; b.appendChild(t);
+      var body = document.createElement('div'); b.appendChild(body);
+      b.addEventListener('click', function () { openDashboard(d.id); window.scrollTo(0, 0); });
+      col.appendChild(b);
+      if (d.metrics) { body.innerHTML = '<span class="ld">分子／分母指標，進入後選年度</span>'; return; }
+      queue.push({ id: d.id, body: body });
+    });
+    board.appendChild(col);
+  });
+  if (!board.children.length) { box.innerHTML = '<div class="panel state">' + EMPTY_TEXT.NO_PERMISSION + '</div>'; return; }
+  box.appendChild(board);
+  var gen = ++S.dashReq;
+  var next = function () {
+    var q = queue.shift(); if (!q || gen !== S.dashReq) return;
+    var hit = S.ovCache[q.id];
+    var p = hit ? Promise.resolve(hit) : api('dashboard', { id: q.id, year: '', month: '', filters: {}, subject: '' }).then(function (j) { S.ovCache[q.id] = j.data; return j.data; });
+    q.body.innerHTML = '<span class="ld">計算中…</span>';
+    p.then(function (d) { if (gen === S.dashReq) fillBoardCard(q.body, d); }, function (e) { if (gen === S.dashReq) q.body.innerHTML = '<span class="ld">' + esc(e.code === 'NO_PERMISSION' ? EMPTY_TEXT.NO_PERMISSION : '載入失敗：' + e.message) + '</span>'; })
+      .then(next);
+  };
+  next(); next();
+}
+function fillBoardCard(body, d) {
+  body.innerHTML = '';
+  var nums = document.createElement('div'); nums.className = 'nums';
+  var add = function (label, v) { var sp = document.createElement('span'); var st = document.createElement('strong'); st.textContent = v; sp.appendChild(st); sp.appendChild(document.createTextNode(label)); nums.appendChild(sp); };
+  var cnt = { OK: 0, SUPP: 0, OTHER: 0 };
+  d.charts.forEach(function (c) { if (c.status === 'OK') cnt.OK++; else if (c.status === 'SUPPRESSED_PRIVACY') cnt.SUPP++; else cnt.OTHER++; });
+  d.charts.filter(function (c) { return c.type === '數字卡' && c.status === 'OK'; }).slice(0, 2).forEach(function (c) {
+    try {
+      var A = aggregateChart(c), tot = null;
+      A.groups.forEach(function (g) { c.series.forEach(function (s, si) { var a = A.get(g, si); if (a) tot = a.supp ? { supp: true } : combine(tot, [0, 0, 0, 0, a.n, a.sum, a.cnt, a.min, a.max, a.text, a.ne, '']); }); });
+      add(c.title.replace(/（[^）]*）/g, ''), fmt(aggValue(c.agg, tot), c.agg));
+    } catch (e) { /* 略過 */ }
+  });
+  var maxN = null; d.charts.forEach(function (c) { var n = c.meta && c.meta.assessment_n; if (typeof n === 'number' && (maxN === null || n > maxN)) maxN = n; });
+  if (maxN !== null) add('紀錄筆數', maxN.toLocaleString('zh-TW'));
+  add('圖表可顯示', cnt.OK + '／' + d.charts.length);
+  body.appendChild(nums);
+  var ts = trendSeries(d); if (ts) body.appendChild(sparkline(ts));
+  var chips = document.createElement('div'); chips.className = 'chips';
+  d.charts.slice(0, 6).forEach(function (c) { var sp = document.createElement('span'); sp.textContent = c.title.replace(/（[^）]*）/g, ''); chips.appendChild(sp); });
+  if (d.charts.length > 6) { var more = document.createElement('span'); more.textContent = '＋' + (d.charts.length - 6); chips.appendChild(more); }
+  body.appendChild(chips);
+  var bar = document.createElement('div'); bar.className = 'bar3'; bar.title = '可顯示 ' + cnt.OK + '｜樣本數不足 ' + cnt.SUPP + '｜無資料或待設定 ' + cnt.OTHER;
+  [[cnt.OK, 'var(--teal)'], [cnt.SUPP, 'var(--rule)'], [cnt.OTHER, 'var(--warn)']].forEach(function (x) { if (!x[0]) return; var i = document.createElement('i'); i.style.flex = String(x[0]); i.style.background = x[1]; bar.appendChild(i); });
+  body.appendChild(bar);
 }
 
 function metaLine(c) {
   var m = c.meta || {}, parts = [];
   if (c.scope === '群體') {
-    parts.push('母體：' + (c.population || ''));
+    if (c.population) parts.push('母體：' + c.population);
     if (m.unique_subject_n !== null && m.unique_subject_n !== undefined) parts.push('不同受評者 ' + m.unique_subject_n + ' 人');
     if (m.assessment_n) parts.push('紀錄 ' + m.assessment_n + ' 筆');
     if (m.unique_assessor_n) parts.push('評核者 ' + m.unique_assessor_n + ' 人');
@@ -1612,6 +1903,7 @@ function metaLine(c) {
 function chartCard(c) {
   var card = document.createElement('section'); card.className = 'chart';
   if (c.type === '看板' || c.type === '對照表' || c.type === '趨勢圖') card.classList.add('wide');
+  if (c.status !== 'OK' && !card.classList.contains('wide')) card.classList.add('third');
   if (c.type === '數字卡') card.classList.add('kpi-card');
   var head = document.createElement('div'); head.className = 'chart-head';
   var h = document.createElement('h3'); h.textContent = c.title.replace(/（選擇[^）]*）/, ''); head.appendChild(h);
@@ -1629,6 +1921,16 @@ function chartCard(c) {
     tbtn = document.createElement('button'); tbtn.type = 'button'; tbtn.className = 'linkbtn'; tbtn.textContent = '表格檢視';
     head.appendChild(tbtn);
   }
+  var tools = document.createElement('div'); tools.className = 'chart-tools';
+  var fb = document.createElement('button'); fb.type = 'button'; fb.className = 'iconbtn'; fb.setAttribute('aria-label', '放大檢視「' + h.textContent + '」'); fb.setAttribute('aria-pressed', 'false'); fb.dataset.focus = '1';
+  fb.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>';
+  fb.addEventListener('click', function () {
+    if (card.classList.contains('focused')) { unfocusChart(); return; }
+    unfocusChart();
+    var sc = document.createElement('div'); sc.className = 'focus-scrim'; sc.addEventListener('click', unfocusChart); document.body.appendChild(sc);
+    card.classList.add('focused'); fb.setAttribute('aria-pressed', 'true'); document.body.style.overflow = 'hidden';
+  });
+  tools.appendChild(fb); head.appendChild(tools);
   card.appendChild(head);
   var desc = String(c.desc || '').replace(/用標題旁的選單[^；;]*[；;]?/g, '').trim();
   if (desc) { var ds = document.createElement('p'); ds.className = 'desc'; ds.textContent = desc; card.appendChild(ds); }
@@ -1925,8 +2227,9 @@ function loadMetrics(pop, first) {
   $('dashStatus').textContent = '計算中…';
   api('metrics', { population: pop, year: $('yearSel').value }).then(function (j) {
     if (req !== S.dashReq) return;
-    var box = $('charts'); box.innerHTML = '';
+    var box = $('charts'); box.innerHTML = ''; $('dashKpis').innerHTML = '';
     $('dashStatus').textContent = '每項指標都列出分子、分母與期間；人數不足者不顯示數值';
+    setChips([chip('lock', '每項指標列出分子、分母與期間；人數不足不顯示數值')]);
     var g = document.createElement('div'); g.className = 'metrics';
     j.data.metrics.forEach(function (m) {
       var c = document.createElement('section'); c.className = 'metric';
@@ -1961,7 +2264,7 @@ function loadImprovement() {
   }).catch(function (e) { $('impStatus').textContent = e.code === 'NO_PERMISSION' ? EMPTY_TEXT.NO_PERMISSION : e.message; });
 }
 var rsTimer = null;
-window.addEventListener('resize', function () { clearTimeout(rsTimer); rsTimer = setTimeout(function () { if (!$('dashPanel').hidden && S.dash && !/^metrics:/.test(S.dashId || '')) renderDashboard(); }, 250); });
+window.addEventListener('resize', function () { clearTimeout(rsTimer); rsTimer = setTimeout(function () { if (!$('dashPanel').hidden && S.dash && S.dashId !== OVERVIEW_ID && !/^metrics:/.test(S.dashId || '') && !document.querySelector('.chart.focused')) renderDashboard(); }, 250); });
 
 /* 測試用介面（不含任何資料或憑證） */
 window.__taoe = { sanitizeHtml: sanitizeHtml, renderCell: renderCell, plainText: plainText, hasHtml: hasHtml, isFullDoc: isFullDoc,
