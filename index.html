@@ -329,6 +329,10 @@ table.grid td{max-width:320px}
 .mtx thead th{position:sticky;top:0;background:var(--wash);z-index:1;white-space:normal;min-width:64px;font-weight:600;color:var(--teal-deep);font-size:.78rem;line-height:1.3}
 .mtx tbody th{text-align:left;background:var(--wash-2);position:sticky;left:0;font-weight:600;white-space:normal;min-width:120px;z-index:1}
 .mtx td{background:var(--wash-2);font-variant-numeric:tabular-nums}
+.mtx td.empty{background:transparent;color:var(--ink-3);box-shadow:inset 0 0 0 1px var(--rule);outline:1px dashed var(--rule);outline-offset:-4px}
+.mtx-scale{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-size:.74rem;color:var(--ink-2)}
+.mtx-scale i{display:block;width:140px;height:8px;border-radius:4px}
+.mtx-scale em{font-style:normal;color:var(--ink-3);margin-left:8px}
 .mtx td .delta{display:block;font-size:.7rem;line-height:1.2;opacity:.9}
 .mtx-sum{margin:0 0 10px;padding:10px 12px;border-radius:var(--r-md);background:var(--wash);color:var(--teal-deep);font-weight:600;font-size:.92rem}
 .self-tone .mtx-sum{background:var(--peach-wash);color:var(--peach)}
@@ -590,7 +594,7 @@ table.grid td{max-width:320px}
  * 只需修改下面一行：貼上 Apps Script 部署後的「網頁應用程式網址」。
  * ===================================================================== */
 var CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbzZGrcm6SWcJ5v4BbcC6kvl3FwM8EKAE1aD5gxY4NBEANwfaExjVSAK-QWkrey1LPh_2Q/exec'
+  API_URL: 'https://script.google.com/macros/s/AKfycbzpbpHDFNjPi3vE4WZvOIMGOX-wmYVmdcie_YzixO3uFihwyeQPgyPg3c4GAErZsPCRGA/exec'
 };
 /* ===================================================================== */
 
@@ -2125,9 +2129,58 @@ function shortHead(label) {
   var m = /^(\d+\.|[A-Z]+\d*\s*[:：]|Level \d\w?|\d{3}年\([上下]\))/.exec(label);
   return m ? m[1].replace(/\s*[:：]$/, '') : (label.length > 8 ? label.slice(0, 6) + '…' : label);
 }
+/* ---------- 序位量表（ordinal）：後端以「第幾級」(1..n) 傳值，前端必須換回等級標籤，色階固定為量表全距 ----------
+ * 等級順序依控制台「評量工具」L 欄（EPA-PHARM：1,2a,2b,3a,3b,3c,4,5；MILESTONE-PHARM：1,2,3,4,5）。
+ * 後端若提供 c.levels（新版）則優先使用；否則依評量工具代碼查表。 */
+var ORD_LEVELS = { 'EPA-PHARM': ['1', '2a', '2b', '3a', '3b', '3c', '4', '5'], 'MILESTONE-PHARM': ['1', '2', '3', '4', '5'] };
+function ordLevels(c) {
+  if (c.levels && c.levels.length) return c.levels;
+  var id = String(c.instrument || '').replace(/（.*$/, '').trim();
+  return ORD_LEVELS[id] || null;
+}
+function ordLabel(levels, v) {
+  if (typeof v !== 'number' || !isFinite(v)) return '—';
+  var lo = Math.floor(v + 1e-9), hi = Math.ceil(v - 1e-9);
+  var L = function (i) { return levels[Math.max(1, Math.min(levels.length, i)) - 1]; };
+  return lo === hi ? 'L' + L(lo) : 'L' + L(lo) + '–' + L(hi);
+}
+/** 連續單色階（淺→深）；k∈[0,1]。缺值不上色（另以虛線框表示），0 仍有可辨識的淺色 */
+var SEQ_STOPS = [[234, 245, 247], [180, 220, 226], [110, 182, 194], [47, 132, 147], [10, 63, 75]];
+function seqColor(k) {
+  k = Math.max(0, Math.min(1, k)); var x = k * (SEQ_STOPS.length - 1), i = Math.min(SEQ_STOPS.length - 2, Math.floor(x)), t = x - i;
+  var a = SEQ_STOPS[i], b = SEQ_STOPS[i + 1];
+  return 'rgb(' + [0, 1, 2].map(function (j) { return Math.round(a[j] + (b[j] - a[j]) * t); }).join(',') + ')';
+}
+function seqInk(k) { return k >= 0.55 ? '#fff' : 'var(--ink)'; }
+function matrixScale(c, all, levels) {
+  if (levels) return { lo: 1, hi: levels.length, kind: 'ord' };
+  var lo = Math.min.apply(null, all.length ? all : [0]), hi = Math.max.apply(null, all.length ? all : [1]);
+  var pct = /達成率|完成率|百分比|%/.test(c.series.join('') + (c.desc || '') + c.title);
+  if (pct && lo >= 0 && hi <= 100) return { lo: 0, hi: 100, kind: 'pct' };
+  if (hi <= 5 && lo >= 0) return { lo: 1, hi: 5, kind: 'likert' };
+  if (hi <= 10 && lo >= 0) return { lo: 0, hi: 10, kind: 'num' };
+  return { lo: lo, hi: hi > lo ? hi : lo + 1, kind: 'num' };
+}
+function scaleKey(sc, levels) {
+  var k = document.createElement('div'); k.className = 'mtx-scale';
+  var a = document.createElement('span'), b = document.createElement('span'), bar = document.createElement('i');
+  bar.style.background = 'linear-gradient(90deg,' + [0, .25, .5, .75, 1].map(seqColor).join(',') + ')';
+  a.textContent = levels ? 'L' + levels[0] : (sc.kind === 'pct' ? '0%' : fmt(sc.lo, '平均'));
+  b.textContent = levels ? 'L' + levels[levels.length - 1] : (sc.kind === 'pct' ? '100%' : fmt(sc.hi, '平均'));
+  var m = document.createElement('em'); m.textContent = '虛線框＝無評值';
+  k.appendChild(a); k.appendChild(bar); k.appendChild(b); k.appendChild(m);
+  return k;
+}
+function stripPeriod(g, c) {
+  var f = c.filterLabel && S.filt ? S.filt[c.filterLabel] : '';
+  if (!f) return g;
+  var esc2 = f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return g.replace(new RegExp('[\\s.．_\\-－]*' + esc2 + '$'), '') || g;
+}
 function drawMatrix(c, A) {
   var wrap = document.createElement('div');
   var box = document.createElement('div'); box.className = 'mtx'; wrap.appendChild(box);
+  var levels = ordLevels(c);
   var t = document.createElement('table'), th = document.createElement('thead'), tr = document.createElement('tr');
   var abbreviate = c.series.length > 6 && c.series.some(function (x) { return x.length > 10; });
   var c0 = document.createElement('th'); c0.textContent = !c.groupLabel || c.groupLabel.length > 10 ? '項目' : c.groupLabel; c0.title = c.groupLabel || ''; tr.appendChild(c0);
@@ -2137,35 +2190,33 @@ function drawMatrix(c, A) {
   function mval(a) { if (!a) return null; if (a.supp) return 'S'; if (magg === '計數（有填）') return a.ne; return a.cnt > 0 ? aggValue(magg, a) : null; }
   var all = [];
   A.groups.forEach(function (g) { c.series.forEach(function (s, si) { var v = mval(A.get(g, si)); if (typeof v === 'number') all.push(v); }); });
-  var lo = Math.min.apply(null, all.length ? all : [0]), hi = Math.max.apply(null, all.length ? all : [1]);
-  var pct = /達成率|%/.test(c.series.join('') + (c.desc || ''));
-  if (magg !== '計數（有填）') {
-    if (hi <= 5 && lo >= 0) { lo = 1; hi = 5; }
-    else if (pct && hi <= 100 && lo >= 0) { lo = 0; hi = 100; }
-    else if (hi <= 100 && lo >= 0 && all.slice().sort(function (a, b) { return a - b; })[Math.floor(all.length / 2)] >= 60) { lo = 60; hi = 100; }
-  }
+  var sc = matrixScale(c, all, levels);
   var personal = c.scope === '個人';
   var tb = document.createElement('tbody'), prev = null, prevLabel = '', summary = null;
-  var rowsG = A.groups.slice().sort(natCmp).filter(function (g) { return c.series.some(function (s, si) { var a = A.get(g, si); return mval(a) !== null || (a && a.text); }); });
+  // 個人圖表的列＝期程，依自然順序；群體圖表保留來源順序（如 PC1→PC6→PK→SBP→ICS→PROF→CPD 的能力架構順序）
+  var order = personal ? A.groups.slice().sort(natCmp) : A.groups.slice();
+  var rowsG = order.filter(function (g) { return c.series.some(function (s, si) { var a = A.get(g, si); return mval(a) !== null || (a && a.text); }); });
+  var show = function (v) { return levels ? ordLabel(levels, v) : (sc.kind === 'pct' ? fmt(v, magg) + '%' : fmt(v, magg)); };
   rowsG.forEach(function (g, gi) {
-    var r = document.createElement('tr'); var h = document.createElement('th'); h.scope = 'row'; h.textContent = g; h.title = g; r.appendChild(h);
+    var r = document.createElement('tr'); var h = document.createElement('th'); h.scope = 'row'; h.textContent = stripPeriod(g, c); h.title = g; r.appendChild(h);
     var cur = [];
     c.series.forEach(function (s, si) {
       var a = A.get(g, si), td = document.createElement('td');
       var v = mval(a); cur.push(typeof v === 'number' ? v : null);
       if (v === 'S') { td.textContent = '樣本不足'; td.className = 'supp'; }
       else if (v !== null) {
-        td.textContent = fmt(v, magg);
-        var k = hi > lo ? (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo) : .5;
-        var step = Math.min(4, Math.floor(k * 5));
-        td.style.background = 'var(--q' + (step + 1) + ')'; if (step >= 3) td.style.color = '#fff';
+        var k = (Math.max(sc.lo, Math.min(sc.hi, v)) - sc.lo) / (sc.hi - sc.lo);
+        td.style.background = seqColor(k); td.style.color = seqInk(k);
+        td.textContent = show(v);
         if (personal && prev && prev[si] !== null && prev[si] !== undefined && v !== prev[si]) {
           var dlt = document.createElement('small'); dlt.className = 'delta'; var up = v > prev[si];
-          dlt.textContent = (up ? '▲' : '▼') + fmt(Math.abs(v - prev[si]), magg); dlt.title = '與上一期相比';
+          var diff = Math.abs(v - prev[si]);
+          dlt.textContent = (up ? '▲' : '▼') + (levels ? fmt(diff, '平均') + ' 級' : fmt(diff, magg)); dlt.title = '與上一期相比';
           td.appendChild(dlt);
         }
-      } else td.textContent = a && a.text ? a.text : '—';
-      td.title = g + '｜' + s + '：' + td.textContent;
+      } else if (a && a.text) { td.textContent = a.text; }
+      else { td.textContent = '—'; td.className = 'empty'; }
+      td.title = g + '｜' + s + '：' + (v !== null && typeof v === 'number' ? show(v) : td.textContent);
       r.appendChild(td);
     });
     if (personal && gi === rowsG.length - 1) {
@@ -2179,6 +2230,7 @@ function drawMatrix(c, A) {
   if (!rowsG.length) { box.innerHTML = '<div class="state">' + EMPTY_TEXT.NO_DATA + '</div>'; return wrap; }
   t.appendChild(tb); box.appendChild(t);
   if (summary) { var sm = document.createElement('p'); sm.className = 'mtx-sum'; sm.textContent = summary; wrap.insertBefore(sm, box); }
+  if (all.length) wrap.appendChild(scaleKey(sc, levels));
   if (abbreviate) {
     var lg = document.createElement('ol'); lg.className = 'mtx-key';
     c.series.forEach(function (s) {
@@ -2191,12 +2243,12 @@ function drawMatrix(c, A) {
   }
   return wrap;
 }
-
 function drawDataTable(c, A) {
   var wrap = document.createElement('div'); wrap.className = 'datatable';
   var t = document.createElement('table');
   var h = '<thead><tr><th>' + esc(c.groupLabel || '項目') + '</th>' + c.series.map(function (s) { return '<th>' + esc(s) + '（' + esc(c.agg) + '）</th>'; }).join('') + '</tr></thead><tbody>';
-  A.groups.forEach(function (g) { h += '<tr><th>' + esc(g) + '</th>' + c.series.map(function (s, si) { var a = A.get(g, si); return '<td>' + esc(a && !a.supp && !a.cnt && a.text && c.agg !== '筆數' ? a.text : fmt(aggValue(c.agg, a), c.agg)) + '</td>'; }).join('') + '</tr>'; });
+  var lv = ordLevels(c);
+  A.groups.forEach(function (g) { h += '<tr><th>' + esc(g) + '</th>' + c.series.map(function (s, si) { var a = A.get(g, si), v = aggValue(c.agg, a); return '<td>' + esc(a && !a.supp && !a.cnt && a.text && c.agg !== '筆數' ? a.text : (lv && typeof v === 'number' ? ordLabel(lv, v) : fmt(v, c.agg))) + '</td>'; }).join('') + '</tr>'; });
   t.innerHTML = h + '</tbody>'; wrap.appendChild(t);
   return wrap;
 }
