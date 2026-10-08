@@ -344,6 +344,10 @@ table.grid td{max-width:320px}
 .kcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r-sm);padding:8px 10px;margin-bottom:6px;font-size:.85rem}
 .kcard div{word-break:break-word}
 .kcard span{color:var(--ink-3)}
+.kcard .kline{padding:4px 0 4px 12px;position:relative;border-bottom:1px solid var(--rule-2)}
+.kcard .kline:last-child{border-bottom:0}
+.kcard .kline::before{content:"";position:absolute;left:0;top:12px;width:5px;height:5px;border-radius:50%;background:var(--teal)}
+.kcol{flex-basis:min(92vw,420px)}
 .datatable{overflow:auto;margin-top:4px}
 .datatable table{border-collapse:collapse;font-size:.84rem;min-width:100%}
 .datatable th,.datatable td{border-bottom:1px solid var(--rule-2);padding:6px 8px;text-align:left;font-variant-numeric:tabular-nums}
@@ -594,7 +598,7 @@ table.grid td{max-width:320px}
  * 只需修改下面一行：貼上 Apps Script 部署後的「網頁應用程式網址」。
  * ===================================================================== */
 var CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbzpbpHDFNjPi3vE4WZvOIMGOX-wmYVmdcie_YzixO3uFihwyeQPgyPg3c4GAErZsPCRGA/exec'
+  API_URL: 'https://script.google.com/macros/s/AKfycbxPPE-LAXmbEcsVTt5E5yJOS0VzBZgUEhcS9-wVijqE3ucL85-6NeGJUquv_RwTktAI6w/exec'
 };
 /* ===================================================================== */
 
@@ -2177,6 +2181,15 @@ function stripPeriod(g, c) {
   var esc2 = f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return g.replace(new RegExp('[\\s.．_\\-－]*' + esc2 + '$'), '') || g;
 }
+/** 數學粗體字母（𝗔）與 ⧾⧿ 正規化成一般 A、+、-，避免手機缺字顯示方框 */
+function normGlyph(t) { return String(t || '').normalize('NFKC').replace(/⧾/g, '+').replace(/⧿/g, '-').trim(); }
+/** 等第文字（A++、A+、A、B+…E）→ 0～1，用於上色；非等第回傳 null */
+function gradeK(t) {
+  var m = /^([A-E])([+\-]*)$/.exec(normGlyph(t)); if (!m) return null;
+  var base = { A: 4, B: 3, C: 2, D: 1, E: 0 }[m[1]], adj = 0;
+  m[2].split('').forEach(function (ch) { adj += ch === '+' ? 0.33 : -0.33; });
+  return Math.max(0, Math.min(1, (base + adj) / 5));
+}
 function drawMatrix(c, A) {
   var wrap = document.createElement('div');
   var box = document.createElement('div'); box.className = 'mtx'; wrap.appendChild(box);
@@ -2198,10 +2211,11 @@ function drawMatrix(c, A) {
   var rowsG = order.filter(function (g) { return c.series.some(function (s, si) { var a = A.get(g, si); return mval(a) !== null || (a && a.text); }); });
   var show = function (v) { return levels ? ordLabel(levels, v) : (sc.kind === 'pct' ? fmt(v, magg) + '%' : fmt(v, magg)); };
   rowsG.forEach(function (g, gi) {
-    var r = document.createElement('tr'); var h = document.createElement('th'); h.scope = 'row'; h.textContent = stripPeriod(g, c); h.title = g; r.appendChild(h);
-    var cur = [];
+    var r = document.createElement('tr'); var h = document.createElement('th'); h.scope = 'row'; h.textContent = normGlyph(stripPeriod(g, c)); h.title = g; r.appendChild(h);
+    var cur = [], filledN = 0;
     c.series.forEach(function (s, si) {
       var a = A.get(g, si), td = document.createElement('td');
+      if (typeof mval(a) === 'number' || (a && a.text)) filledN++;
       var v = mval(a); cur.push(typeof v === 'number' ? v : null);
       if (v === 'S') { td.textContent = '樣本不足'; td.className = 'supp'; }
       else if (v !== null) {
@@ -2214,13 +2228,17 @@ function drawMatrix(c, A) {
           dlt.textContent = (up ? '▲' : '▼') + (levels ? fmt(diff, '平均') + ' 級' : fmt(diff, magg)); dlt.title = '與上一期相比';
           td.appendChild(dlt);
         }
-      } else if (a && a.text) { td.textContent = a.text; }
+      } else if (a && a.text) {
+        var tx = normGlyph(a.text), gk = gradeK(tx);
+        td.textContent = tx;
+        if (gk !== null) { td.style.background = seqColor(gk); td.style.color = seqInk(gk); td.classList.add('grade'); }
+      }
       else { td.textContent = '—'; td.className = 'empty'; }
       td.title = g + '｜' + s + '：' + (v !== null && typeof v === 'number' ? show(v) : td.textContent);
       r.appendChild(td);
     });
-    if (personal && gi === rowsG.length - 1) {
-      var filled = cur.filter(function (v) { return v !== null; }).length, ups = [];
+    if (personal && gi === rowsG.length - 1 && (rowsG.length > 1 || cur.some(function (v) { return v !== null; }))) {
+      var filled = filledN, ups = [];
       if (prev) cur.forEach(function (v, si) { if (v !== null && prev[si] !== null && prev[si] !== undefined && v > prev[si]) ups.push(shortHead(c.series[si])); });
       summary = g + '：' + c.series.length + ' 項中 ' + filled + ' 項已有評值' + (prev ? (ups.length ? '；比 ' + prevLabel + ' 進步 ' + ups.length + ' 項（' + ups.slice(0, 6).join('、') + (ups.length > 6 ? '…' : '') + '）' : '；與 ' + prevLabel + ' 相比沒有提升') : '');
     }
@@ -2258,12 +2276,20 @@ function drawKanban(c) {
   var cols = {}, order = [];
   (c.cards || []).forEach(function (k) { if (!cols[k.g]) { cols[k.g] = []; order.push(k.g); } cols[k.g].push(k); });
   if (!order.length) { wrap.innerHTML = '<div class="state">' + EMPTY_TEXT.NO_DATA + '</div>'; return wrap; }
+  // 欄名只差結尾序號（如「具體內容-1…-30」）時不逐行重複欄名，改為條列
+  var fl = c.fieldLabels || [], stem = function (x) { return String(x || '').replace(/[-－_]?\s*\d+$/, ''); };
+  var sameStem = fl.length > 1 && fl.every(function (x) { return stem(x) === stem(fl[0]); });
   order.forEach(function (g) {
     var col = document.createElement('div'); col.className = 'kcol';
     var h = document.createElement('h4'); h.textContent = g; var n = document.createElement('span'); n.textContent = cols[g].length; h.appendChild(n); col.appendChild(h);
     cols[g].forEach(function (k) {
       var cd = document.createElement('div'); cd.className = 'kcard';
-      (k.v || []).forEach(function (v, i) { if (!v) return; var d = document.createElement('div'); if (i > 0) { var lb = document.createElement('span'); lb.textContent = (c.fieldLabels || [])[i] + '：'; d.appendChild(lb); } d.appendChild(document.createTextNode(v)); if (i === 0) d.style.fontWeight = '700'; cd.appendChild(d); });
+      (k.v || []).forEach(function (v, i) {
+        if (!v) return; var d = document.createElement('div');
+        if (sameStem) { d.className = 'kline'; }
+        else { if (i > 0) { var lb = document.createElement('span'); lb.textContent = (c.fieldLabels || [])[i] + '：'; d.appendChild(lb); } if (i === 0) d.style.fontWeight = '700'; }
+        d.appendChild(document.createTextNode(normGlyph(v))); cd.appendChild(d);
+      });
       col.appendChild(cd);
     });
     wrap.appendChild(col);
