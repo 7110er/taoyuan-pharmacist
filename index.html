@@ -96,7 +96,7 @@ button,input,select{font:inherit;color:inherit}
 @media(max-width:560px){.who{display:none}}
 
 .shell{max-width:1360px;margin:0 auto}
-main{padding:0 16px calc(var(--nav-h) + 32px + env(safe-area-inset-bottom))}
+main{min-width:0;padding:0 16px calc(var(--nav-h) + 32px + env(safe-area-inset-bottom))}
 
 /* 導覽：手機底部；桌機左側 */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:35;height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);
@@ -106,7 +106,7 @@ main{padding:0 16px calc(var(--nav-h) + 32px + env(safe-area-inset-bottom))}
 .tab[aria-selected="true"]{color:var(--teal)}
 .tab[aria-selected="true"]::before{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 3px 3px;background:var(--teal)}
 @media(min-width:900px){
-  .shell{display:grid;grid-template-columns:200px 1fr;gap:0}
+  .shell{display:grid;grid-template-columns:200px minmax(0,1fr);gap:0}
   .nav{position:sticky;top:calc(var(--top-h) + 1px);height:calc(100vh - var(--top-h) - 1px);flex-direction:column;justify-content:flex-start;gap:4px;
     border-top:0;border-right:1px solid var(--rule);background:transparent;padding:20px 12px}
   .tab{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:10px;padding:10px 12px;border-radius:var(--r-md);font-size:.95rem}
@@ -241,7 +241,7 @@ table.grid td{max-width:320px}
 .field:last-child{border-bottom:0}
 .field dt{font-size:.78rem;color:var(--ink-3)}
 .field dd{margin:0;word-break:break-word;line-height:1.7}
-@media(min-width:900px){.field{grid-template-columns:200px 1fr;gap:20px}.field dt{padding-top:3px}}
+@media(min-width:900px){.field{grid-template-columns:200px minmax(0,1fr);gap:20px}.field dt{padding-top:3px}}
 .cell-text{white-space:pre-wrap}
 .cell-html{overflow-x:auto}
 .cell-html table{border-collapse:collapse;margin:4px 0}
@@ -602,7 +602,35 @@ var CONFIG = {
 };
 /* ===================================================================== */
 
-var APP_VERSION = '2.1.0';
+/* ---------- 錯誤可視化（v2.1.1）：任何未處理錯誤改為畫面提示，不再留白 ---------- */
+(function () {
+  function showFatal(msg) {
+    try {
+      var box = document.getElementById('fatalBox');
+      if (!box) {
+        box = document.createElement('div'); box.id = 'fatalBox'; box.setAttribute('role', 'alert');
+        box.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:9999;background:#FBE9E7;color:#A3261D;border:1px solid #A3261D;border-radius:10px;padding:12px 14px;font:14px/1.5 system-ui,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.15)';
+        (document.body || document.documentElement).appendChild(box);
+      }
+      box.textContent = '畫面發生錯誤，請截圖此訊息給系統管理者：' + msg + '（v' + (window.APP_VERSION || '') + '，' + (navigator.userAgent || '').slice(0, 120) + '）';
+    } catch (e) { /* 忽略 */ }
+  }
+  window.addEventListener('error', function (ev) { if (ev && ev.message && !/^Script error|ResizeObserver/.test(ev.message)) showFatal(ev.message + (ev.lineno ? ' @' + ev.lineno : '')); });
+  window.addEventListener('unhandledrejection', function (ev) { var r = ev && ev.reason; showFatal((r && (r.message || r.code)) || String(r)); });
+})();
+/* ---------- App 內建瀏覽器處理（v2.1.1）----------
+ * LINE／Facebook／Instagram 等 App 內建瀏覽器不允許 Google 登入（登入後空白）。
+ * LINE：自動加 openExternalBrowser=1，由 LINE 改用手機預設瀏覽器開啟。
+ * 其他 App：登入頁顯示改用 Safari／Chrome 的說明。 */
+var IN_APP = (function () {
+  var ua = navigator.userAgent || '';
+  if (/\bLine\//i.test(ua) && !/[?&]openExternalBrowser=1/.test(location.search)) {
+    location.replace(location.origin + location.pathname + (location.search ? location.search + '&' : '?') + 'openExternalBrowser=1' + location.hash);
+  }
+  return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
+})();
+var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
+var APP_VERSION = '2.1.1';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -708,7 +736,8 @@ function boot() {
     document.title = S.siteName; $('loginTitle').textContent = S.siteName; $('brand').textContent = S.siteName;
     if (S.session) { startApp(); return; }
     if (!clientId) { showLogin('系統尚未設定 Google 登入（控制台「系統設定」）。', 'err'); return; }
-    showLogin(); initGsi();
+    if (IN_APP) showLogin(IN_APP_MSG, 'err'); else showLogin();
+    initGsi();
   }).catch(function (e) { showLogin(e.message, 'err'); });
 }
 
