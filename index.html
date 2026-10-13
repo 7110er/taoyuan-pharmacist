@@ -687,7 +687,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.2.1';
+var APP_VERSION = '2.2.2';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -2394,15 +2394,18 @@ function drawMatrix(c, A) {
   th.appendChild(tr); t.appendChild(th);
   var magg = c.agg === '筆數' ? '平均' : c.agg;
   function mval(a) { if (!a) return null; if (a.supp) return 'S'; if (magg === '計數（有填）') return a.ne; return a.cnt > 0 ? aggValue(magg, a) : null; }
-  var all = [];
-  A.groups.forEach(function (g) { c.series.forEach(function (s, si) { var v = mval(A.get(g, si)); if (typeof v === 'number') all.push(v); }); });
-  var sc = matrixScale(c, all, levels);
+  // 列名標示為人數／筆數／次數者視為計數列：不加 %，另以該類列自身範圍上色（避免「完成人數 12」被顯示成 12%）
+  var isCountRow = function (g) { return !levels && /人數|筆數|次數|人次|件數|[（(]人[)）]/.test(String(g)); };
+  var all = [], allN = [];
+  A.groups.forEach(function (g) { c.series.forEach(function (s, si) { var v = mval(A.get(g, si)); if (typeof v === 'number') (isCountRow(g) ? allN : all).push(v); }); });
+  var sc = matrixScale(c, all.length ? all : allN, levels);
+  var scN = { lo: 0, hi: Math.max.apply(null, allN.length ? allN : [1]) || 1, kind: 'count' };
   var personal = c.scope === '個人';
   var tb = document.createElement('tbody'), prev = null, prevLabel = '', summary = null;
   // 個人圖表的列＝期程，依自然順序；群體圖表保留來源順序（如 PC1→PC6→PK→SBP→ICS→PROF→CPD 的能力架構順序）
   var order = personal ? A.groups.slice().sort(natCmp) : A.groups.slice();
   var rowsG = order.filter(function (g) { return c.series.some(function (s, si) { var a = A.get(g, si); return mval(a) !== null || (a && a.text); }); });
-  var show = function (v) { return levels ? ordLabel(levels, v) : (sc.kind === 'pct' ? fmt(v, magg) + '%' : fmt(v, magg)); };
+  var show = function (v, g) { if (isCountRow(g)) return fmt(v, '筆數') + (/人/.test(String(g)) ? ' 人' : ''); return levels ? ordLabel(levels, v) : (sc.kind === 'pct' ? fmt(v, magg) + '%' : fmt(v, magg)); };
   rowsG.forEach(function (g, gi) {
     var r = document.createElement('tr'); var h = document.createElement('th'); h.scope = 'row'; h.textContent = normGlyph(stripPeriod(g, c)); h.title = g; r.appendChild(h);
     var cur = [], filledN = 0;
@@ -2412,9 +2415,10 @@ function drawMatrix(c, A) {
       var v = mval(a); cur.push(typeof v === 'number' ? v : null);
       if (v === 'S') { td.textContent = '樣本不足'; td.className = 'supp'; }
       else if (v !== null) {
-        var k = (Math.max(sc.lo, Math.min(sc.hi, v)) - sc.lo) / (sc.hi - sc.lo);
+        var scx = isCountRow(g) ? scN : sc;
+        var k = (Math.max(scx.lo, Math.min(scx.hi, v)) - scx.lo) / (scx.hi - scx.lo);
         td.style.background = seqColor(k); td.style.color = seqInk(k);
-        td.textContent = show(v);
+        td.textContent = show(v, g);
         if (personal && prev && prev[si] !== null && prev[si] !== undefined && v !== prev[si]) {
           var dlt = document.createElement('small'); dlt.className = 'delta'; var up = v > prev[si];
           var diff = Math.abs(v - prev[si]);
@@ -2427,7 +2431,7 @@ function drawMatrix(c, A) {
         if (gk !== null) { td.style.background = seqColor(gk); td.style.color = seqInk(gk); td.classList.add('grade'); }
       }
       else { td.textContent = '—'; td.className = 'empty'; }
-      td.title = g + '｜' + s + '：' + (v !== null && typeof v === 'number' ? show(v) : td.textContent);
+      td.title = g + '｜' + s + '：' + (v !== null && typeof v === 'number' ? show(v, g) : td.textContent);
       r.appendChild(td);
     });
     if (personal && gi === rowsG.length - 1 && (rowsG.length > 1 || cur.some(function (v) { return v !== null; }))) {
@@ -2441,7 +2445,7 @@ function drawMatrix(c, A) {
   if (!rowsG.length) { box.innerHTML = '<div class="state">' + EMPTY_TEXT.NO_DATA + '</div>'; return wrap; }
   t.appendChild(tb); box.appendChild(t);
   if (summary) { var sm = document.createElement('p'); sm.className = 'mtx-sum'; sm.textContent = summary; wrap.insertBefore(sm, box); }
-  if (all.length) wrap.appendChild(scaleKey(sc, levels));
+  if (all.length) { var skx = scaleKey(sc, levels); if (allN.length) { var nn = document.createElement('em'); nn.textContent = '人數列：不是百分比，依 0–' + fmt(scN.hi, '筆數') + ' 上色'; skx.appendChild(nn); } wrap.appendChild(skx); }
   if (abbreviate) {
     var lg = document.createElement('ol'); lg.className = 'mtx-key';
     c.series.forEach(function (s) {
