@@ -334,6 +334,38 @@ table.grid td{max-width:320px}
 .self-tone .mtx-sum{background:var(--peach-wash);color:var(--peach)}
 .mtx-key{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:2px 16px;font-size:.78rem;color:var(--ink-2)}
 .mtx-key b{color:var(--teal-deep);margin-right:2px}
+
+/* CBME 進展矩陣 */
+.charts>.chart,.chart>div,.prog,.mtx-sections,.mtx-sec{min-width:0;max-width:100%}
+.prog-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 10px}
+.prog-lab{font-size:.78rem;color:var(--ink-3)}
+.seg{display:inline-flex;background:var(--wash-2);border:1px solid var(--rule);border-radius:999px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;min-width:40px;min-height:32px;padding:0 10px;border-radius:999px;font:600 .82rem var(--body);color:var(--ink-2);cursor:pointer;font-variant-numeric:tabular-nums}
+.seg button:hover{color:var(--ink);background:var(--sheet)}
+.seg button[aria-checked="true"]{background:var(--teal-deep);color:#fff;box-shadow:0 1px 3px rgba(10,63,75,.25)}
+.prog-hint{font-size:.78rem;color:var(--ink-3);flex:1 1 240px}
+.prog-sum{font-weight:500;font-size:.86rem;font-variant-numeric:tabular-nums}
+.prog .mtx tbody th{min-width:180px;max-width:260px;line-height:1.35}
+.prog .mtx tbody th b{display:inline-block;font:700 .72rem ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--teal-deep);background:var(--sheet);border-radius:4px;padding:1px 5px;margin-right:6px;vertical-align:1px}
+.prog .mtx tbody th span{font-weight:600}
+.prog .mtx td{min-width:76px;padding:6px 6px 4px;vertical-align:middle}
+.prog .mtx td .pv{display:block;font-weight:600}
+.prog .stair{display:block;width:44px;height:14px;margin:3px auto 0;overflow:visible}
+.prog .stair rect{fill:currentColor;opacity:.38}
+.prog .stair rect.on{opacity:1}
+.prog .stair rect.na{opacity:.15}
+.prog .mtx td.dlt{background:transparent;font-weight:700;font-size:.82rem;min-width:56px}
+.prog .mtx td.dlt.up{color:var(--ok)} .prog .mtx td.dlt.down{color:var(--err)} .prog .mtx td.dlt.flat{color:var(--ink-3)}
+.prog .mtx tr.fam th{background:transparent;position:static;font:700 .86rem var(--display);color:var(--ink);padding:12px 4px 4px;letter-spacing:.02em}
+.prog .mtx tr.avg th,.prog .mtx tr.avg td{background:var(--wash);font-weight:700;color:var(--teal-deep);border-top:2px solid var(--rule)}
+.prog .mtx td.supp{font-size:.74rem;color:var(--ink-3)}
+.prog .mtx tbody tr:not(.fam):hover th{background:var(--wash);color:var(--teal-deep)}
+.mtx-sections{display:grid;gap:18px}
+.mtx-sec h4{margin:0 0 8px;font-family:var(--display);font-size:1rem;display:flex;align-items:baseline;gap:8px;color:var(--ink)}
+.mtx-sec .mtx table{table-layout:fixed}
+.mtx-sec .mtx thead th:first-child,.mtx-sec .mtx tbody th{width:34%}
+@media(max-width:560px){.mtx-sec .mtx table{table-layout:auto;min-width:560px}.prog .mtx tbody th{min-width:112px;max-width:132px;font-size:.78rem}.prog .mtx td{min-width:62px}.prog .mtx tbody th b{display:block;width:max-content;margin:0 0 2px}}
+.mtx-sec h4 span{font:500 .74rem var(--body);color:var(--ink-3)}
 .kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
 .kcol{flex:0 0 min(78vw,260px);background:var(--wash-2);border-radius:var(--r-md);padding:8px;max-height:70vh;overflow:auto;scroll-snap-align:start}
 .kcol h4{margin:2px 4px 8px;font-size:.9rem;display:flex;justify-content:space-between}
@@ -687,7 +719,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.2.2';
+var APP_VERSION = '2.3.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -2151,7 +2183,7 @@ function chartCard(c) {
       if (showTable) { body.appendChild(drawDataTable(c, A)); return; }
       if (c.type === '數字卡') body.appendChild(drawKpi(c, A));
       else if (c.type === '趨勢圖') body.appendChild(drawTrend(c));
-      else if (c.type === '對照表') body.appendChild(drawMatrix(c, A));
+      else if (c.type === '對照表') body.appendChild(isProgression(c, A) ? drawProgression(c, A) : drawMatrixSections(c, A));
       else body.appendChild(drawBars(c, A, c.type === '長條圖'));
     } catch (e) { body.innerHTML = '<div class="state err">圖表繪製失敗</div>'; }
   }
@@ -2382,6 +2414,162 @@ function gradeK(t) {
   var base = { A: 4, B: 3, C: 2, D: 1, E: 0 }[m[1]], adj = 0;
   m[2].split('').forEach(function (ch) { adj += ch === '+' ? 0.33 : -0.33; });
   return Math.max(0, Math.min(1, (base + adj) / 5));
+}
+/* ---------- CBME 進展矩陣：列＝里程碑／EPA 項目，欄＝訓練期程，格＝選定 Level 之達成率；格內小階梯＝該期程各 Level 全貌 ----------
+ * 觸發條件：對照表、數值欄全為「Level …」、分組值多數為「項目＋期程（PGY3M…）」。資料一律來自伺服器回傳之群體統計格。 */
+var STAGE_RE = /[\s.．_\-－]*(PGY\s*\d+\s*M|PGY\s*0)\s*$/i;
+var FAMILY = { MS: { name: '臺灣藥師學習里程碑（Milestones）', short: '里程碑' }, EPA: { name: '臺灣藥師可信賴專業活動（EPAs）', short: 'EPA' } };
+function splitItemStage(g) {
+  var s = String(g || ''), m = STAGE_RE.exec(s); if (!m || m.index === 0) return null;
+  return { item: s.slice(0, m.index).trim(), stage: m[1].replace(/\s+/g, '').toUpperCase() };
+}
+function stageMonths(s) { var m = /(\d+)/.exec(s); return m ? +m[1] : 0; }
+function familyOf(item) { var m = /^(MS|EPA)\s*[-－]/i.exec(String(item || '')); return m ? m[1].toUpperCase() : ''; }
+/** 「MS-PC1：適當藥品提供」→ {code:'PC1', name:'適當藥品提供'}；「EPA-1. 門診處方評估」→ {code:'EPA 1', …}；「EPA-藥事基礎作業」→ {code:'', …} */
+function itemParts(item) {
+  var fam = familyOf(item), rest = String(item).replace(/^(MS|EPA)\s*[-－]\s*/i, '').trim();
+  var m = /^([A-Z]+\d*)\s*[:：]\s*(.+)$/.exec(rest) || /^(\d+)\s*[.．、]\s*(.+)$/.exec(rest);
+  if (!m) return { code: '', name: rest, fam: fam };
+  return { code: (fam === 'EPA' && /^\d+$/.test(m[1]) ? 'EPA ' : '') + m[1], name: m[2].trim(), fam: fam };
+}
+function levelShort(s) { var m = /Level\s*(\d\w?)/i.exec(String(s)); return m ? 'L' + m[1] : shortHead(s); }
+function levelDesc(s) { return String(s).replace(/【[^】]*】/g, '').replace(/\s+/g, ' ').trim(); }
+function isProgression(c, A) {
+  if (c.type !== '對照表' || c.series.length < 3 || !c.series.every(function (s) { return /Level\s*\d/i.test(s); })) return false;
+  var ok = A.groups.filter(function (g) { return splitItemStage(g); }).length;
+  return ok >= 2 && ok >= A.groups.length * 0.8;
+}
+function rateOf(a) { if (!a) return null; if (a.supp) return 'S'; return a.cnt > 0 ? a.sum / a.cnt : null; }
+
+function drawProgression(c, A) {
+  var pf = function (v) { return (Math.round(v * 10) / 10).toLocaleString('zh-TW', { maximumFractionDigits: 1 }); };
+  var items = [], stages = [], cell = {};
+  A.groups.forEach(function (g) {
+    var p = splitItemStage(g); if (!p) return;
+    var vals = c.series.map(function (s, si) { return rateOf(A.get(g, si)); });
+    if (!vals.some(function (v) { return v !== null; })) return;
+    if (items.indexOf(p.item) < 0) items.push(p.item);
+    if (stages.indexOf(p.stage) < 0) stages.push(p.stage);
+    cell[p.item + '\u0001' + p.stage] = vals;
+  });
+  stages.sort(function (a, b) { return stageMonths(a) - stageMonths(b); });
+  var wrap = document.createElement('div'); wrap.className = 'prog';
+  if (!items.length) { wrap.innerHTML = '<div class="state">' + EMPTY_TEXT.NO_DATA + '</div>'; return wrap; }
+  var L = c.series.length;
+  // 預設等級：各格差異最大者（最能區辨期程進展）；使用者切換後記在 c._lvl
+  if (c._lvl === undefined || c._lvl >= L) {
+    var best = 0, bestVar = -1;
+    for (var li = 0; li < L; li++) {
+      var xs = []; items.forEach(function (it) { stages.forEach(function (st) { var v = (cell[it + '\u0001' + st] || [])[li]; if (typeof v === 'number') xs.push(v); }); });
+      if (!xs.length) continue;
+      var mu = xs.reduce(function (s, x) { return s + x; }, 0) / xs.length, va = xs.reduce(function (s, x) { return s + (x - mu) * (x - mu); }, 0) / xs.length;
+      if (va >= bestVar) { bestVar = va; best = li; }
+    }
+    c._lvl = best;
+  }
+  var lv = c._lvl;
+  var hi = Math.max.apply(null, [].concat.apply([], Object.keys(cell).map(function (k) { return cell[k].filter(function (v) { return typeof v === 'number'; }); })).concat([1]));
+  var top = hi <= 1.0001 ? 1 : 100, pct = function (v) { return top === 1 ? v * 100 : v; };
+
+  // 控制列：等級切換（radiogroup）
+  var ctl = document.createElement('div'); ctl.className = 'prog-ctl';
+  var lab = document.createElement('span'); lab.className = 'prog-lab'; lab.id = 'pl' + Math.random().toString(36).slice(2, 8); lab.textContent = '檢視等級'; ctl.appendChild(lab);
+  var grp = document.createElement('div'); grp.className = 'seg'; grp.setAttribute('role', 'radiogroup'); grp.setAttribute('aria-labelledby', lab.id);
+  c.series.forEach(function (s, si) {
+    var b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(si === lv)); b.tabIndex = si === lv ? 0 : -1;
+    b.textContent = levelShort(s); b.title = levelDesc(s);
+    b.addEventListener('click', function () { c._lvl = si; var nw = drawProgression(c, A); wrap.replaceWith(nw); var f = nw.querySelector('.seg [aria-checked="true"]'); if (f) f.focus(); });
+    b.addEventListener('keydown', function (e) { var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!d) return; e.preventDefault(); var bs = grp.children, j = (si + d + bs.length) % bs.length; bs[j].click(); });
+    grp.appendChild(b);
+  });
+  ctl.appendChild(grp);
+  var hint = document.createElement('span'); hint.className = 'prog-hint'; hint.textContent = levelDesc(c.series[lv]) + '：各期程達到此等級以上之學員比率'; ctl.appendChild(hint);
+  wrap.appendChild(ctl);
+
+  // 摘要：各期程平均（選定等級）
+  var colMean = stages.map(function (st) {
+    var xs = items.map(function (it) { return (cell[it + '\u0001' + st] || [])[lv]; }).filter(function (v) { return typeof v === 'number'; });
+    return xs.length ? xs.reduce(function (s, x) { return s + x; }, 0) / xs.length : null;
+  });
+  var sm = document.createElement('p'); sm.className = 'mtx-sum prog-sum';
+  sm.textContent = levelShort(c.series[lv]) + ' 平均達成率：' + stages.map(function (st, i) { return st.replace('PGY', '') + ' ' + (colMean[i] === null ? '—' : pf(pct(colMean[i])) + '%'); }).join(' → ');
+  wrap.appendChild(sm);
+
+  var box = document.createElement('div'); box.className = 'mtx'; wrap.appendChild(box);
+  var t = document.createElement('table'), th = document.createElement('thead'), tr = document.createElement('tr');
+  var c0 = document.createElement('th'); c0.textContent = '項目'; tr.appendChild(c0);
+  stages.forEach(function (st) { var x = document.createElement('th'); x.scope = 'col'; x.textContent = st; tr.appendChild(x); });
+  var cd = document.createElement('th'); cd.scope = 'col'; cd.textContent = '進展'; cd.title = '最早期程 → 最晚期程，選定等級之達成率差（百分點）'; tr.appendChild(cd);
+  th.appendChild(tr); t.appendChild(th);
+  var tb = document.createElement('tbody'), lastFam = null;
+  var NS = 'http://www.w3.org/2000/svg';
+  function stair(vals) {
+    var svg = document.createElementNS(NS, 'svg'), W = 6 * L - 2, H = 14; svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('class', 'stair'); svg.setAttribute('aria-hidden', 'true');
+    vals.forEach(function (v, i) {
+      var r = document.createElementNS(NS, 'rect'), h = typeof v === 'number' ? Math.max(1, pct(v) / 100 * H) : 1;
+      r.setAttribute('x', i * 6); r.setAttribute('y', H - h); r.setAttribute('width', 4); r.setAttribute('height', h); r.setAttribute('rx', 1);
+      r.setAttribute('class', i === lv ? 'on' : (typeof v === 'number' ? '' : 'na')); svg.appendChild(r);
+    });
+    return svg;
+  }
+  items.forEach(function (it) {
+    var ip = itemParts(it);
+    if (ip.fam && ip.fam !== lastFam && familyOf(items[0]) !== familyOf(items[items.length - 1])) {
+      var fr = document.createElement('tr'); fr.className = 'fam'; var fh = document.createElement('th'); fh.colSpan = stages.length + 2; fh.textContent = (FAMILY[ip.fam] || {}).name || ip.fam; fr.appendChild(fh); tb.appendChild(fr);
+    }
+    lastFam = ip.fam;
+    var r = document.createElement('tr'), h = document.createElement('th'); h.scope = 'row'; h.title = it;
+    if (ip.code) { var b = document.createElement('b'); b.textContent = ip.code; h.appendChild(b); }
+    var nm = document.createElement('span'); nm.textContent = ip.name; h.appendChild(nm); r.appendChild(h);
+    var first = null, last = null;
+    stages.forEach(function (st) {
+      var vals = cell[it + '\u0001' + st], td = document.createElement('td');
+      var v = vals ? vals[lv] : null;
+      if (v === 'S') { td.textContent = '樣本不足'; td.className = 'supp'; }
+      else if (typeof v === 'number') {
+        var k = Math.max(0, Math.min(1, pct(v) / 100)); td.style.background = seqColor(k); td.style.color = seqInk(k);
+        var n = document.createElement('span'); n.className = 'pv'; n.textContent = pf(pct(v)) + '%'; td.appendChild(n);
+        td.appendChild(stair(vals));
+        if (first === null) first = pct(v); last = pct(v);
+      } else { td.textContent = '—'; td.className = 'empty'; }
+      td.title = ip.code + ' ' + ip.name + '｜' + st + '\n' + c.series.map(function (s, si) { var x = vals ? vals[si] : null; return levelShort(s) + '：' + (typeof x === 'number' ? pf(pct(x)) + '%' : x === 'S' ? '樣本不足' : '—'); }).join('\n');
+      r.appendChild(td);
+    });
+    var dt = document.createElement('td'); dt.className = 'dlt';
+    if (first !== null && last !== null && stages.length > 1) {
+      var dd = last - first; dt.textContent = (dd > 0 ? '▲' : dd < 0 ? '▼' : '＝') + (dd ? pf(Math.abs(dd)) : ''); dt.classList.add(dd > 0 ? 'up' : dd < 0 ? 'down' : 'flat');
+    } else dt.textContent = '—';
+    r.appendChild(dt); tb.appendChild(r);
+  });
+  // 期程平均列
+  var fr2 = document.createElement('tr'); fr2.className = 'avg'; var ah = document.createElement('th'); ah.scope = 'row'; ah.textContent = '期程平均'; fr2.appendChild(ah);
+  colMean.forEach(function (m) { var td = document.createElement('td'); td.textContent = m === null ? '—' : pf(pct(m)) + '%'; fr2.appendChild(td); });
+  var ad = document.createElement('td'); var cm = colMean.filter(function (m) { return m !== null; });
+  ad.className = 'dlt'; if (cm.length > 1) { var d2 = pct(cm[cm.length - 1]) - pct(cm[0]); ad.textContent = (d2 > 0 ? '▲' : d2 < 0 ? '▼' : '＝') + (d2 ? pf(Math.abs(d2)) : ''); ad.classList.add(d2 > 0 ? 'up' : d2 < 0 ? 'down' : 'flat'); } else ad.textContent = '—';
+  fr2.appendChild(ad); tb.appendChild(fr2);
+  t.appendChild(tb); box.appendChild(t);
+  var key = scaleKey({ lo: 0, hi: 100, kind: 'pct' }, null);
+  var em = key.querySelector('em'); if (em) em.textContent = '格內小階梯＝該期程 ' + levelShort(c.series[0]) + '→' + levelShort(c.series[L - 1]) + ' 各級達成率，深色為選定等級｜進展＝最早→最晚期程差（百分點）';
+  wrap.appendChild(key);
+  return wrap;
+}
+/** 對照表列同時含里程碑（MS-）與 EPA 時，分成兩段各自上色與閱讀，不混排 */
+function drawMatrixSections(c, A) {
+  var fams = [];
+  A.groups.forEach(function (g) { var f = familyOf(g); if (fams.indexOf(f) < 0) fams.push(f); });
+  if (fams.length < 2 || fams.indexOf('') >= 0) return drawMatrix(c, A);
+  var wrap = document.createElement('div'); wrap.className = 'mtx-sections';
+  fams.forEach(function (f, fi) {
+    var gs = A.groups.filter(function (g) { return familyOf(g) === f; });
+    var sub = { groups: gs, series: A.series, get: A.get };
+    var sec = document.createElement('section'); sec.className = 'mtx-sec';
+    var h = document.createElement('h4'); h.textContent = (FAMILY[f] || {}).name || f; var n = document.createElement('span'); n.textContent = gs.length + ' 項'; h.appendChild(n); sec.appendChild(h);
+    var m = drawMatrix(c, sub);
+    Array.prototype.forEach.call(m.querySelectorAll('tbody th'), function (x) { x.textContent = x.textContent.replace(/^(MS|EPA)\s*[-－]\s*/i, ''); });
+    if (fi < fams.length - 1) { var sk = m.querySelector('.mtx-scale'); if (sk) sk.remove(); }
+    sec.appendChild(m); wrap.appendChild(sec);
+  });
+  return wrap;
 }
 function drawMatrix(c, A) {
   var wrap = document.createElement('div');
