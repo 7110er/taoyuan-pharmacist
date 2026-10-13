@@ -374,6 +374,18 @@ table.grid td{max-width:320px}
 .kcard span{color:var(--ink-3)}
 .kcard .kline{padding:4px 0 4px 12px;position:relative;border-bottom:1px solid var(--rule-2)}
 .kcard .kline:last-child{border-bottom:0}
+.kmedia{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}
+.kmedia .kplay,.kmedia .kpeek{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:4px 12px;border-radius:999px;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer;border:1px solid transparent}
+.kmedia .kplay{background:var(--teal-deep);color:#fff}
+.kmedia .kplay:hover{background:var(--teal)}
+.kmedia .kpeek{background:transparent;color:var(--teal-deep);border-color:var(--rule)}
+.kmedia .kpeek:hover{background:var(--wash)}
+.kmedia .kplay:focus-visible,.kmedia .kpeek:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.kmedia .kframe{flex-basis:100%;margin-top:6px}
+.kcard .klink::before{display:none}
+.kcard .klink a{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:3px 10px;border-radius:999px;background:var(--wash);color:var(--teal-deep);font-weight:600;text-decoration:none;font-size:.8rem}
+.kcard .klink a::before{content:"▶";font-size:.7em}
+.kcard .klink a:hover{background:var(--teal);color:#fff}
 .kcard .kline::before{content:"";position:absolute;left:0;top:12px;width:5px;height:5px;border-radius:50%;background:var(--teal)}
 .kcol{flex-basis:min(92vw,420px)}
 .datatable{overflow:auto;margin-top:4px}
@@ -719,7 +731,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.3.0';
+var APP_VERSION = '2.4.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -837,6 +849,11 @@ function startApp() {
   skeletonView();
   api('catalog').then(function (j) {
     S.catalog = j;
+    // 已併入成效儀表板的分頁：不在「資料查詢」列出（資料仍由後端依權限提供給儀表板；這裡只是介面隱藏，不是權限設定）
+    j.sheets = (j.sheets || []).filter(function (s) { return !QUERY_HIDDEN[s.key] && !(QUERY_HIDDEN_TITLES[s.title] && /多元評量/.test(s.source || '')); });
+    // 同一主題的來源合併顯示：「教學資源（晨會簡報）」併入「教學資源」群組（控制台名稱保持唯一，網頁上同組呈現）
+    var baseSrc = {}; (j.sheets || []).forEach(function (s) { baseSrc[s.source] = 1; });
+    (j.sheets || []).forEach(function (s) { var b = String(s.source || '').replace(/\s*（[^）]*）\s*$/, ''); if (b && b !== s.source && baseSrc[b]) { s.sourceFull = s.source; s.source = b; } });
     if (j.bootstrap) { S.user = j.bootstrap; saveSession(); showUser(); }
     var sn = j.bootstrap && j.bootstrap.ui_config && j.bootstrap.ui_config.siteName;
     if (sn) { S.siteName = sn; document.title = sn; $('brand').textContent = sn; }
@@ -1701,11 +1718,14 @@ document.addEventListener('keydown', function (e) {
 S.dash = null; S.dashId = null; S.filt = {}; S.subject = ''; S.dashReq = 0;
 var MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 /* 成效儀表板資訊架構：總覽 → 四大類 → 各儀表板。分類依控制台名稱（使用者裁決之對照）；控制台若提供 category 欄位則優先採用 */
+/* 已併入成效儀表板、不在資料查詢列出的分頁（分頁代碼＝控制台「分頁開放」K 欄；標題為代碼變動時的備援比對） */
+var QUERY_HIDDEN = { '954792c76b807eeb': '學生分數', '3d3b4891940686c4': '學員CbD', 'd3550fcb622ecb9a': '學員CBME', 'b6eaeac3bf68cc26': '教師分數', '74a3d4736da2f0d1': '各組分數', '176bff05bd70277d': '簡報回饋', 'd8371f3ad2728fd7': 'CBME成效' };
+var QUERY_HIDDEN_TITLES = { '學生分數': 1, '學員CbD': 1, '學員CBME': 1, '教師分數': 1, '各組分數': 1, '簡報回饋': 1, 'CBME成效': 1 };
 var DASH_CATS = [
   { key: 'personal', name: '個人成績', desc: '本人或指派對象的評核結果與學習歷程', cls: 'p',
     names: ['PGY 學員個人成績', 'UGY 學生個人成績', '教師教學評核（個人）'] },
   { key: 'teach', name: '教學成效', desc: '能力養成、教學單位、教師群體與學術產出', cls: 't',
-    names: ['CBME 成效', '教學單位評核', '簡報評核', '教育訓練成效', '臨床教師概況（群體）', '學習風格與教材', '教學與學術成果'] },
+    names: ['CBME 成效', '病例導向討論（CbD）整體成效', '藥學生整體成效', '簡報評核', '教學單位評核', '臨床教師概況（群體）', '教育訓練成效', '學習風格與教材', '教學與學術成果'] },
   { key: 'clinic', name: '臨床成效', desc: '藥事照護介入、衛教與諮詢服務的產出', cls: 'c',
     names: ['藥事照會介入成效', '衛教諮詢成效', '諮詢服務', '整合病房減藥成效'] },
   { key: 'metric', name: '教學評量指標', desc: '以分子／分母定義、可逐年追蹤的群體指標', cls: 'm', names: ['指標：學員', '指標：學生'] }
@@ -2664,6 +2684,11 @@ function drawKanban(c) {
   // 欄名只差結尾序號（如「具體內容-1…-30」）時不逐行重複欄名，改為條列
   var fl = c.fieldLabels || [], stem = function (x) { return String(x || '').replace(/[-－_]?\s*\d+$/, ''); };
   var sameStem = fl.length > 1 && fl.every(function (x) { return stem(x) === stem(fl[0]); });
+  // 第一欄為日期時，各欄卡片由新到舊排列（最近一次在最上方）
+  if (/日期|時間/.test(fl[0] || '')) {
+    var dt = function (k) { var m = /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/.exec((k.v || [])[0] || ''); return m ? +m[1] * 10000 + +m[2] * 100 + +m[3] : 0; };
+    order.forEach(function (g) { cols[g].sort(function (a, b) { return dt(b) - dt(a); }); });
+  }
   order.forEach(function (g) {
     var col = document.createElement('div'); col.className = 'kcol';
     var h = document.createElement('h4'); h.textContent = g; var n = document.createElement('span'); n.textContent = cols[g].length; h.appendChild(n); col.appendChild(h);
@@ -2673,13 +2698,47 @@ function drawKanban(c) {
         if (!v) return; var d = document.createElement('div');
         if (sameStem) { d.className = 'kline'; }
         else { if (i > 0) { var lb = document.createElement('span'); lb.textContent = (c.fieldLabels || [])[i] + '：'; d.appendChild(lb); } if (i === 0) d.style.fontWeight = '700'; }
-        d.appendChild(document.createTextNode(normGlyph(v))); cd.appendChild(d);
+        var tv = normGlyph(v);
+        if (/^https?:\/\/\S+$/.test(tv)) { d.appendChild(kanbanMedia(tv, kanbanTitle(k, c))); d.classList.add('klink'); }
+        else d.appendChild(linkifyText(tv));
+        cd.appendChild(d);
       });
       col.appendChild(cd);
     });
     wrap.appendChild(col);
   });
   return wrap;
+}
+
+/* 看板卡片的簡報／檔案連結：雲端 .pptx／.pdf／Google 簡報 → 全螢幕播放＋頁內翻閱；其他網址 → 一般連結 */
+function kanbanTitle(k, c) {
+  var fl = c.fieldLabels || [], v = k.v || [], t = '';
+  fl.forEach(function (l, i) { if (!t && /主題|題目|標題|名稱/.test(l) && v[i]) t = v[i]; });
+  return normGlyph(t || v.filter(function (x) { return x && !/^https?:/.test(x); })[1] || v[0] || c.title || '簡報');
+}
+function kanbanMedia(u, title) {
+  var id = driveId(u), g = docsInfo(u);
+  var src = id ? 'https://drive.google.com/file/d/' + id + '/preview'
+    : (g && g.type === 'presentation') ? 'https://docs.google.com/presentation/d/' + (g.pub ? 'e/' : '') + g.id + (g.pub ? '/embed?start=false&loop=false' : '/preview') : '';
+  if (!src) return linkEl(u, '開啟連結');
+  var box = document.createElement('div'); box.className = 'kmedia';
+  var play = document.createElement('button'); play.type = 'button'; play.className = 'kplay';
+  play.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>播放簡報';
+  play.setAttribute('aria-label', '全螢幕播放：' + title);
+  play.addEventListener('click', function (e) { e.stopPropagation(); openViewer(title, null, { src: src, stage: true }); });
+  var peek = document.createElement('button'); peek.type = 'button'; peek.className = 'kpeek'; peek.textContent = '頁內翻閱'; peek.setAttribute('aria-expanded', 'false');
+  var holder = null;
+  peek.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (holder) { holder.remove(); holder = null; peek.textContent = '頁內翻閱'; peek.setAttribute('aria-expanded', 'false'); return; }
+    holder = document.createElement('div'); holder.className = 'embed slide-frame kframe';
+    var f = document.createElement('iframe'); f.className = 'ratio'; f.loading = 'lazy'; f.title = title + '（內嵌翻閱）';
+    f.setAttribute('sandbox', SLIDE_SANDBOX); f.setAttribute('allow', 'fullscreen; autoplay'); f.setAttribute('allowfullscreen', '');
+    f.referrerPolicy = 'strict-origin-when-cross-origin'; f.src = src;
+    holder.appendChild(f); box.appendChild(holder); peek.textContent = '收合'; peek.setAttribute('aria-expanded', 'true');
+  });
+  box.appendChild(play); box.appendChild(peek);
+  return box;
 }
 
 /* ---------- 教學評量指標（§34–35）：每項指標一張卡；數值、分子／分母、定義、期間分層呈現；分子分母矛盾時 fail-closed 不顯示數值 ---------- */
