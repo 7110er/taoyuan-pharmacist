@@ -467,6 +467,7 @@ table.grid td{max-width:320px}
 .metric.off .v{font-family:var(--body);font-size:.95rem;font-weight:600;color:var(--ink-3)}
 .mt-meter{height:6px;border-radius:3px;background:var(--rule-2);overflow:hidden}
 .mt-meter i{display:block;height:100%;background:#4a3aa7;border-radius:3px}
+.metric .v .mt-lbl{display:block;font:500 .74rem var(--body);color:var(--ink-3);margin-bottom:2px}
 .mt-nd{display:flex;gap:16px;font-size:.78rem;color:var(--ink-3)}
 .mt-nd b{color:var(--ink);font-variant-numeric:tabular-nums}
 .mt-dist{list-style:none;margin:0;padding:0;display:grid;gap:2px}
@@ -686,7 +687,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.2.0';
+var APP_VERSION = '2.2.1';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -2490,12 +2491,14 @@ function drawKanban(c) {
 }
 
 /* ---------- 教學評量指標（§34–35）：每項指標一張卡；數值、分子／分母、定義、期間分層呈現；分子分母矛盾時 fail-closed 不顯示數值 ---------- */
+/* 非比率型指標：中位數（筆／人、人／人）與分布；其 numerator/denominator 不是比值的分子分母 */
+var METRIC_KIND = { 'MET-005': { unit: ' 筆／人', label: '中位數', n: '總筆數', d: '對象數' }, 'MET-006': { unit: ' 人／人', label: '中位數', n: '', d: '對象數' }, 'MET-007': { dist: true, d: '對象數' } };
 function metricCheck(m) {
   var p = [];
   var hasND = typeof m.numerator === 'number' && typeof m.denominator === 'number';
   if (m.status === 'OK' && hasND) {
     if (m.denominator === 0) p.push('分母為 0');
-    else if (m.numerator > m.denominator && m.id !== 'MET-005') p.push('分子大於分母');
+    else if (m.numerator > m.denominator && !METRIC_KIND[m.id]) p.push('分子大於分母');
     if (m.numerator < 0 || m.denominator < 0) p.push('分子或分母為負值');
   }
   if (!m.numerator_def || !m.denominator_def) p.push('分子或分母定義缺漏');
@@ -2523,16 +2526,21 @@ function loadMetrics(pop, first) {
       var idt = document.createElement('span'); idt.className = 'mt-id'; idt.textContent = m.id; hd.appendChild(idt);
       var h = document.createElement('h3'); h.textContent = m.name; hd.appendChild(h); c.appendChild(hd);
       var v = document.createElement('div'); v.className = 'v';
-      var isPct = m.id !== 'MET-005' && m.id !== 'MET-007';
+      var K = METRIC_KIND[m.id], isPct = !K;
       if (m.status !== 'OK') v.textContent = EMPTY_TEXT[m.status] || m.status;
       else if (blocked) { v.textContent = '定義待查'; nFlag++; }
-      else { nOK++; v.textContent = m.id === 'MET-007' ? '' : ((m.value === null || m.value === undefined) ? '—' : (m.id === 'MET-005' ? m.value + ' 筆／人' : m.value + '%')); }
+      else { nOK++; v.textContent = K && K.dist ? '' : ((m.value === null || m.value === undefined) ? '—' : (K ? m.value + K.unit : m.value + '%')); if (K && K.label && v.textContent) { var lb = document.createElement('small'); lb.className = 'mt-lbl'; lb.textContent = K.label; v.insertBefore(lb, v.firstChild); } }
       if (v.textContent) c.appendChild(v);
       if (m.status === 'OK' && !blocked && isPct && hasND && m.denominator > 0) {
         var mt = document.createElement('div'); mt.className = 'mt-meter'; mt.setAttribute('aria-hidden', 'true');
         var fi = document.createElement('i'); fi.style.width = Math.max(0, Math.min(100, m.numerator / m.denominator * 100)) + '%'; mt.appendChild(fi); c.appendChild(mt);
       }
-      if (m.status === 'OK' && hasND) { var nd = document.createElement('div'); nd.className = 'mt-nd'; nd.innerHTML = '<span>分子 <b>' + esc(m.numerator) + '</b></span><span>分母 <b>' + esc(m.denominator) + '</b></span>'; c.appendChild(nd); }
+      if (m.status === 'OK' && (hasND || (K && typeof m.denominator === 'number'))) {
+        var nd = document.createElement('div'); nd.className = 'mt-nd';
+        nd.innerHTML = K ? ((K.n && typeof m.numerator === 'number' ? '<span>' + K.n + ' <b>' + esc(m.numerator) + '</b></span>' : '') + '<span>' + K.d + ' <b>' + esc(m.denominator) + '</b></span>')
+          : '<span>分子 <b>' + esc(m.numerator) + '</b></span><span>分母 <b>' + esc(m.denominator) + '</b></span>';
+        c.appendChild(nd);
+      }
       if (m.distribution) {
         var dl = document.createElement('ul'); dl.className = 'mt-dist';
         m.distribution.forEach(function (d) { var li = document.createElement('li'); li.innerHTML = '<span>' + esc(d.level) + '</span><b>' + esc(d.suppressed ? '樣本數不足' : d.n + ' 人') + '</b>'; dl.appendChild(li); });
