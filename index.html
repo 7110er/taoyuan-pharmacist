@@ -847,7 +847,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.8.0';
+var APP_VERSION = '2.9.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -1859,10 +1859,12 @@ var DASH_LAYOUT = {
     hide: [/（CbD）五大面向/, /（CbD）晨會簡報/, /^簡報分數/, /^簡報各評核面向/, /^簡報文字回饋/]
   },
   'UGY 學生個人成績': { hide: [/^實習總成績組成/, /^個人整體實習分數/] },
-  'CBME 成效': { order: ['ax:ind2', 'ax:ind'] },
-  '學生學習成效': { order: ['ax:ind', 'ax:matrix', 'ax:board'], hide: [/^實習總成績組成/] },
-  '病例導向討論(CbD)': { order: ['ax:matrix', 'ax:board'], hide: [/每月晨會病例簡報場次/] },
-  '簡報評核': { order: ['ax:matrix', 'ax:board'], hide: [/每月晨會病例簡報場次/] }
+  'CBME 成效': { order: ['ax:hl', 'ax:ind2', 'ax:ind'] },
+  '學生學習成效': { order: ['ax:board', 'ax:ind', 'ax:matrix'], hide: [/^實習總成績組成/] },
+  '單位組別成效': { order: ['ax:board', 'ax:matrix'] },
+  '教師教學成效': { order: ['ax:board', 'ax:matrix'] },
+  '病例導向討論(CbD)': { order: ['ax:board', 'ax:matrix'], hide: [/每月晨會病例簡報場次/] },
+  '簡報評核': { order: ['ax:board', 'ax:matrix'], hide: [/每月晨會病例簡報場次/] }
 };
 function layoutMatch(el, o) { if (typeof o === 'string') return o.indexOf('ax:') === 0 && el.dataset && el.dataset.ax === o.slice(3); return !!(el.dataset && el.dataset.title && o.test(el.dataset.title)); }
 function visibleCharts(d, name) { var L = DASH_LAYOUT[name] || {}, H = L.hide || []; return (d.charts || []).filter(function (c) { return !H.some(function (re) { return re.test(c.title || ''); }); }); }
@@ -3094,7 +3096,8 @@ function axGroup(recs, key) { var g = {}; recs.forEach(function (r) { var k = r[
 function axSortKeys(keys, dim) {
   var stage = function (s) { var m = /(\d+)\s*M/i.exec(s); return m ? +m[1] : 999; };
   var year = function (s) { var m = /(\d{3})年\((上|下)\)/.exec(s); return m ? +m[1] * 2 + (m[2] === '下' ? 1 : 0) : 0; };
-  if (dim === 'item') return keys.sort(function (a, b) { return (parseInt(a, 10) || 99) - (parseInt(b, 10) || 99) || a.localeCompare(b, 'zh-Hant'); });
+  var zh = function (s) { var i = '一二三四五六七八九十'.indexOf(String(s).charAt(0)); return i >= 0 && String(s).charAt(1) === '、' ? i + 1 : 99; };
+  if (dim === 'item') return keys.sort(function (a, b) { return (parseInt(a, 10) || zh(a)) - (parseInt(b, 10) || zh(b)) || a.localeCompare(b, 'zh-Hant'); });
   if (keys.some(function (k) { return /\d{3}年/.test(k); })) return keys.sort(function (a, b) { return year(a) - year(b); });
   if (keys.some(function (k) { return /PGY\d+M/i.test(k); })) return keys.sort(function (a, b) { return stage(a) - stage(b); });
   return keys.sort(function (a, b) { return a.localeCompare(b, 'zh-Hant'); });
@@ -3155,7 +3158,7 @@ function axColor(t) { // 0..1 → 青綠序列（淺→深），文字顏色自�
 }
 function axMatrix(host, M, cfg) {
   // M: { recs, items, dims:[{k,label}] }  cfg: {title, desc, measure, row, col, facet, scale:[lo,hi], unit, marks:fn(rowKey,colKey,facetKey)->badge}
-  var st = { row: cfg.row, col: cfg.col, facet: cfg.facet || '', measure: cfg.measure || 'mean', filt: {}, pre: {} };
+  var st = { row: cfg.row, col: cfg.col, facet: cfg.facet || '', measure: cfg.measure || 'mean', filt: Object.assign({}, cfg.fdef || {}), pre: {} };
   var minN = cfg.minN || AX.MIN_N;
   var preK = (cfg.pre || []).map(function (p) { return p.k; });
   (cfg.pre || []).forEach(function (p) { if (p.def !== undefined) st.pre[p.k] = p.def; });
@@ -3186,7 +3189,7 @@ function axMatrix(host, M, cfg) {
     // 其餘維度＝篩選
     var used = [st.row, st.col, st.facet];
     DIMS.forEach(function (d) {
-      if (used.indexOf(d.k) >= 0) return;
+      if (!cfg.filterAll && used.indexOf(d.k) >= 0) return;
       var keys = axSortKeys(Object.keys(axGroup(M.recs, d.k)), d.k);
       if (keys.length < 2) return;
       filters.appendChild(axSelect(d.label, [{ v: '', t: '全部' }].concat(keys.map(function (k) { return { v: k, t: k }; })), st.filt[d.k] || '', function (v) { st.filt[d.k] = v; draw(); }));
@@ -3281,7 +3284,7 @@ var AX_PANELS = {
   '教師教學成效': axTeacherGroup,
   '病例導向討論（CbD）整體成效': axCbdGroup,
   '病例導向討論(CbD)': axCbdGroup,
-  'CBME 成效': axTraineeIndicators,
+  'CBME 成效': axCbmeGroup,
   'UGY 學生個人成績': axStudentPersonal,
   'PGY 學員個人成績': axTraineePersonal,
   '教師教學評核（個人）': axTeacherPersonal,
@@ -3364,7 +3367,7 @@ function axCohortBoard(host, title, groups, opt) {
     var g = groups[cur]; grid.innerHTML = ''; sum.innerHTML = '';
     var items = g.items.slice().sort(function (a, b) { return axHlScore(b) - axHlScore(a) || a.name.localeCompare(b.name, 'zh-Hant'); });
     var nStar = items.filter(function (x) { return x.hl && x.hl.star && x.hl.star.length; }).length;
-    [['同期群', g.n + ' ' + (opt.unit || '人')], ['★ 群體亮點', nStar + ' ' + (opt.unit || '人')], ['有任一亮點', items.length + ' ' + (opt.unit || '人')]].concat(g.facts || []).forEach(function (f) { var c = axEl('span', 'ax-fact'); c.appendChild(axEl('small', '', f[0])); c.appendChild(axEl('b', '', f[1])); sum.appendChild(c); });
+    [[opt.cohortWord || '同期群', g.n + ' ' + (opt.unit || '人')], ['★ 群體亮點', nStar + ' ' + (opt.unit || '人')], ['有任一亮點', items.length + ' ' + (opt.unit || '人')]].concat(g.facts || []).forEach(function (f) { var c = axEl('span', 'ax-fact'); c.appendChild(axEl('small', '', f[0])); c.appendChild(axEl('b', '', f[1])); sum.appendChild(c); });
     items.forEach(function (it) { grid.appendChild(axHLCard(it.name, it.sub, it.hl, it.quotes, it.extra)); });
     if (!items.length) grid.appendChild(axEl('div', 'state', '此同期群目前沒有達標示門檻的對象。'));
     var rest = g.n - items.length; foot.textContent = rest > 0 ? '其餘 ' + rest + ' ' + (opt.unit || '人') + '未達標示門檻（評核份數不足，或各題未高於同期群）。' : '';
@@ -3434,21 +3437,21 @@ var AX_RULE_CONT = '<b>★ 群體亮點</b>：本人在該面向的平均，達�
 function axStudentGroup(host) {
   return axPrep('stu').then(function (M) {
     axStudentIndicators(host, M);
-    axMatrix(host, { recs: M.recs, dims: [{ k: 'unit', label: '教學單位' }, { k: 'item', label: '評分題目' }, { k: 'year', label: '年份' }, { k: 'view', label: '評核視角' }] }, {
-      ax: 'matrix', title: '學生學習成效：年份 × 教學單位 × 評分題目', desc: '同時比較不同年份、教學單位與評分題目（1–6 分量表）。可切換列、欄、分面，並以評核視角篩選。', row: 'unit', col: 'item', facet: 'year',
+    var sy = axSortKeys(Object.keys(axGroup(M.recs, 'year')), 'year');
+    axMatrix(host, { recs: M.recs, dims: [{ k: 'year', label: '年份' }, { k: 'view', label: '評核視角' }, { k: 'unit', label: '教學單位' }, { k: 'item', label: '評分題目' }] }, {
+      ax: 'matrix', title: '學生學習成效：年份 × 教學單位 × 評分題目', desc: '預設：最新年份、不分評核視角。四個維度皆可篩選；列、欄、分面可自由切換（例如分面選「年份」即可跨年比較）。', row: 'unit', col: 'item', facet: '', filterAll: true, fdef: { year: sy[sy.length - 1] || '' },
       note: '資料：分析_學生成效（學生教學成效鏡像）。' + axFlagNote(M.flags) + '。每格為該條件下所有評分的平均；改選「最高分比例」可避開天花板效應。'
     });
     var hl = axHighlights(M.recs, 'subj', 'year');
-    axCohortBoard(host, '學生亮點（依年份同期群）', axGroupsByCohort(hl, M.recs, 'subj', 'year'), { ax: 'board', groupLabel: '年份', desc: '一次只看一個年份；同期群＝同一年份的全體學生。卡片依亮點強度排序（★ 優先）。' });
+    axCohortBoard(host, '學生亮點（依年份同期群）', axGroupsByCohort(hl, M.recs, 'subj', 'year', axName), { ax: 'board', groupLabel: '年份', desc: '一次只看一個年份；同期群＝同一年份的全體學生。卡片依亮點強度排序（★ 優先）。' });
   });
 }
 /* ---------- 單位組別成效（群體） ---------- */
 function axUnitGroup(host) {
   return axPrep('unit').then(function (M) {
     var years = axSortKeys(Object.keys(axGroup(M.recs, 'year')), 'year');
-    axMatrix(host, { recs: M.recs, dims: [{ k: 'year', label: '年份' }, { k: 'unit', label: '教學單位' }, { k: 'item', label: '評分題目' }, { k: 'role', label: '評核身份' }] }, {
-      ax: 'matrix', title: '單位組別成效：年份 × 評核身份 × 教學單位 × 評分題目', desc: '先選年份，再以列（教學單位）× 欄（評分題目）× 分面（評核身份）比較。', row: 'unit', col: 'item', facet: 'role',
-      pre: [{ k: 'year', label: '年份', all: '全部年份', def: years[years.length - 1] || '' }],
+    axMatrix(host, { recs: M.recs, dims: [{ k: 'year', label: '年份' }, { k: 'role', label: '評核身份' }, { k: 'unit', label: '教學單位' }, { k: 'item', label: '評分題目' }] }, {
+      ax: 'matrix', title: '單位組別成效：年份 × 評核身份 × 教學單位 × 評分題目', desc: '預設：最新年份、不分評核身份。四個維度皆可篩選；列、欄、分面可自由切換。', row: 'unit', col: 'item', facet: '', filterAll: true, fdef: { year: years[years.length - 1] || '' },
       note: '資料：分析_組別成效（組別教學成效鏡像，不含填答者姓名）。' + axFlagNote(M.flags) + '。'
     });
     var hl = axHighlights(M.recs, 'unit', 'year');
@@ -3459,9 +3462,8 @@ function axUnitGroup(host) {
 function axTeacherGroup(host) {
   return axPrep('tea').then(function (M) {
     var years = axSortKeys(Object.keys(axGroup(M.recs, 'year')), 'year');
-    axMatrix(host, { recs: M.recs, dims: [{ k: 'year', label: '年份' }, { k: 'unit', label: '教學單位' }, { k: 'item', label: '評分題目' }, { k: 'view', label: '評核視角' }] }, {
-      ax: 'matrix', title: '教師教學成效：年份 × 評核視角 × 教學單位 × 評分題目', desc: '先選年份，再以列（教學單位）× 欄（評分題目）× 分面（評核視角）比較。', row: 'unit', col: 'item', facet: 'view',
-      pre: [{ k: 'year', label: '年份', all: '全部年份', def: '' }],
+    axMatrix(host, { recs: M.recs, dims: [{ k: 'year', label: '年份' }, { k: 'view', label: '評核視角' }, { k: 'unit', label: '教學單位' }, { k: 'item', label: '評分題目' }] }, {
+      ax: 'matrix', title: '教師教學成效：年份 × 評核視角 × 教學單位 × 評分題目', desc: '預設：最新年份、不分評核視角。四個維度皆可篩選；列、欄、分面可自由切換。', row: 'unit', col: 'item', facet: '', filterAll: true, fdef: { year: years[years.length - 1] || '' },
       note: '資料：分析_教師成效（教師教學成效鏡像，不含評量者姓名）。' + axFlagNote(M.flags) + '。'
     });
     var hl = axHighlights(M.recs, 'subj', 'year');
@@ -3477,24 +3479,24 @@ function axCbdGroup(host) {
     if (!src.rows.length) throw { code: 'NO_PERMISSION' };
     var M = axMelt(src, axCbdSpec());
     M.recs.forEach(function (x) { x.coh = axCohortLabel(axCode(x.subj), starts); });
-    axMatrix(host, { recs: M.recs, dims: [{ k: 'source', label: '病例來源' }, { k: 'stage', label: '期程' }, { k: 'view', label: '評核視角' }, { k: 'item', label: '五大面向' }, { k: 'coh', label: '同期群' }] }, {
-      ax: 'matrix', title: '病例導向討論（CbD）三向比較：病例來源 × 期程 × 評核視角', desc: '列＝病例來源、欄＝期程、分面＝評核視角；可用五大面向、同期群篩選。數值為面向分數（0–100）。', row: 'source', col: 'stage', facet: 'view', measures: [{ v: 'mean', t: '平均' }, { v: 'median', t: '中位數' }], dec: 1, hideN: true, minN: 3,
+    axMatrix(host, { recs: M.recs, dims: [{ k: 'source', label: '病例來源' }, { k: 'stage', label: '期程' }, { k: 'view', label: '評核視角' }, { k: 'item', label: '五大面向' }, { k: 'coh', label: '梯次' }] }, {
+      ax: 'matrix', title: '病例導向討論（CbD）三向比較：病例來源 × 期程 × 評核視角', desc: '預設：不分病例來源、不分評核視角，列＝五大面向、欄＝期程。病例來源、期程、評核視角、五大面向、梯次皆可篩選；列、欄、分面可自由切換。數值為面向分數（0–100）。', row: 'item', col: 'stage', facet: '', filterAll: true, measures: [{ v: 'mean', t: '平均' }, { v: 'median', t: '中位數' }], dec: 1, hideN: true, minN: 3,
       note: '資料：學員CbD 五大面向分數。' + axFlagNote(M.flags) + '。評核少於 3 份的格子不呈現數值。'
     });
-    // 同期群亮點：學員 × 面向平均（每人每面向至少 3 份），同梯次內比較
-    var cols = src.cols, nI = axCol(cols, /^學員姓名$/), gI = []; cols.forEach(function (c, i) { if (/表現良好/.test(c)) gI.push(i); });
-    var byC = axGroup(M.recs, 'coh'), groups = [];
-    Object.keys(byC).forEach(function (c) {
-      var byP = axGroup(byC[c], 'subj'), H = axContHighlights(byP, 3, 4), items = [];
+    // 學員亮點依病例來源分群：同一病例來源內比較（每人每面向至少 2 份；該來源至少 4 人）
+    var cols = src.cols, nI = axCol(cols, /^學員姓名$/), pI = axCol(cols, /^病例來源$/), gI = []; cols.forEach(function (c, i) { if (/表現良好/.test(c)) gI.push(i); });
+    var byS = axGroup(M.recs, 'source'), groups = [];
+    Object.keys(byS).filter(function (k) { return k !== '（未填）'; }).forEach(function (c) {
+      var byP = axGroup(byS[c], 'subj'), H = axContHighlights(byP, 2, 4), items = [];
       Object.keys(byP).forEach(function (p) {
         var h = H[p], ups = axUps(byP[p]); if (!(h.star.length || h.diamond || ups.length)) return;
-        var qs = []; src.rows.forEach(function (row) { if (row[nI] === p) gI.forEach(function (i) { qs.push(row[i]); }); });
-        items.push({ name: axName(p), sub: h.n + ' 份 CbD｜期程 ' + axSortKeys(Object.keys(axGroup(byP[p], 'stage')), 'stage').join('、'), hl: h, extra: axUpBadges(ups, 1), quotes: axQuotes(qs, 1) });
+        var qs = []; src.rows.forEach(function (row) { if (row[nI] === p && String(row[pI] || '').trim() === c) gI.forEach(function (i) { qs.push(row[i]); }); });
+        items.push({ name: axName(p), sub: h.n + ' 份 CbD｜' + (byP[p][0].coh || '') , hl: h, extra: axUpBadges(ups, 1), quotes: axQuotes(qs, 1) });
       });
-      groups.push({ key: c, label: c, n: Object.keys(byP).length, items: items, o: axCohortOrder(c, starts) });
+      groups.push({ key: c, label: c, n: Object.keys(byP).length, items: items, facts: [['CbD', axRows(byS[c]) + ' 份']] });
     });
-    groups.sort(function (a, b) { return a.o - b.o; });
-    axCohortBoard(host, '學員亮點（依年份同期群）', groups, { ax: 'board', groupLabel: '梯次', note: AX_RULE_CONT + '<br>同期群＝學員代碼字首（梯次）；起訓年月由學員CBME 的 CCC 日期與期程推估，僅供辨識。', desc: '一次只看一個梯次；比較基準為同梯次學員。' });
+    groups.sort(function (a, b) { return b.n - a.n || a.key.localeCompare(b.key, 'zh-Hant'); });
+    axCohortBoard(host, '學員亮點（依病例來源分群）', groups, { ax: 'board', groupLabel: '病例來源', def: 0, cohortWord: '受評學員', note: AX_RULE_CONT.replace('本人該面向至少 3 份評核，同期群至少 4 人有足夠評核', '本人在該病例來源、該面向至少 2 份評核，且該病例來源至少 4 位學員有足夠評核').replace('同期群內比較，不跨梯次排名', '比較基準＝同一病例來源的全體學員（不分梯次）；分頁依該來源受評學員數由多到少排列'), desc: '一次只看一個病例來源；比較基準為在該病例來源接受 CbD 的全體學員。' });
   });
 }
 /* ---------- 評估工具：簡報評核（簡報回饋：每列＝一場簡報的各題平均） ---------- */
@@ -3597,12 +3599,13 @@ function axCbmeParse(src) {
   var kinds = {}; T.concat(C).forEach(function (c) { kinds[c.key] = c.kind; });
   return { rows: rows, kinds: kinds, T: T, C: C };
 }
+var AX_RULE_CBME = '<b>★ 同期程領先</b>：最近一期程某項目的等級，高於同期程學員中位數且達第 75 百分位；同期程至少 5 人。<br><b>◆ 個人強項</b>：最近一期程中，高於本人各項中位數最多的項目，且不低於同期程中位數。<br><b>↑ 進步</b>：同一項目最早期程到最近期程的等級提升（取提升最多的 2 項）。<br><b>❝ 回饋摘錄</b>：學員CBME 的質性回饋中肯定語氣的句子。<br>等級來源：該期程有 CCC 判定時採 CCC，否則採教師評核。EPA 次等級換算：2a＜2b＜3a＜3b＜3c＜4。';
 function axCbmeMed(row, kind, kinds) { var a = []; Object.keys(row.use).forEach(function (k) { if (kinds[k] === kind) a.push(row.use[k].v); }); return a.length ? axMedian(a) : null; }
 
 /* 個人亮點（CBME）：同期群＝同一期程的全體學員 */
-function axCbmeBlock(host, who, cb) {
-  var P = axCbmeParse(cb), mine = P.rows.filter(function (r) { return r.who === who && r.any; }).sort(function (a, b) { return (a.mo || 0) - (b.mo || 0); });
-  if (!mine.length) return;
+function axCbmeCalc(P, who) {
+  var mine = P.rows.filter(function (r) { return r.who === who && r.any; }).sort(function (a, b) { return (a.mo || 0) - (b.mo || 0); });
+  if (!mine.length) return null;
   var last = mine[mine.length - 1], coh = P.rows.filter(function (r) { return r.stage === last.stage && r.any; });
   var stars = [], best = null, ownMed = axMedian(Object.keys(last.use).map(function (k) { return last.use[k].v; }));
   Object.keys(last.use).forEach(function (k) {
@@ -3620,10 +3623,15 @@ function axCbmeBlock(host, who, cb) {
   ups.sort(function (a, b) { return b.d - a.d; });
   var extra = ups.slice(0, 2).map(function (u) { return axBadge('↑', 'up', u.k + '（' + u.from + '→' + u.to + '）', '同一項目最早期程與最近期程比較（優先採 CCC 判定）'); });
   var qs = []; mine.forEach(function (r) { qs = qs.concat(r.fb); });
+  return { mine: mine, last: last, coh: coh, stars: stars, best: best, ups: ups, extra: extra, qs: qs };
+}
+function axCbmeBlock(host, who, cb) {
+  var P = axCbmeParse(cb), R = axCbmeCalc(P, who); if (!R) return;
+  var mine = R.mine, last = R.last, coh = R.coh, stars = R.stars, best = R.best, extra = R.extra, qs = R.qs;
   var sec = axEl('section', 'chart ax-card ax-board'); sec.dataset.ax = 'cbmeHL'; host.appendChild(sec);
   var h = axEl('div', 'ax-head'); h.appendChild(axEl('h3', 'ax-title', '個人亮點（CBME：Milestones & EPAs）'));
   var info = axEl('button', 'ax-info', 'ⓘ'); info.type = 'button'; info.setAttribute('aria-label', '亮點規則說明'); h.appendChild(info); sec.appendChild(h);
-  var nt = axEl('div', 'ax-note'); nt.hidden = true; nt.innerHTML = '<b>★ 同期程領先</b>：最近一期程某項目的等級，高於同期程學員中位數且達第 75 百分位；同期程至少 ' + AX.MIN_N + ' 人。<br><b>◆ 個人強項</b>：最近一期程中，高於本人各項中位數最多的項目，且不低於同期程中位數。<br><b>↑ 進步</b>：同一項目最早期程到最近期程的等級提升（取提升最多的 2 項）。<br><b>❝ 回饋摘錄</b>：學員CBME 的質性回饋中肯定語氣的句子。<br>等級來源：該期程有 CCC 判定時採 CCC，否則採教師評核。EPA 次等級換算：2a＜2b＜3a＜3b＜3c＜4。'; sec.appendChild(nt);
+  var nt = axEl('div', 'ax-note'); nt.hidden = true; nt.innerHTML = AX_RULE_CBME; sec.appendChild(nt);
   info.addEventListener('click', function () { nt.hidden = !nt.hidden; });
   var grid = axEl('div', 'ax-cbme'); sec.appendChild(grid);
   var card = axHLCard(who, '最近期程 ' + last.stage + '（' + last.src + '）｜同期程 ' + coh.length + ' 人', { star: stars, diamond: best }, axQuotes(qs, 2), extra);
@@ -3746,6 +3754,23 @@ function axTraineeCbd(host, who, src, M, mine) {
   });
 }
 
+/* CBME 成效（群體）：學員個人亮點看板（依梯次）＋教學評量指標 */
+function axCbmeGroup(host) {
+  return axLoad(AX.KEYS.cbme).then(function (cb) {
+    if (!cb.rows.length) throw { code: 'NO_PERMISSION' };
+    var P = axCbmeParse(cb), starts = axCohortStarts(cb), byC = {};
+    P.rows.forEach(function (r) { if (!r.any || !r.who) return; var c = axCohortLabel(axCode(r.name), starts); (byC[c] = byC[c] || {})[r.who] = 1; });
+    var groups = Object.keys(byC).map(function (c) {
+      var items = [];
+      Object.keys(byC[c]).forEach(function (w) {
+        var R = axCbmeCalc(P, w); if (!R) return;
+        if (R.stars.length || R.best || R.extra.length) items.push({ name: w, sub: '最近期程 ' + R.last.stage + '（' + R.last.src + '）｜同期程 ' + R.coh.length + ' 人', hl: { star: R.stars, diamond: R.best }, extra: R.extra, quotes: axQuotes(R.qs, 1) });
+      });
+      return { key: c, label: c, n: Object.keys(byC[c]).length, items: items, o: axCohortOrder(c, starts) };
+    }).sort(function (a, b) { return a.o - b.o; });
+    axCohortBoard(host, '學員個人亮點（CBME：Milestones & EPAs，依年份同期群）', groups, { ax: 'hl', groupLabel: '梯次', note: AX_RULE_CBME + '<br>同期群（分頁）＝學員代碼字首（梯次），起訓年月由 CCC 日期與期程推估；等級比較基準為「同一期程」的全體學員，避免不同訓練階段直接比較。', desc: '一次只看一個梯次；每張卡為該學員最近一個期程的亮點。' });
+  }).catch(function (e) { if (e && e.code === 'NO_PERMISSION') throw e; }).then(function () { return axTraineeIndicators(host); });
+}
 /* ---------- 教學評量指標（適用版，2026-10-14 取代原「指標：學員／學生」） ---------- */
 function axIQR(a) { if (!a.length) return null; var b = a.slice().sort(function (x, y) { return x - y; }); var q = function (p) { var i = (b.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i); return b[lo] + (b[hi] - b[lo]) * (i - lo); }; return [q(.25), q(.5), q(.75)]; }
 function axKpi(o) {
