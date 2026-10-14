@@ -847,7 +847,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.9.0';
+var APP_VERSION = '2.9.1';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -3659,7 +3659,14 @@ function axCbmeBlock(host, who, cb) {
 }
 
 /* ---------- 個人頁 ---------- */
-function axSubjName(d) { var lab = ''; (d.subjects || []).forEach(function (s) { if (s.pid === (d.subject || S.subject)) lab = s.label; }); return axName(lab); }
+function axSubjName(d) {
+  var lab = ''; (d.subjects || []).forEach(function (s) { if (s.pid === (d.subject || S.subject)) lab = s.label; });
+  // 「我本人（傅鈺翔）」：實際姓名在括號內；括號內可能帶角色，如「我本人（傅鈺翔（臨床指導教師））」
+  var m = /^\s*(我本人|本人|我)\s*[（(]\s*([^（()）]+)/.exec(String(lab || ''));
+  if (m) return axName(m[2]);
+  if (/^\s*(我本人|本人)\s*$/.test(String(lab || '')) && S.user) return axName(S.user.display_name || '');
+  return axName(lab);
+}
 function axStudentPersonal(host, d) {
   var who = axSubjName(d); if (!who) return Promise.resolve();
   return Promise.all([axPrep('stu'), axLoad(AX.KEYS.stuScore).catch(function () { return null; })]).then(function (r) {
