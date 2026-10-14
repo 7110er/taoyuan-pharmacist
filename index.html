@@ -407,7 +407,8 @@ table.grid td{max-width:320px}
 .bi-cat,.bi-pages,.board-sec,.crumb-up{--cc:var(--teal);--cc-soft:var(--wash)}
 :is(.bi-cat,.bi-pages,.board-sec,.crumb-up).p{--cc:var(--seal);--cc-soft:var(--peach-wash)}
 :is(.bi-cat,.bi-pages,.board-sec,.crumb-up).c{--cc:#2B6A4B;--cc-soft:#E4F2EA}
-:is(.bi-cat,.bi-pages,.board-sec,.crumb-up).m{--cc:#4a3aa7;--cc-soft:#ECE9FA}
+:is(.bi-cat,.bi-pages,.board-sec,.crumb-up).m,:is(.bi-cat,.bi-pages,.board-sec,.crumb-up).a{--cc:#4a3aa7;--cc-soft:#ECE9FA}
+:is(.bi-cat,.bi-pages,.board-sec,.crumb-up).r{--cc:#8A5D0E;--cc-soft:#FBF1DE}
 :is(.bi-cat,.bi-pages,.board-sec,.crumb-up).o{--cc:var(--ink-2);--cc-soft:var(--wash-2)}
 .bi-cats,.bi-pages{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;min-width:0;padding:0 2px;scroll-padding:0 24px}
 .bi-cats::-webkit-scrollbar,.bi-pages::-webkit-scrollbar{display:none}
@@ -624,6 +625,21 @@ table.grid td{max-width:320px}
 .ax-tl li{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--rule-2);border-radius:var(--r-md);background:var(--wash-2)}
 .ax-tl time{font-size:.72rem;color:var(--ink-3);font-variant-numeric:tabular-nums}
 .ax-tl small{font-size:.72rem;color:var(--teal)}
+
+.ax-kpigrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))}
+.ax-kpi{border:1px solid var(--rule);border-radius:var(--r-md);padding:12px 14px;background:linear-gradient(180deg,var(--sheet),var(--wash-2));display:grid;gap:6px;align-content:start;position:relative;overflow:hidden}
+.ax-kpi::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--teal)}
+.ax-kpi.warn::before{background:#C98A1B}
+.ax-kpi.na{opacity:.75}.ax-kpi.na::before{background:var(--rule)}
+.ax-kpi-n{font-size:.8rem;font-weight:700;color:var(--ink-2)}
+.ax-kpi-v{font:700 1.9rem/1.1 var(--display);color:var(--teal-deep);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.ax-kpi-v small{font:600 .78rem var(--body);color:var(--ink-3);margin-left:4px}
+.ax-kpi-bar{height:6px;border-radius:999px;background:var(--rule-2);overflow:hidden}
+.ax-kpi-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-deep));border-radius:inherit;transition:width .6s var(--ease)}
+.ax-kpi.warn .ax-kpi-bar i{background:linear-gradient(90deg,#E0A93A,#C98A1B)}
+.ax-kpi-nd{font-size:.72rem;color:var(--ink-3);line-height:1.5}
+.ax-kpi-nd b{color:var(--ink);font-variant-numeric:tabular-nums}
+.ax-kpi-note{font-size:.72rem;color:#8A5D0E;background:#FBF1DE;border-radius:6px;padding:4px 8px}
 </style>
 </head>
 <body>
@@ -810,7 +826,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.6.0';
+var APP_VERSION = '2.7.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -1803,17 +1819,21 @@ var QUERY_HIDDEN_TITLES = { '分析_學生成效': 1, '分析_教師成效': 1, 
 var DASH_CATS = [
   { key: 'personal', name: '個人成績', desc: '本人或指派對象的評核結果與學習歷程', cls: 'p',
     names: ['PGY 學員個人成績', 'UGY 學生個人成績', '教師教學評核（個人）'] },
-  { key: 'teach', name: '教學成效', desc: '能力養成、教學單位、教師群體與學術產出', cls: 't',
-    names: ['CBME 成效', '病例導向討論（CbD）整體成效', '學生學習成效', '簡報評核', '單位組別成效', '教師教學成效', '教育訓練成效', '學習風格與教材', '教學與學術成果', '藥學生整體成效', '教學單位評核', '臨床教師概況（群體）'] },
+  { key: 'teach', name: '教學成效', desc: '學員、學生、單位組別與教師的教學成效與教學評量指標', cls: 't',
+    names: ['CBME 成效', '學生學習成效', '單位組別成效', '教師教學成效', '藥學生整體成效', '教學單位評核', '臨床教師概況（群體）'] },
+  { key: 'tool', name: '評估工具', desc: '以評量工具為單位的整體表現：病例導向討論、簡報評核', cls: 'a',
+    names: ['病例導向討論(CbD)', '病例導向討論（CbD）整體成效', '簡報評核'] },
   { key: 'clinic', name: '臨床成效', desc: '藥事照護介入、衛教與諮詢服務的產出', cls: 'c',
     names: ['藥事照會介入成效', '衛教諮詢成效', '諮詢服務', '整合病房減藥成效'] },
-  { key: 'metric', name: '教學評量指標', desc: '以分子／分母定義、可逐年追蹤的群體指標', cls: 'm', names: ['指標：學員', '指標：學生'] }
+  { key: 'res', name: '資源成果', desc: '教育訓練、學習風格與教材、教學與學術成果', cls: 'r',
+    names: ['教育訓練成效', '學習風格與教材', '教學與學術成果'] }
 ];
+/* 「教學評量指標」分類已停用（2026-10-14）：適用指標改在 CBME 成效／學生學習成效頁內由分析引擎計算 */
 var OVERVIEW_ID = 'overview';
 function normName(s) { return String(s || '').replace(/\s+/g, '').replace(/\(/g, '（').replace(/\)/g, '）').replace(/:/g, '：'); }
 function catByKey(k) { for (var i = 0; i < DASH_CATS.length; i++) if (DASH_CATS[i].key === k) return DASH_CATS[i]; return null; }
 function catOf(d) {
-  if (d.metrics) return 'metric';
+  if (d.metrics) return 'teach';
   var c = normName(d.category);
   if (c) for (var i = 0; i < DASH_CATS.length; i++) if (c === DASH_CATS[i].key || c === normName(DASH_CATS[i].name)) return DASH_CATS[i].key;
   var n = normName(d.name);
@@ -1827,8 +1847,7 @@ S.dashIndex = []; S.dashCat = '';
 function buildDashList() {
   var list = S.catalog.dashboards || [], caps = (S.user && S.user.capabilities) || {};
   var all = list.map(function (d) { return { id: d.id, name: d.name, personal: !!d.personal, category: d.category }; });
-  if (caps.can_read_trainee_aggregate) all.push({ id: 'metrics:TRAINEE', name: '指標：學員', metrics: true, sub: 'PGY 學員群體' });
-  if (caps.can_read_student_aggregate) all.push({ id: 'metrics:STUDENT', name: '指標：學生', metrics: true, sub: 'UGY 學生群體' });
+
   all.forEach(function (d, i) { d.cat = catOf(d); d.seq = i; });
   S.dashIndex = [];
   DASH_CATS.forEach(function (c) {
@@ -3212,6 +3231,8 @@ var AX_PANELS = {
   '單位組別成效': axUnitGroup,
   '教師教學成效': axTeacherGroup,
   '病例導向討論（CbD）整體成效': axCbdGroup,
+  '病例導向討論(CbD)': axCbdGroup,
+  'CBME 成效': axTraineeIndicators,
   'UGY 學生個人成績': axStudentPersonal,
   'PGY 學員個人成績': axTraineePersonal,
   '教師教學評核（個人）': axTeacherPersonal
@@ -3247,6 +3268,7 @@ function axFlagNote(f) { var a = []; if (f.self) a.push('已排除自評 ' + f.s
 
 function axStudentGroup(host) {
   return axPrep('stu').then(function (M) {
+    axStudentIndicators(host, M);
     axMatrix(host, { recs: M.recs, dims: [{ k: 'unit', label: '教學單位' }, { k: 'item', label: '評分題目' }, { k: 'year', label: '年份' }, { k: 'view', label: '評核視角' }] }, {
       title: '學生學習成效：年份 × 教學單位 × 評分題目', desc: '同時比較不同年份、教學單位與評分題目（1–6 分量表）。可切換列、欄、分面，並以評核視角篩選。', row: 'unit', col: 'item', facet: 'year',
       note: '資料：分析_學生成效（學生教學成效鏡像）。' + axFlagNote(M.flags) + '。每格為該條件下所有評分的平均；改選「最高分比例」可避開天花板效應。'
@@ -3415,6 +3437,109 @@ function axTraineePersonal(host, d) {
       }
     }
   });
+}
+
+/* ---------- 教學評量指標（適用版，2026-10-14 取代原「指標：學員／學生」） ---------- */
+function axIQR(a) { if (!a.length) return null; var b = a.slice().sort(function (x, y) { return x - y; }); var q = function (p) { var i = (b.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i); return b[lo] + (b[hi] - b[lo]) * (i - lo); }; return [q(.25), q(.5), q(.75)]; }
+function axKpi(o) {
+  // o: {name, value, unit, num, den, numDef, denDef, note, kind:'rate'|'median'|'count', warn}
+  var c = axEl('article', 'ax-kpi' + (o.warn ? ' warn' : '') + (o.na ? ' na' : ''));
+  c.appendChild(axEl('div', 'ax-kpi-n', o.name));
+  var v = axEl('div', 'ax-kpi-v');
+  if (o.na) v.textContent = '—';
+  else if (o.kind === 'rate') v.textContent = (o.den ? Math.round(o.num / o.den * 1000) / 10 : 0) + '%';
+  else v.textContent = o.value;
+  if (o.unit && !o.na) v.appendChild(axEl('small', '', o.unit)); c.appendChild(v);
+  if (o.kind === 'rate' && !o.na) { var bar = axEl('div', 'ax-kpi-bar'); var f = axEl('i'); f.style.width = Math.min(100, o.den ? o.num / o.den * 100 : 0) + '%'; bar.appendChild(f); c.appendChild(bar); }
+  var nd = axEl('div', 'ax-kpi-nd');
+  if (o.na) nd.textContent = o.naText || '資料不足，無法計算';
+  else if (o.kind === 'rate') nd.innerHTML = '<b>' + o.num + '</b>／' + o.den + '　' + esc(o.numDef) + '／' + esc(o.denDef);
+  else nd.textContent = o.sub || '';
+  c.appendChild(nd);
+  if (o.note) c.appendChild(axEl('div', 'ax-kpi-note', o.note));
+  return c;
+}
+function axKpiSection(host, title, desc, kpis, ctrl) {
+  var sec = axEl('section', 'chart ax-card ax-kpis');
+  var h = axEl('div', 'ax-head'); h.appendChild(axEl('h3', 'ax-title', title));
+  var info = axEl('button', 'ax-info', 'ⓘ'); info.type = 'button'; info.setAttribute('aria-label', '指標定義'); h.appendChild(info); sec.appendChild(h);
+  var nt = axEl('div', 'ax-note'); nt.hidden = true; nt.innerHTML = '每項指標皆列出分子／分母定義與數值；比率型指標以長條表示達成比例。資料來源為後台試算表，隨每次更新重算；自評、非數值與負值不納入。<br>' + (desc || ''); sec.appendChild(nt);
+  info.addEventListener('click', function () { nt.hidden = !nt.hidden; });
+  if (ctrl) sec.appendChild(ctrl);
+  var g = axEl('div', 'ax-kpigrid'); kpis.forEach(function (k) { g.appendChild(axKpi(k)); }); sec.appendChild(g);
+  host.appendChild(sec); return sec;
+}
+function axTraineeIndicators(host) {
+  return Promise.all([axLoad(AX.KEYS.cbd), axLoad('d3550fcb622ecb9a').catch(function () { return null; }), axLoad(AX.KEYS.morning).catch(function () { return null; })]).then(function (r) {
+    var cbd = r[0], cbme = r[1], mo = r[2];
+    if (!cbd.rows.length) throw { code: 'NO_PERMISSION' };
+    var cols = cbd.cols, nI = axCol(cols, /^學員姓名$/), sI = axCol(cols, /^期程$/), pI = axCol(cols, /^病例來源$/), vI = axCol(cols, /^評核視角$/);
+    var dI = []; cols.forEach(function (c, i) { if (AX_DOMAINS.test(c)) dI.push(i); });
+    var grp = function (re) { var a = []; cols.forEach(function (c, i) { if (re.test(c)) a.push(i); }); return a; };
+    var gI = grp(/表現良好/), wI = grp(/未來可加強/), aI = grp(/具體改進行動/);
+    var has = function (row, idx) { return idx.some(function (i) { var t = String(row[i] || '').trim(); return t && !/^(無|none)$/i.test(t); }); };
+    var rows = cbd.rows.filter(function (row) { return axName(row[nI]); });
+    var roster = {};
+    if (cbme) { var ci = axCol(cbme.cols, /^學員姓名$/); cbme.rows.forEach(function (row) { var n = axName(row[ci]); if (n) roster[n] = 1; }); }
+    rows.forEach(function (row) { roster[axName(row[nI])] = roster[axName(row[nI])] || 0; });
+    var people = Object.keys(roster), byP = {};
+    rows.forEach(function (row) { (byP[axName(row[nI])] = byP[axName(row[nI])] || []).push(row); });
+    var withCbd = Object.keys(byP);
+    var counts = withCbd.map(function (p) { return byP[p].length; }), iq = axIQR(counts);
+    var ps = {}; rows.forEach(function (row) { var k = axName(row[nI]) + '|' + row[sI]; (ps[k] = ps[k] || {})[String(row[vI] || '')] = 1; });
+    var psK = Object.keys(ps), both = psK.filter(function (k) { return ps[k]['教師評核'] && ps[k]['同儕評核']; }).length;
+    var fbFull = rows.filter(function (row) { return has(row, gI) && has(row, wI) && has(row, aI); }).length;
+    var div3 = withCbd.filter(function (p) { var u = {}; byP[p].forEach(function (row) { u[row[pI]] = 1; }); return Object.keys(u).length >= 3; }).length;
+    var prog = 0, progDen = 0;
+    withCbd.forEach(function (p) {
+      var st = {}; byP[p].forEach(function (row) { var v = dI.map(function (i) { return axNum(row[i]); }).filter(function (x) { return x !== null && x >= 0 && x <= 100; }); if (v.length) (st[row[sI]] = st[row[sI]] || []).push(axMean(v)); });
+      var keys = axSortKeys(Object.keys(st).filter(function (k) { return st[k].length >= 2; }), 'stage');
+      if (keys.length >= 2) { progDen++; if (axMean(st[keys[keys.length - 1]]) > axMean(st[keys[0]])) prog++; }
+    });
+    var bad = 0, tot = 0; rows.forEach(function (row) { dI.forEach(function (i) { var v = axNum(row[i]); if (String(row[i] || '').trim()) { tot++; if (v === null || v < 0 || v > 100) bad++; } }); });
+    var moP = {}; if (mo) { var mn = axCol(mo.cols, /簡報者姓名/); mo.rows.forEach(function (row) { var n = axName(row[mn]); if (n && n in roster) moP[n] = 1; }); }
+    var K = [
+      { name: 'CbD 受評涵蓋率', kind: 'rate', num: withCbd.length, den: people.length, numDef: '有 ≥1 份 CbD 之學員', denDef: '學員名冊（學員CBME＋CbD 出現者）' },
+      { name: 'CbD 評核密度', kind: 'median', value: iq ? axFmt(iq[1], 1) : '—', unit: ' 份／人', sub: iq ? 'IQR ' + axFmt(iq[0], 1) + '–' + axFmt(iq[2], 1) + '｜有 CbD 之學員 ' + withCbd.length + ' 人' : '' },
+      { name: '教師＋同儕雙視角完成率', kind: 'rate', num: both, den: psK.length, numDef: '同一期程同時有教師與同儕評核', denDef: '有 CbD 之「學員×期程」' },
+      { name: '質性回饋完整率', kind: 'rate', num: fbFull, den: rows.length, numDef: '表現良好、未來可加強、行動計畫三類皆填寫', denDef: 'CbD 評核份數' },
+      { name: '病例來源多樣性', kind: 'rate', num: div3, den: withCbd.length, numDef: '涵蓋 ≥3 種病例來源', denDef: '有 CbD 之學員' },
+      { name: '期程進步率', kind: 'rate', num: prog, den: progDen, numDef: '最後期程五大面向平均高於最早期程', denDef: '有 ≥2 個期程（各 ≥2 份）之學員', na: !progDen, naText: '尚無學員具 ≥2 個期程且各 ≥2 份評核' },
+      { name: '晨會病例簡報參與率', kind: 'rate', num: Object.keys(moP).length, den: people.length, numDef: '有 ≥1 場晨會病例簡報', denDef: '學員名冊', na: !mo, naText: '晨會簡報資料尚未開放給目前角色' },
+      { name: '面向分數資料品質', kind: 'rate', num: tot - bad, den: tot, numDef: '有效分數（0–100）', denDef: '已填寫之面向分數格', warn: bad > 0, note: bad ? '發現 ' + bad + ' 格異常值（負值、超過 100 或非數值），已排除於所有統計，請於來源表確認。' : '' }
+    ];
+    axKpiSection(host, '教學評量指標：PGY 學員（CBME／CbD）', '學員名冊以「學員CBME」與 CbD 中出現的學員姓名聯集為準；「指標：學員」原有的評核完成率、評核者參與率等因後台未設定應評次數與評核者身分而無法計算，已改為上列可由現有資料計算的指標。', K);
+  });
+}
+function axStudentIndicators(host, M) {
+  var src = M.src, cols = src.cols, yI = axCol(cols, /^年份/), nI = axCol(cols, /學生姓名/), uI = axCol(cols, /教學單位/), vI = axCol(cols, /評核視角/);
+  var items = []; cols.forEach(function (c, i) { if (/^\d+\.\s*/.test(c)) items.push(i); });
+  var years = axSortKeys(Object.keys(axGroup(src.rows.map(function (r) { return { year: String(r[yI] || '') }; }), 'year')), 'year');
+  var wrap = axEl('div'); host.appendChild(wrap);
+  var sel = '';
+  function draw() {
+    wrap.innerHTML = '';
+    var rows = src.rows.filter(function (r) { return !sel || String(r[yI]) === sel; });
+    var byS = {}; rows.forEach(function (r) { var n = axName(r[nI]); if (n) (byS[n] = byS[n] || []).push(r); });
+    var S_ = Object.keys(byS), other = function (r) { return !/自評/.test(String(r[vI] || '')); };
+    var ge5 = S_.filter(function (s) { return byS[s].filter(other).length >= 5; }).length;
+    var both = S_.filter(function (s) { var v = {}; byS[s].forEach(function (r) { v[String(r[vI] || '')] = 1; }); return v['教師'] && v['同儕']; }).length;
+    var self = S_.filter(function (s) { return byS[s].some(function (r) { return /自評/.test(String(r[vI] || '')); }); }).length;
+    var units = S_.map(function (s) { var u = {}; byS[s].filter(other).forEach(function (r) { u[r[uI]] = 1; }); return Object.keys(u).length; }), iq = axIQR(units);
+    var six = 0, cnt = 0, miss = 0, cells = 0;
+    rows.filter(other).forEach(function (r) { items.forEach(function (i) { cells++; var v = axNum(r[i]); if (v === null || v < 0 || v > 6) { miss++; return; } cnt++; if (v >= 6) six++; }); });
+    var K = [
+      { name: '他評涵蓋率（≥5 份）', kind: 'rate', num: ge5, den: S_.length, numDef: '他評（教師＋同儕）≥5 份之學生', denDef: '期間內有評核紀錄之學生' },
+      { name: '教師＋同儕雙來源評核率', kind: 'rate', num: both, den: S_.length, numDef: '同時有教師與同儕評核', denDef: '期間內有評核紀錄之學生' },
+      { name: '自評完成率', kind: 'rate', num: self, den: S_.length, numDef: '有自評紀錄', denDef: '期間內有評核紀錄之學生' },
+      { name: '教學單位覆蓋', kind: 'median', value: iq ? axFmt(iq[1], 1) : '—', unit: ' 個單位／人', sub: iq ? 'IQR ' + axFmt(iq[0], 1) + '–' + axFmt(iq[2], 1) + '｜他評涵蓋之教學單位數' : '' },
+      { name: '最高分（6 分）比例', kind: 'rate', num: six, den: cnt, numDef: '6 分評分數', denDef: '他評有效題目評分數', warn: cnt && six / cnt > .4, note: cnt && six / cnt > .4 ? '超過四成給滿分，題目鑑別度有限；比較時建議改看「最高分比例」或中位數。' : '' },
+      { name: '題目分數有效率', kind: 'rate', num: cells - miss, den: cells, numDef: '有效分數（1–6）', denDef: '他評題目格數', warn: miss / (cells || 1) > .05, note: miss ? miss + ' 格為 #DIV/0! 或空白，視為缺值。' : '' }
+    ];
+    var ctrl = axEl('div', 'ax-bar'); ctrl.appendChild(axSelect('年份', [{ v: '', t: '全部年份' }].concat(years.map(function (y) { return { v: y, t: y }; })), sel, function (v) { sel = v; draw(); }));
+    axKpiSection(wrap, '教學評量指標：UGY 學生' + (sel ? '（' + sel + '）' : ''), '「指標：學生」原有的評核完成率、評核者參與率等因後台未設定應評次數與評核者身分而無法計算，已改為上列可由現有資料計算的指標。', K, ctrl);
+  }
+  draw();
 }
 /*AX-END*/
 
