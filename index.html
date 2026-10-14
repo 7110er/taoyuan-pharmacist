@@ -556,6 +556,14 @@ table.grid td{max-width:320px}
 
 /* ===== 分析引擎：多維比較矩陣＋亮點看板 ===== */
 .ax-host{display:grid;gap:16px;grid-column:1/-1;min-width:0}
+.fresh-bar{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:90;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 32px);padding:9px 10px 9px 14px;border-radius:999px;background:var(--teal-deep);color:#fff;font-size:.86rem;box-shadow:0 10px 30px rgba(10,63,75,.28);animation:freshin .28s var(--ease)}
+.fresh-bar[hidden]{display:none}
+.fresh-dot{width:8px;height:8px;border-radius:50%;background:#7EE0B5;box-shadow:0 0 0 4px rgba(126,224,181,.25);flex:none}
+.fresh-btn{border:0;border-radius:999px;background:#fff;color:var(--teal-deep);font:inherit;font-weight:700;font-size:.8rem;padding:5px 12px;cursor:pointer}
+.fresh-x{border:0;background:transparent;color:rgba(255,255,255,.75);font-size:1.1rem;line-height:1;cursor:pointer;padding:2px 6px}
+.fresh-btn:focus-visible,.fresh-x:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@keyframes freshin{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
+@media (prefers-reduced-motion:reduce){.fresh-bar{animation:none}}
 .charts>[data-ax]{grid-column:1/-1;min-width:0}
 .ax-card{position:relative}
 .ax-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -847,7 +855,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.9.1';
+var APP_VERSION = '2.10.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -958,18 +966,100 @@ function boot() {
   }).catch(function (e) { showLogin(e.message, 'err'); });
 }
 
+/* 目錄前處理：已併入成效儀表板的分頁不在「資料查詢」列出（僅介面隱藏，不是權限設定）；同一主題的來源合併顯示 */
+function prepCatalog(j) {
+  j.sheets = (j.sheets || []).filter(function (s) { return !QUERY_HIDDEN[s.key] && !(QUERY_HIDDEN_TITLES[s.title] && /多元評量/.test(s.source || '')); });
+  var baseSrc = {}; (j.sheets || []).forEach(function (s) { baseSrc[s.source] = 1; });
+  (j.sheets || []).forEach(function (s) { var b = String(s.source || '').replace(/\s*（[^）]*）\s*$/, ''); if (b && b !== s.source && baseSrc[b]) { s.sourceFull = s.source; s.source = b; } });
+  return j;
+}
+
+/* ---------- 資料新鮮度：後台重建資料後，前台自動偵測並更新（v2.10） ----------
+   1. 網頁開著時每 5 分鐘、或從其他分頁切回本頁時，向後台查詢一次目錄，比對各分頁的「資料更新時間」。
+   2. 有變動且使用者約 1 分鐘內沒有操作 → 清除前台暫存並重畫目前畫面，頂端提示「資料已更新」。
+      使用者正在操作（篩選、放大檢視、閱讀全文、輸入搜尋）→ 只顯示「有新資料，點此更新」，不打斷畫面。
+   3. 網站本身（index.html）換版時，提示重新載入。 */
+var FRESH = { every: 5 * 60 * 1000, sig: '', busy: false, last: 0, timer: null, pending: null, act: 0, etag: '', verChecked: false };
+function freshSig(cat) { var a = (cat.sheets || []).map(function (x) { return String(x.updated || ''); }).filter(Boolean).sort(); return a.length ? a[a.length - 1] + '#' + a.length + '#' + a.join('').length : ''; }
+function freshLatest(cat) { var a = (cat.sheets || []).map(function (x) { return String(x.updated || ''); }).filter(Boolean).sort(); return a.length ? a[a.length - 1] : ''; }
+function freshBusyUser() {
+  if (Date.now() - FRESH.act < 60000) return true;
+  if (document.querySelector('.chart.focused')) return true;
+  var dr = $('drawer'); if (dr && !dr.hidden) return true;
+  var ae = document.activeElement; if (ae && (ae.id === 'q' || /^(SELECT|INPUT|TEXTAREA)$/.test(ae.tagName))) return true;
+  return false;
+}
+['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (ev) { document.addEventListener(ev, function () { FRESH.act = Date.now(); }, { passive: true, capture: true }); });
+function freshBar(msg, btnText, onBtn, sticky) {
+  var b = $('freshBar');
+  if (!b) { b = document.createElement('div'); b.id = 'freshBar'; b.className = 'fresh-bar'; b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); document.body.appendChild(b); }
+  clearTimeout(b._t); b.innerHTML = ''; b.hidden = false;
+  var ic = document.createElement('span'); ic.className = 'fresh-dot'; ic.setAttribute('aria-hidden', 'true'); b.appendChild(ic);
+  b.appendChild(document.createTextNode(msg));
+  if (btnText) { var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'fresh-btn'; bt.textContent = btnText; bt.addEventListener('click', function () { b.hidden = true; onBtn(); }); b.appendChild(bt); }
+  var x = document.createElement('button'); x.type = 'button'; x.className = 'fresh-x'; x.setAttribute('aria-label', '關閉提示'); x.textContent = '×'; x.addEventListener('click', function () { b.hidden = true; }); b.appendChild(x);
+  b.classList.toggle('sticky', !!sticky);
+  if (!sticky) b._t = setTimeout(function () { b.hidden = true; }, 6000);
+}
+function freshCheck(force) {
+  if (!S.session || !S.catalog || FRESH.busy) return Promise.resolve();
+  if (!force && document.hidden) return Promise.resolve();
+  if (!force && Date.now() - FRESH.last < 60000) return Promise.resolve();
+  FRESH.busy = true; FRESH.last = Date.now();
+  freshCheckApp();
+  return api('catalog').then(function (j) {
+    var sig = freshSig(j); if (!sig) return;
+    if (!FRESH.sig) { FRESH.sig = sig; return; }
+    if (sig === FRESH.sig) return;
+    FRESH.pending = { j: j, sig: sig };
+    if (freshBusyUser()) freshBar('後台資料已更新（' + freshLatest(j) + '）', '更新畫面', freshApply, true);
+    else freshApply();
+  }).catch(function () { /* 網路或權限暫時失敗：下次再試，不打擾使用者 */ }).then(function () { FRESH.busy = false; });
+}
+function freshApply() {
+  var P = FRESH.pending; if (!P) return; FRESH.pending = null;
+  var oldTime = freshLatest(S.catalog), newTime = freshLatest(P.j);
+  FRESH.sig = P.sig;
+  // 清除所有前台暫存（資料查詢分頁、儀表板總覽、分析引擎）
+  S.data = {}; S.failedKeys = {}; S.loadingKeys = {}; S.ovCache = {};
+  if (typeof AX !== 'undefined') { AX.cache = {}; AX.pending = {}; AX.resolved = null; }
+  var oldDash = (S.catalog.dashboards || []).map(function (d) { return d.id + d.name; }).join('|');
+  S.catalog = prepCatalog(P.j);
+  buildScope(); buildPages();
+  if ((S.catalog.dashboards || []).map(function (d) { return d.id + d.name; }).join('|') !== oldDash) { var keep = S.dashId; buildDashList(); if (keep && dashItem(keep)) { S.dashId = keep; S.dashCat = catOfId(keep); renderDashNav(); } }
+  var dashOn = !$('dashPanel').hidden;
+  if (dashOn && S.dashId) {
+    if (S.dashId === OVERVIEW_ID || S.dashId.indexOf(OVERVIEW_ID + ':') === 0) renderOverview(S.dashCat); else loadDashboard(false);
+  }
+  render(); preloadAll();
+  freshBar('資料已更新' + (oldTime && newTime ? '（' + oldTime.slice(5) + ' → ' + newTime.slice(5) + '）' : ''), '', null, false);
+}
+/* 網站換版偵測：比對伺服器上的 index.html 版本號 */
+function freshCheckApp() {
+  if (!window.fetch || location.protocol === 'file:') return;
+  var url = location.pathname + (location.pathname.slice(-1) === '/' ? '' : '');
+  var getVer = function () {
+    return fetch(url + '?v=' + Date.now(), { cache: 'no-store' }).then(function (r) { FRESH.etag = r.headers.get('etag') || FRESH.etag; return r.text(); }).then(function (t) {
+      var m = /var APP_VERSION = '([\d.]+)'/.exec(t); if (m && m[1] !== APP_VERSION) freshBar('網站已更新為 v' + m[1] + '（目前 v' + APP_VERSION + '）', '重新載入', function () { location.reload(); }, true);
+    });
+  };
+  if (!FRESH.verChecked) { FRESH.verChecked = true; getVer().catch(function () {}); return; }
+  fetch(url + '?h=' + Date.now(), { method: 'HEAD', cache: 'no-store' }).then(function (r) { var e = r.headers.get('etag'); if (e && FRESH.etag && e !== FRESH.etag) return getVer(); }).catch(function () {});
+}
+function freshStart() {
+  clearInterval(FRESH.timer);
+  FRESH.timer = setInterval(function () { freshCheck(false); }, FRESH.every);
+}
+document.addEventListener('visibilitychange', function () { if (!document.hidden) { freshCheck(false); if (FRESH.pending && !freshBusyUser()) freshApply(); } });
+
 function startApp() {
   $('loginView').hidden = true; $('appView').hidden = false;
   showUser();
   setStatus('');
   skeletonView();
   api('catalog').then(function (j) {
-    S.catalog = j;
-    // 已併入成效儀表板的分頁：不在「資料查詢」列出（資料仍由後端依權限提供給儀表板；這裡只是介面隱藏，不是權限設定）
-    j.sheets = (j.sheets || []).filter(function (s) { return !QUERY_HIDDEN[s.key] && !(QUERY_HIDDEN_TITLES[s.title] && /多元評量/.test(s.source || '')); });
-    // 同一主題的來源合併顯示：「教學資源（晨會簡報）」併入「教學資源」群組（控制台名稱保持唯一，網頁上同組呈現）
-    var baseSrc = {}; (j.sheets || []).forEach(function (s) { baseSrc[s.source] = 1; });
-    (j.sheets || []).forEach(function (s) { var b = String(s.source || '').replace(/\s*（[^）]*）\s*$/, ''); if (b && b !== s.source && baseSrc[b]) { s.sourceFull = s.source; s.source = b; } });
+    FRESH.sig = freshSig(j);
+    S.catalog = prepCatalog(j);
     if (j.bootstrap) { S.user = j.bootstrap; saveSession(); showUser(); }
     var sn = j.bootstrap && j.bootstrap.ui_config && j.bootstrap.ui_config.siteName;
     if (sn) { S.siteName = sn; document.title = sn; $('brand').textContent = sn; }
@@ -979,6 +1069,7 @@ function startApp() {
     buildDashList();
     render();
     preloadAll();
+    freshStart();
   }).catch(function (e) {
     if (e.code === 'AUTH_REQUIRED' || e.code === 'ACCESS_DENIED') return;
     if (e.code === 'SYSTEM_NOT_ACTIVATED') { stateView('', '系統正在上線檢查，暫不提供資料。您的帳號與角色已確認，啟用後即可使用。'); return; }
