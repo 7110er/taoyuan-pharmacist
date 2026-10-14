@@ -374,6 +374,13 @@ table.grid td{max-width:320px}
 .kcard span{color:var(--ink-3)}
 .kcard .kline{padding:4px 0 4px 12px;position:relative;border-bottom:1px solid var(--rule-2)}
 .kcard .kline:last-child{border-bottom:0}
+.kcard .ksec{margin-top:8px;padding:6px 0 2px 10px;border-left:3px solid var(--rule)}
+.kcard .ksec.pos{border-left-color:#2E8B6E}
+.kcard .ksec.warn{border-left-color:#C98A1B}
+.kcard .ksec.act{border-left-color:var(--teal-deep)}
+.kcard .ksec-h{font-size:.74rem;font-weight:700;letter-spacing:.02em;color:var(--ink-2);margin-bottom:2px}
+.kcard .ksec.pos .ksec-h{color:#1F6E55}
+.kcard .ksec.warn .ksec-h{color:#8A5D0E}
 .kmedia{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}
 .kmedia .kplay,.kmedia .kpeek{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:4px 12px;border-radius:999px;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer;border:1px solid transparent}
 .kmedia .kplay{background:var(--teal-deep);color:#fff}
@@ -545,6 +552,78 @@ table.grid td{max-width:320px}
 .chart .state.supp-state::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230F5E6E' stroke-width='2' stroke-linecap='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E")}
 @media print{.top,.nav,.drawer-foot,.scrim,.searchbar,.dash-top,.bi-head{display:none}.bcard{break-inside:avoid}.drawer{position:static;box-shadow:none;max-height:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ===== 分析引擎：多維比較矩陣＋亮點看板 ===== */
+.ax-host{display:grid;gap:16px;grid-column:1/-1;min-width:0}
+.ax-card{position:relative}
+.ax-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ax-title{font-size:1rem;margin:0;font-weight:700;letter-spacing:.01em}
+.ax-info{margin-left:auto;width:28px;height:28px;border-radius:50%;border:1px solid var(--rule);background:var(--sheet);color:var(--teal);cursor:pointer;font-size:.85rem;flex:none}
+.ax-info:hover{background:var(--wash)}
+.ax-note{font-size:.8rem;line-height:1.7;color:var(--ink-2);background:var(--wash-2);border:1px solid var(--rule-2);border-radius:var(--r-md);padding:10px 12px;margin:4px 0 10px}
+.ax-bar,.ax-filters{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:6px 0}
+.ax-filters:empty{display:none}
+.ax-sel{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)}
+.ax-sel select{font-size:.85rem;padding:5px 26px 5px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--sheet) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%230F5E6E' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 10px center;appearance:none;-webkit-appearance:none;color:var(--ink);max-width:14rem}
+.ax-sel select:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+.ax-facets{display:grid;gap:14px}
+.ax-facets.multi{grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.ax-facet{min-width:0}
+.ax-ftitle{font-size:.78rem;font-weight:700;color:var(--teal-deep);letter-spacing:.04em;margin:2px 0 6px;padding-left:8px;border-left:3px solid var(--seal)}
+.ax-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r-md);border:1px solid var(--rule-2)}
+.ax-heat{border-collapse:separate;border-spacing:2px;font-size:.78rem;min-width:100%}
+.ax-heat th,.ax-heat td{padding:0}
+.ax-corner{position:sticky;left:0;background:var(--sheet);z-index:2}
+.ax-ch{vertical-align:bottom;font-weight:600;color:var(--ink-2);min-width:52px;max-width:96px;padding:4px 2px 6px!important}
+.ax-ch span{display:block;font-size:.72rem;line-height:1.3;white-space:normal;word-break:break-all}
+.ax-ch.num span{font-size:.8rem;color:var(--teal-deep);font-variant-numeric:tabular-nums}
+.ax-itemkey{margin-top:10px;font-size:.78rem;color:var(--ink-2)}
+.ax-itemkey summary{cursor:pointer;color:var(--teal);font-weight:600}
+.ax-itemkey ol{margin:6px 0 0;padding-left:2.2em;columns:2 260px;column-gap:24px}
+.ax-itemkey li{break-inside:avoid;margin:2px 0}
+.ax-rh{position:sticky;left:0;z-index:1;background:var(--sheet);text-align:left;font-weight:600;color:var(--ink);padding:0 10px 0 4px!important;white-space:nowrap;max-width:11rem;overflow:hidden;text-overflow:ellipsis}
+.ax-heat td{min-width:52px;height:44px;text-align:center;border-radius:6px;position:relative;transition:transform .15s var(--ease),box-shadow .15s var(--ease)}
+.ax-heat td b{display:block;font-size:.86rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.ax-heat td small{display:block;font-size:.62rem;opacity:.75;font-variant-numeric:tabular-nums}
+.ax-heat td.ax-na{background:repeating-linear-gradient(45deg,transparent 0 4px,var(--rule-2) 4px 5px)}
+.ax-heat td.ax-small{background:#F1F3F4;color:var(--ink-3)}
+.ax-heat td.ax-small span{font-size:.66rem}
+.ax-heat td.ax-click{cursor:pointer}
+.ax-heat td.ax-click:hover,.ax-heat td.ax-click:focus-visible{transform:scale(1.06);box-shadow:0 4px 14px rgba(10,63,75,.25);z-index:3;outline:none}
+.ax-mk{position:absolute;top:2px;right:4px;font-style:normal;font-size:.7rem;color:#F5C451;text-shadow:0 0 2px rgba(0,0,0,.4)}
+.ax-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:10px;font-size:.74rem;color:var(--ink-3)}
+.ax-ramp{width:120px;height:8px;border-radius:999px;background:linear-gradient(90deg,rgb(238,245,246),rgb(10,63,75))}
+.ax-sw.small{width:14px;height:10px;border-radius:3px;background:#F1F3F4;border:1px solid var(--rule)}
+.ax-loading{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:.85rem}
+.ax-spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--teal-soft);border-top-color:var(--teal);animation:axspin .8s linear infinite}
+@keyframes axspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.ax-spin{animation:none}.ax-heat td{transition:none}}
+.ax-keyrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:2px 0 12px}
+.ax-hlgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr))}
+.ax-hl{background:linear-gradient(180deg,var(--sheet),var(--wash-2));border:1px solid var(--rule);border-radius:var(--r-md);padding:12px 14px;display:grid;gap:8px;align-content:start}
+.ax-hl header{display:flex;flex-direction:column}
+.ax-hl header b{font-size:.98rem;letter-spacing:.02em}
+.ax-hl header small{font-size:.72rem;color:var(--ink-3)}
+.ax-bl{display:flex;flex-wrap:wrap;gap:6px}
+.ax-b{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 6px;border-radius:999px;font-size:.76rem;font-weight:600;border:1px solid transparent;line-height:1.4}
+.ax-b i{font-style:normal;display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;font-size:.72rem}
+.ax-b.star{background:#FFF6DC;color:#7A5300;border-color:#F1D88E}.ax-b.star i{background:#F5C451;color:#5C3D00}
+.ax-b.dia{background:var(--wash);color:var(--teal-deep);border-color:var(--teal-soft)}.ax-b.dia i{background:var(--teal);color:#fff}
+.ax-b.up{background:var(--ok-soft);color:var(--ok);border-color:#BFE0CC}.ax-b.up i{background:var(--ok);color:#fff}
+.ax-b.q{background:var(--peach-wash);color:var(--peach);border-color:#F3C3D2}.ax-b.q i{background:var(--seal);color:#fff}
+.ax-q{margin:0;padding:8px 10px 8px 12px;border-left:3px solid var(--seal);background:var(--sheet);border-radius:0 8px 8px 0;font-size:.82rem;color:var(--ink-2);display:flex;gap:6px}
+.ax-q i{font-style:normal;color:var(--seal);font-size:1rem;line-height:1}
+.ax-muted{margin:0;font-size:.78rem;color:var(--ink-3)}
+.ax-split{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:1100px){.ax-split:has(.ax-side:not([hidden])){grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr)}}
+.ax-side{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r-lg);padding:14px;display:grid;gap:10px;align-content:start;max-height:80vh;overflow:auto}
+.ax-side-h{display:flex;align-items:center;gap:8px;position:sticky;top:-14px;background:var(--sheet);padding:4px 0}
+.ax-x{margin-left:auto;border:0;background:var(--wash);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1rem}
+.ax-case{font-weight:700;font-size:.85rem;margin-bottom:4px}
+.ax-tl{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:10px}
+.ax-tl li{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--rule-2);border-radius:var(--r-md);background:var(--wash-2)}
+.ax-tl time{font-size:.72rem;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.ax-tl small{font-size:.72rem;color:var(--teal)}
 </style>
 </head>
 <body>
@@ -731,7 +810,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.4.0';
+var APP_VERSION = '2.6.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -1719,13 +1798,13 @@ S.dash = null; S.dashId = null; S.filt = {}; S.subject = ''; S.dashReq = 0;
 var MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 /* 成效儀表板資訊架構：總覽 → 四大類 → 各儀表板。分類依控制台名稱（使用者裁決之對照）；控制台若提供 category 欄位則優先採用 */
 /* 已併入成效儀表板、不在資料查詢列出的分頁（分頁代碼＝控制台「分頁開放」K 欄；標題為代碼變動時的備援比對） */
-var QUERY_HIDDEN = { '954792c76b807eeb': '學生分數', '3d3b4891940686c4': '學員CbD', 'd3550fcb622ecb9a': '學員CBME', 'b6eaeac3bf68cc26': '教師分數', '74a3d4736da2f0d1': '各組分數', '176bff05bd70277d': '簡報回饋', 'd8371f3ad2728fd7': 'CBME成效' };
-var QUERY_HIDDEN_TITLES = { '學生分數': 1, '學員CbD': 1, '學員CBME': 1, '教師分數': 1, '各組分數': 1, '簡報回饋': 1, 'CBME成效': 1 };
+var QUERY_HIDDEN = { '954792c76b807eeb': '學生分數', '3d3b4891940686c4': '學員CbD', 'd3550fcb622ecb9a': '學員CBME', 'b6eaeac3bf68cc26': '教師分數', '74a3d4736da2f0d1': '各組分數', '176bff05bd70277d': '簡報回饋', 'd8371f3ad2728fd7': 'CBME成效', 'eb909b5ef78a1d2f': '分析_學生成效', '4b1b100f6ff586a8': '分析_教師成效', '020dfa0741ec0cb2': '分析_組別成效' };
+var QUERY_HIDDEN_TITLES = { '分析_學生成效': 1, '分析_教師成效': 1, '分析_組別成效': 1, '學生分數': 1, '學員CbD': 1, '學員CBME': 1, '教師分數': 1, '各組分數': 1, '簡報回饋': 1, 'CBME成效': 1 };
 var DASH_CATS = [
   { key: 'personal', name: '個人成績', desc: '本人或指派對象的評核結果與學習歷程', cls: 'p',
     names: ['PGY 學員個人成績', 'UGY 學生個人成績', '教師教學評核（個人）'] },
   { key: 'teach', name: '教學成效', desc: '能力養成、教學單位、教師群體與學術產出', cls: 't',
-    names: ['CBME 成效', '病例導向討論（CbD）整體成效', '藥學生整體成效', '簡報評核', '教學單位評核', '臨床教師概況（群體）', '教育訓練成效', '學習風格與教材', '教學與學術成果'] },
+    names: ['CBME 成效', '病例導向討論（CbD）整體成效', '學生學習成效', '簡報評核', '單位組別成效', '教師教學成效', '教育訓練成效', '學習風格與教材', '教學與學術成果', '藥學生整體成效', '教學單位評核', '臨床教師概況（群體）'] },
   { key: 'clinic', name: '臨床成效', desc: '藥事照護介入、衛教與諮詢服務的產出', cls: 'c',
     names: ['藥事照會介入成效', '衛教諮詢成效', '諮詢服務', '整合病房減藥成效'] },
   { key: 'metric', name: '教學評量指標', desc: '以分子／分母定義、可逐年追蹤的群體指標', cls: 'm', names: ['指標：學員', '指標：學生'] }
@@ -1959,7 +2038,16 @@ function renderDashboard() {
   var subjLabel = '';
   (d.subjects || []).forEach(function (s) { if (s.pid === d.subject) subjLabel = s.label; });
   setCrumb(dashName(S.dashId) || d.name, [(y ? y + ' 年' : '全部年度') + (m ? ' ' + Number(m) + ' 月' : ''), subjLabel].filter(Boolean).join('｜'));
-  if (!d.charts.length) { box.innerHTML = '<div class="panel state">' + EMPTY_TEXT.NO_PERMISSION + '</div>'; return; }
+  if (!d.charts.length) { // 後端未回任何圖表：可能是資料重建中，或目前角色沒有此儀表板的圖表；不直接斷言「無權限」
+    box.innerHTML = '';
+    var em = document.createElement('div'); em.className = 'panel state';
+    em.textContent = '此儀表板目前沒有可顯示的圖表。常見原因：資料正在重建（約 5–10 分鐘），或目前角色（' + ((S.user && S.user.active_role_label) || '目前角色') + '）不含此儀表板的圖表。請稍後重新整理，或在右上角切換為「臨床指導教師」。';
+    var rb = document.createElement('button'); rb.type = 'button'; rb.className = 'btn small'; rb.textContent = '重新整理'; rb.style.marginTop = '10px';
+    rb.addEventListener('click', function () { loadDashboard(false); });
+    em.appendChild(document.createElement('br')); em.appendChild(rb); box.appendChild(em);
+    if (!S.emptyRetry) { S.emptyRetry = setTimeout(function () { S.emptyRetry = null; if (S.dash === d) loadDashboard(false); }, 30000); }
+    return;
+  }
   // KPI 列：數字卡（OK）＋本頁摘要
   var personal = d.charts.some(function (c) { return c.scope === '個人'; });
   var ts = trendSeries(d), sparkDone = false;
@@ -1984,6 +2072,7 @@ function renderDashboard() {
   if (maxSubj !== null) kp.appendChild(metaTile('受評人數', maxSubj.toLocaleString('zh-TW'), '本頁人數最多之群體圖表（不同人）'));
   if (personal && subjLabel) kp.appendChild(metaTile('檢視對象', subjLabel, '', true));
   d.charts.forEach(function (c) { if (!(c.type === '數字卡' && c.status === 'OK')) box.appendChild(chartCard(c)); });
+  try { enhanceDashboard(d, box); } catch (e) { if (window.console) console.error(e); }
 }
 var ICON = {
   clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
@@ -2684,6 +2773,7 @@ function drawKanban(c) {
   // 欄名只差結尾序號（如「具體內容-1…-30」）時不逐行重複欄名，改為條列
   var fl = c.fieldLabels || [], stem = function (x) { return String(x || '').replace(/[-－_]?\s*\d+$/, ''); };
   var sameStem = fl.length > 1 && fl.every(function (x) { return stem(x) === stem(fl[0]); });
+  var stemCount = {}; fl.forEach(function (x) { var t = stem(x); stemCount[t] = (stemCount[t] || 0) + 1; });
   // 第一欄為日期時，各欄卡片由新到舊排列（最近一次在最上方）
   if (/日期|時間/.test(fl[0] || '')) {
     var dt = function (k) { var m = /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/.exec((k.v || [])[0] || ''); return m ? +m[1] * 10000 + +m[2] * 100 + +m[3] : 0; };
@@ -2694,22 +2784,36 @@ function drawKanban(c) {
     var h = document.createElement('h4'); h.textContent = g; var n = document.createElement('span'); n.textContent = cols[g].length; h.appendChild(n); col.appendChild(h);
     cols[g].forEach(function (k) {
       var cd = document.createElement('div'); cd.className = 'kcard';
+      var sec = null, secStem = null, seen = {};
       (k.v || []).forEach(function (v, i) {
-        if (!v) return; var d = document.createElement('div');
-        if (sameStem) { d.className = 'kline'; }
-        else { if (i > 0) { var lb = document.createElement('span'); lb.textContent = (c.fieldLabels || [])[i] + '：'; d.appendChild(lb); } if (i === 0) d.style.fontWeight = '700'; }
-        var tv = normGlyph(v);
+        var tv = normGlyph(v || '').trim();
+        if (!tv || /^(無|none|null|n\/a|-)$/i.test(tv)) return;
+        var lab = fl[i] || '', st = stem(lab), multi = stemCount[st] > 1;
+        if (sameStem) { var d0 = document.createElement('div'); d0.className = 'kline'; d0.appendChild(linkifyText(tv)); cd.appendChild(d0); return; }
+        if (multi) { // 同欄名序號群組（如「表現良好 1…21」）：一個小標題＋條列，重複內容只列一次
+          if (secStem !== st) {
+            sec = document.createElement('div'); sec.className = 'ksec ' + kTone(st); secStem = st; seen = {};
+            var hh = document.createElement('div'); hh.className = 'ksec-h'; hh.textContent = st.replace(/[『』「」]/g, '').replace(/[\s:：]+$/, ''); sec.appendChild(hh); cd.appendChild(sec);
+          }
+          if (seen[tv]) return; seen[tv] = 1;
+          var li = document.createElement('div'); li.className = 'kline'; li.appendChild(linkifyText(tv)); sec.appendChild(li); return;
+        }
+        secStem = null;
+        var d = document.createElement('div');
+        if (i > 0) { var lb = document.createElement('span'); lb.textContent = lab + '：'; d.appendChild(lb); } else d.style.fontWeight = '700';
         if (/^https?:\/\/\S+$/.test(tv)) { d.appendChild(kanbanMedia(tv, kanbanTitle(k, c))); d.classList.add('klink'); }
         else d.appendChild(linkifyText(tv));
         cd.appendChild(d);
       });
-      col.appendChild(cd);
+      if (cd.children.length) col.appendChild(cd);
     });
     wrap.appendChild(col);
   });
   return wrap;
 }
 
+/* 質性回饋分段色調：表現良好＝正向、可加強＝提醒、行動計畫＝行動 */
+function kTone(st) { if (/良好|優點/.test(st) && /加強|缺點/.test(st)) return ''; return /良好|優點|優秀|值得肯定/.test(st) ? 'pos' : /加強|缺點|改善|建議/.test(st) && !/行動|計畫/.test(st) ? 'warn' : /行動|計畫|改善方法/.test(st) ? 'act' : ''; }
 /* 看板卡片的簡報／檔案連結：雲端 .pptx／.pdf／Google 簡報 → 全螢幕播放＋頁內翻閱；其他網址 → 一般連結 */
 function kanbanTitle(k, c) {
   var fl = c.fieldLabels || [], v = k.v || [], t = '';
@@ -2839,6 +2943,481 @@ window.__taoe = { sanitizeHtml: sanitizeHtml, renderCell: renderCell, plainText:
   ytId: ytId, driveId: driveId, docsInfo: docsInfo, cleanStyle: cleanStyle, search: search, norm: norm, injectData: injectData, aggregateChart: aggregateChart, state: S, version: APP_VERSION };
 
 boot();
+
+/*AX-BEGIN*/
+/* =====================================================================
+   分析引擎（v2.6.0）：多維比較矩陣＋三層正向亮點
+   資料來源一律走後端 api('sheet')，權限由後端過濾；前端只做統計與呈現。
+   規則（2026-10-14 管理者核定）：
+   ★ 群體亮點：該題最高分（6 分）比例 ≥ 同期群比例＋15 個百分點，且 Wilson 90% 下界 > 同期群比例，且 n ≥ 5
+   ◆ 個人強項：自身相對最強的一題（題目平均－本人總平均最大），且不低於同期群該題中位數，且 n ≥ 5
+   ❝ 質性亮點：直接引用「表現良好」類回饋原文
+   排除：自評、#DIV/0!／非數值、負值（資料錯誤並標示）；不顯示任何負面標記；不顯示評核者姓名
+   ===================================================================== */
+var AX = {
+  MIN_N: 5, DELTA: 0.15, Z: 1.645, TOP: 6,
+  KEYS: { stu: 'AX_STU', tea: 'AX_TEA', unit: 'AX_UNIT', cbd: '3d3b4891940686c4', morning: '95bbabf465ea2c2d', stuScore: '954792c76b807eeb', teaScore: 'b6eaeac3bf68cc26', unitFb: '' },
+  cache: {}, pending: {}
+};
+/* 分析分頁的分頁代碼（控制台「分頁開放」K 欄）；啟動時由目錄或常數補齊 */
+var AX_SHEET_TITLES = { AX_STU: '分析_學生成效', AX_TEA: '分析_教師成效', AX_UNIT: '分析_組別成效' };
+
+function axNum(v) {
+  if (v === null || v === undefined || v === '') return null;
+  if (typeof v === 'number') return isFinite(v) ? v : null;
+  var m = /^\s*(-?\d+(?:\.\d+)?)/.exec(String(v));
+  return m ? parseFloat(m[1]) : null;
+}
+function axMean(a) { if (!a.length) return null; var s = 0; a.forEach(function (x) { s += x; }); return s / a.length; }
+function axMedian(a) { if (!a.length) return null; var b = a.slice().sort(function (x, y) { return x - y; }); var m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; }
+function axWilsonLB(k, n, z) { if (!n) return 0; var p = k / n, d = 1 + z * z / n, c = p + z * z / (2 * n), r = z * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)); return (c - r) / d; }
+function axName(s) { return String(s || '').replace(/（.*$/, '').replace(/^\s*[A-Za-z]{0,2}\d+\s+/, '').replace(/\s+/g, '').trim(); }
+function axShort(label) {
+  var t = String(label || '').replace(/的(AVERAGE|SUM|COUNTA?)$/i, '').replace(/\t/g, ' ').trim();
+  var m = /^(\d+)\.\s*(.*)$/.exec(t); var no = m ? m[1] : '', body = m ? m[2] : t;
+  body = body.replace(/[（(].*$/, '').replace(/[，,？?].*$/, '').trim();
+  if (body.length > 22) body = body.slice(0, 21) + '…';
+  return (no ? no + '. ' : '') + body;
+}
+function axFmt(v, d) { return v === null || v === undefined || !isFinite(v) ? '—' : (Math.round(v * Math.pow(10, d || 0)) / Math.pow(10, d || 0)).toLocaleString('zh-TW'); }
+function axPct(v) { return v === null || !isFinite(v) ? '—' : Math.round(v * 100) + '%'; }
+function axEl(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined && text !== null) e.textContent = text; return e; }
+
+/* ---------- 資料載入（同一次瀏覽只抓一次） ---------- */
+function axKey(k) { return AX.KEYS[k] && !/^AX_/.test(AX.KEYS[k]) ? AX.KEYS[k] : (AX.resolved && AX.resolved[k]) || ''; }
+function axLoad(key) {
+  if (!key) return Promise.reject({ code: 'NO_KEY', message: '分析分頁尚未登錄' });
+  if (AX.cache[key]) return Promise.resolve(AX.cache[key]);
+  if (AX.pending[key]) return AX.pending[key];
+  AX.pending[key] = api('sheet', { key: key }).then(function (j) {
+    var d = j.data || {}; var cols = (d.columns || []).map(function (c) { return c.label; });
+    var res = { cols: cols, rows: (d.rows || []).map(function (r) { return Array.isArray(r) ? r : cols.map(function (c) { return r[c]; }); }), own: !!d.own };
+    AX.cache[key] = res; delete AX.pending[key]; return res;
+  }, function (e) { delete AX.pending[key]; throw e; });
+  return AX.pending[key];
+}
+function axCol(cols, re, not) { for (var i = 0; i < cols.length; i++) { if (re.test(cols[i]) && !(not && not.test(cols[i]))) return i; } return -1; }
+
+/* ---------- 長表（melt）：每一筆＝一位評核者對一個對象的一題分數 ---------- */
+function axMelt(src, spec) {
+  var cols = src.cols, out = [], flags = { neg: 0, self: 0, bad: 0 };
+  var di = {}; Object.keys(spec.dims).forEach(function (k) { di[k] = axCol(cols, spec.dims[k]); });
+  var items = []; cols.forEach(function (c, i) { if (spec.item.test(c) && !(spec.itemNot && spec.itemNot.test(c))) items.push({ i: i, label: c, short: spec.shortFn ? spec.shortFn(c) : axShort(c) }); });
+  var selfI = spec.selfCol ? axCol(cols, spec.selfCol) : -1;
+  src.rows.forEach(function (r, ri) {
+    if (selfI >= 0 && /自評/.test(String(r[selfI] || ''))) { flags.self++; return; }
+    if (spec.rowFilter && !spec.rowFilter(r, cols)) return;
+    var base = {}; Object.keys(di).forEach(function (k) { base[k] = di[k] >= 0 ? String(r[di[k]] == null ? '' : r[di[k]]).trim() : ''; });
+    items.forEach(function (it) {
+      var v = axNum(r[it.i]);
+      if (v === null) { if (String(r[it.i] || '').trim()) flags.bad++; return; }
+      if (v < 0) { flags.neg++; return; }
+      if (spec.max && v > spec.max) return;
+      var rec = {}; for (var k in base) rec[k] = base[k]; rec.item = it.short; rec.v = v; rec._row = ri; out.push(rec);
+    });
+  });
+  return { recs: out, items: items.map(function (x) { return x.short; }), flags: flags, dimIdx: di };
+}
+
+/* ---------- 聚合 ---------- */
+function axRows(recs) { var u = {}, n = 0; recs.forEach(function (r) { var k = r._row === undefined ? Math.random() : r._row; if (!u[k]) { u[k] = 1; n++; } }); return n; }
+function axAgg(recs, measure) {
+  var vals = recs.map(function (r) { return r.v; });
+  if (!vals.length) return { n: 0, v: null };
+  var a = axAgg0(vals, measure); a.n = axRows(recs); a.k = vals.length; return a;
+}
+function axAgg0(vals, measure) {
+  if (measure === 'top') { var k = vals.filter(function (x) { return x >= AX.TOP; }).length; return { n: vals.length, v: k / vals.length }; }
+  if (measure === 'median') return { n: vals.length, v: axMedian(vals) };
+  return { n: vals.length, v: axMean(vals) };
+}
+function axGroup(recs, key) { var g = {}; recs.forEach(function (r) { var k = r[key] || '（未填）'; (g[k] = g[k] || []).push(r); }); return g; }
+function axSortKeys(keys, dim) {
+  var stage = function (s) { var m = /(\d+)\s*M/i.exec(s); return m ? +m[1] : 999; };
+  var year = function (s) { var m = /(\d{3})年\((上|下)\)/.exec(s); return m ? +m[1] * 2 + (m[2] === '下' ? 1 : 0) : 0; };
+  if (dim === 'item') return keys.sort(function (a, b) { return (parseInt(a, 10) || 99) - (parseInt(b, 10) || 99) || a.localeCompare(b, 'zh-Hant'); });
+  if (keys.some(function (k) { return /\d{3}年/.test(k); })) return keys.sort(function (a, b) { return year(a) - year(b); });
+  if (keys.some(function (k) { return /PGY\d+M/i.test(k); })) return keys.sort(function (a, b) { return stage(a) - stage(b); });
+  return keys.sort(function (a, b) { return a.localeCompare(b, 'zh-Hant'); });
+}
+
+/* ---------- 三層亮點 ---------- */
+function axHighlights(recs, subjKey, cohortKey) {
+  var byCoh = cohortKey ? axGroup(recs, cohortKey) : { __all: recs };
+  var res = {}; // res[subject][cohort] = { star:[], diamond:null, n }
+  Object.keys(byCoh).forEach(function (coh) {
+    var cr = byCoh[coh];
+    var itemAll = axGroup(cr, 'item'), cohRate = {}, cohMed = {};
+    Object.keys(itemAll).forEach(function (it) { var v = itemAll[it].map(function (r) { return r.v; }); cohRate[it] = v.filter(function (x) { return x >= AX.TOP; }).length / v.length; cohMed[it] = axMedian(v); });
+    var bySubj = axGroup(cr, subjKey);
+    Object.keys(bySubj).forEach(function (s) {
+      var sr = bySubj[s], own = axMean(sr.map(function (r) { return r.v; }));
+      var byItem = axGroup(sr, 'item'), stars = [], best = null;
+      Object.keys(byItem).forEach(function (it) {
+        var v = byItem[it].map(function (r) { return r.v; }); var n = v.length; if (n < AX.MIN_N) return;
+        var k = v.filter(function (x) { return x >= AX.TOP; }).length, rate = k / n, lb = axWilsonLB(k, n, AX.Z);
+        if (rate >= cohRate[it] + AX.DELTA && lb > cohRate[it]) stars.push({ item: it, rate: rate, coh: cohRate[it], n: n, lb: lb });
+        var m = axMean(v);
+        if (m >= cohMed[it] && (!best || m - own > best.rel || (m - own === best.rel && n > best.n))) best = { item: it, mean: m, rel: m - own, n: n, cohMed: cohMed[it] };
+      });
+      stars.sort(function (a, b) { return (b.rate - b.coh) - (a.rate - a.coh); });
+      (res[s] = res[s] || {})[coh] = { star: stars, diamond: best, n: axRows(sr) };
+    });
+  });
+  return res;
+}
+/* 正向回饋摘錄：只取明確肯定語氣、且不含建議／不足語氣的句子 */
+var AX_POS = /(能|積極|認真|細心|用心|主動|熱忱|熱心|清楚|完整|詳細|優秀|良好|很好|佳|讚|專業|負責|仔細|有條理|豐富|努力|進步|穩定|耐心|親切)/;
+var AX_NEG = /(可再|再加強|建議|加強|不足|錯誤|小心|需要|應該|應更|請|改善|缺乏|不夠|較弱|待|未能|不太|沒有|無法)/;
+function axQuotes(texts, max) {
+  var seen = {}, out = [];
+  texts.forEach(function (t) {
+    String(t || '').split(/[\n；;。]/).forEach(function (s) {
+      s = normGlyph(s).replace(/^\s*[\d一二三四五六七八九十]+[.、)）]\s*/, '').trim();
+      if (s.length < 4 || s.length > 80 || seen[s]) return;
+      if (AX_POS.test(s) && !AX_NEG.test(s)) { seen[s] = 1; out.push(s); }
+    });
+  });
+  return out.slice(0, max || 2);
+}
+
+/* ---------- UI：多維比較矩陣 ---------- */
+function axSelect(label, opts, val, onChange) {
+  var w = axEl('label', 'ax-sel'); w.appendChild(axEl('span', '', label));
+  var s = document.createElement('select');
+  opts.forEach(function (o) { var op = document.createElement('option'); op.value = o.v; op.textContent = o.t; if (o.v === val) op.selected = true; s.appendChild(op); });
+  s.addEventListener('change', function () { onChange(s.value); }); w.appendChild(s); return w;
+}
+function axColor(t) { // 0..1 → 青綠序列（淺→深），文字顏色自動對比
+  t = Math.max(0, Math.min(1, t));
+  var a = [238, 245, 246], b = [10, 63, 75];
+  var c = a.map(function (x, i) { return Math.round(x + (b[i] - x) * Math.pow(t, .85)); });
+  return { bg: 'rgb(' + c.join(',') + ')', fg: t > .55 ? '#fff' : 'var(--ink)' };
+}
+function axMatrix(host, M, cfg) {
+  // M: { recs, items, dims:[{k,label}] }  cfg: {title, desc, measure, row, col, facet, scale:[lo,hi], unit, marks:fn(rowKey,colKey,facetKey)->badge}
+  var st = { row: cfg.row, col: cfg.col, facet: cfg.facet || '', measure: cfg.measure || 'mean', filt: {} };
+  var minN = cfg.minN || AX.MIN_N;
+  var card = axEl('section', 'chart ax-card'); host.appendChild(card);
+  var h = axEl('div', 'ax-head'); var ht = axEl('h3', 'ax-title', cfg.title); h.appendChild(ht);
+  var info = axEl('button', 'ax-info', 'ⓘ'); info.type = 'button'; info.setAttribute('aria-label', '計算方式說明'); h.appendChild(info); card.appendChild(h);
+  var note = axEl('div', 'ax-note'); note.hidden = true; note.textContent = cfg.note || ''; card.appendChild(note);
+  info.addEventListener('click', function () { note.hidden = !note.hidden; });
+  if (cfg.desc) card.appendChild(axEl('p', 'desc', cfg.desc));
+  var bar = axEl('div', 'ax-bar'); card.appendChild(bar);
+  var filters = axEl('div', 'ax-filters'); card.appendChild(filters);
+  var body = axEl('div', 'ax-body'); card.appendChild(body);
+  var dimOpts = M.dims.map(function (d) { return { v: d.k, t: d.label }; });
+  function draw() {
+    bar.innerHTML = ''; filters.innerHTML = ''; body.innerHTML = '';
+    bar.appendChild(axSelect('列', dimOpts, st.row, function (v) { if (v === st.col) st.col = st.row; if (v === st.facet) st.facet = ''; st.row = v; draw(); }));
+    bar.appendChild(axSelect('欄', dimOpts, st.col, function (v) { if (v === st.row) st.row = st.col; if (v === st.facet) st.facet = ''; st.col = v; draw(); }));
+    bar.appendChild(axSelect('分面', [{ v: '', t: '（不分面）' }].concat(dimOpts.filter(function (o) { return o.v !== st.row && o.v !== st.col; })), st.facet, function (v) { st.facet = v; draw(); }));
+    var mOpts = cfg.measures || [{ v: 'mean', t: '平均' }, { v: 'top', t: '最高分（6 分）比例' }];
+    if (mOpts.length > 1) bar.appendChild(axSelect('數值', mOpts, st.measure, function (v) { st.measure = v; draw(); }));
+    // 其餘維度＝篩選
+    var used = [st.row, st.col, st.facet];
+    var recs = M.recs;
+    M.dims.forEach(function (d) {
+      if (used.indexOf(d.k) >= 0) return;
+      var keys = axSortKeys(Object.keys(axGroup(M.recs, d.k)), d.k);
+      if (keys.length < 2) return;
+      filters.appendChild(axSelect(d.label, [{ v: '', t: '全部' }].concat(keys.map(function (k) { return { v: k, t: k }; })), st.filt[d.k] || '', function (v) { st.filt[d.k] = v; draw(); }));
+      if (st.filt[d.k]) recs = recs.filter(function (r) { return r[d.k] === st.filt[d.k]; });
+    });
+    var facets = st.facet ? axSortKeys(Object.keys(axGroup(recs, st.facet)), st.facet) : [''];
+    var rowKeys = axSortKeys(Object.keys(axGroup(recs, st.row)), st.row), colKeys = axSortKeys(Object.keys(axGroup(recs, st.col)), st.col);
+    if (!recs.length) { body.appendChild(axEl('div', 'state', '此條件下沒有資料。')); return; }
+    var all = []; // 色階範圍：所有可顯示格
+    var grid = {};
+    facets.forEach(function (f) {
+      var fr = st.facet ? recs.filter(function (r) { return r[st.facet] === f; }) : recs;
+      var g = {}; fr.forEach(function (r) { var k = (r[st.row] || '（未填）') + '\u0001' + (r[st.col] || '（未填）'); (g[k] = g[k] || []).push(r); });
+      grid[f] = {}; Object.keys(g).forEach(function (k) { var a = axAgg(g[k], st.measure); grid[f][k] = a; if (a.n >= minN) all.push(a.v); });
+    });
+    var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all); if (!all.length) { lo = 0; hi = 1; }
+    var wrap = axEl('div', 'ax-facets' + (facets.length > 1 && colKeys.length <= 6 ? ' multi' : ''));
+    facets.forEach(function (f) {
+      var fb = axEl('div', 'ax-facet'); if (f) fb.appendChild(axEl('div', 'ax-ftitle', f));
+      var sc = axEl('div', 'ax-scroll'); var t = document.createElement('table'); t.className = 'ax-heat';
+      var thead = document.createElement('thead'), trh = document.createElement('tr'); trh.appendChild(axEl('th', 'ax-corner', ''));
+      var itemCols = st.col === 'item';
+      colKeys.forEach(function (c) { var th = axEl('th', 'ax-ch' + (itemCols ? ' num' : '')); var m = itemCols && /^(\d+)\./.exec(c); th.appendChild(axEl('span', '', m ? m[1] : c)); th.title = c; th.setAttribute('scope', 'col'); th.setAttribute('aria-label', c); trh.appendChild(th); });
+      thead.appendChild(trh); t.appendChild(thead);
+      var tb = document.createElement('tbody');
+      rowKeys.forEach(function (rk) {
+        var tr = document.createElement('tr'); var th = axEl('th', 'ax-rh', rk); th.title = rk; tr.appendChild(th);
+        colKeys.forEach(function (ck) {
+          var a = grid[f][rk + '\u0001' + ck]; var td = document.createElement('td');
+          if (!a || !a.n) { td.className = 'ax-na'; td.textContent = ''; td.setAttribute('aria-label', '無資料'); }
+          else if (a.n < minN) { td.className = 'ax-small'; td.innerHTML = '<span>樣本少</span><small>n=' + a.n + '</small>'; td.title = rk + '｜' + ck + '：n=' + a.n + ' 份評核（少於 ' + minN + '，不呈現數值）'; }
+          else {
+            var tt = hi > lo ? (a.v - lo) / (hi - lo) : .5, col = axColor(tt);
+            td.style.background = col.bg; td.style.color = col.fg;
+            td.innerHTML = '<b>' + (st.measure === 'top' ? axPct(a.v) : axFmt(a.v, cfg.dec === undefined ? 2 : cfg.dec)) + '</b><small>n=' + a.n + '</small>';
+            td.title = rk + '｜' + ck + (f ? '｜' + f : '') + '：' + (st.measure === 'top' ? '最高分比例 ' + axPct(a.v) : '平均 ' + axFmt(a.v, 2)) + '（' + a.n + ' 份評核）';
+            if (cfg.marks) { var mk = cfg.marks(st, rk, ck, f); if (mk) { var sp = axEl('i', 'ax-mk', mk.sym); sp.title = mk.title; td.appendChild(sp); } }
+          }
+          if (cfg.onCell) { td.tabIndex = 0; td.classList.add('ax-click'); td.addEventListener('click', function () { cfg.onCell(st, rk, ck, f); }); td.addEventListener('keydown', function (e) { if (e.key === 'Enter') cfg.onCell(st, rk, ck, f); }); }
+          tr.appendChild(td);
+        });
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); sc.appendChild(t); fb.appendChild(sc); wrap.appendChild(fb);
+    });
+    body.appendChild(wrap);
+    if (st.col === 'item' && colKeys.some(function (c) { return /^\d+\./.test(c); })) {
+      var key = axEl('details', 'ax-itemkey'); key.appendChild(axEl('summary', '', '題目對照（' + colKeys.length + ' 題）'));
+      var ol = axEl('ol'); colKeys.forEach(function (c) { var li = axEl('li', '', c.replace(/^\d+\.\s*/, '')); var m = /^(\d+)\./.exec(c); if (m) li.value = +m[1]; ol.appendChild(li); }); key.appendChild(ol); body.appendChild(key);
+    }
+    var lg = axEl('div', 'ax-legend');
+    lg.innerHTML = '<span class="ax-ramp"></span><span>' + (st.measure === 'top' ? axPct(lo) : axFmt(lo, 2)) + ' → ' + (st.measure === 'top' ? axPct(hi) : axFmt(hi, 2)) + '</span><span class="ax-sw small"></span><span>n &lt; ' + AX.MIN_N + '：樣本少，不呈現數值</span>' + (cfg.legendExtra || '');
+    body.appendChild(lg);
+  }
+  draw();
+  return { redraw: draw, state: st };
+}
+
+/* ---------- UI：亮點看板 ---------- */
+function axBadge(sym, cls, text, title) { var b = axEl('span', 'ax-b ' + cls); b.appendChild(axEl('i', '', sym)); b.appendChild(document.createTextNode(text)); if (title) b.title = title; return b; }
+function axHLCard(name, sub, hl, quotes, extra) {
+  var c = axEl('article', 'ax-hl');
+  var hd = axEl('header'); hd.appendChild(axEl('b', '', name)); if (sub) hd.appendChild(axEl('small', '', sub)); c.appendChild(hd);
+  var list = axEl('div', 'ax-bl'); var any = false;
+  (hl && hl.star || []).slice(0, 3).forEach(function (s) { any = true; list.appendChild(axBadge('★', 'star', s.item, '群體亮點：最高分比例 ' + axPct(s.rate) + '，同期群 ' + axPct(s.coh) + '（n=' + s.n + '，Wilson 90% 下界 ' + axPct(s.lb) + '）')); });
+  if (hl && hl.diamond && !(hl.star || []).some(function (s) { return s.item === hl.diamond.item; })) { any = true; list.appendChild(axBadge('◆', 'dia', hl.diamond.item, '個人強項：本題平均 ' + axFmt(hl.diamond.mean, 2) + '，高於本人總平均 ' + axFmt(hl.diamond.rel, 2) + '；同期群中位數 ' + axFmt(hl.diamond.cohMed, 1) + '（n=' + hl.diamond.n + '）')); }
+  (extra || []).forEach(function (x) { any = true; list.appendChild(x); });
+  c.appendChild(list);
+  (quotes || []).forEach(function (q) { any = true; var p = axEl('blockquote', 'ax-q'); p.appendChild(axEl('i', '', '❝')); p.appendChild(document.createTextNode(q)); c.appendChild(p); });
+  if (!any) c.appendChild(axEl('p', 'ax-muted', '評核份數尚未達 ' + AX.MIN_N + ' 份，暫不標示。'));
+  return c;
+}
+function axBoard(host, title, cards, note) {
+  var sec = axEl('section', 'chart ax-card ax-board');
+  var h = axEl('div', 'ax-head'); h.appendChild(axEl('h3', 'ax-title', title));
+  var info = axEl('button', 'ax-info', 'ⓘ'); info.type = 'button'; info.setAttribute('aria-label', '亮點規則說明'); h.appendChild(info); sec.appendChild(h);
+  var nt = axEl('div', 'ax-note'); nt.hidden = true; nt.innerHTML = note || AX_RULE_HTML; sec.appendChild(nt);
+  info.addEventListener('click', function () { nt.hidden = !nt.hidden; });
+  var key = axEl('div', 'ax-keyrow'); key.innerHTML = '<span class="ax-b star"><i>★</i>群體亮點</span><span class="ax-b dia"><i>◆</i>個人強項</span><span class="ax-b up"><i>↑</i>進步</span><span class="ax-b q"><i>❝</i>回饋摘錄</span>';
+  sec.appendChild(key);
+  var grid = axEl('div', 'ax-hlgrid'); cards.forEach(function (c) { grid.appendChild(c); });
+  if (!cards.length) grid.appendChild(axEl('div', 'state', '目前沒有可標示的對象。'));
+  sec.appendChild(grid); host.appendChild(sec); return sec;
+}
+var AX_RULE_HTML = '<b>★ 群體亮點</b>：該題給「6 分（最高分）」的比例，比同期群高至少 15 個百分點，且 Wilson 90% 信賴下界仍高於同期群，且至少 5 筆評分。<br><b>◆ 個人強項</b>：本人表現最好的一題（題目平均減本人總平均最大），且不低於同期群該題中位數，且至少 5 筆。<br><b>↑ 進步</b>：同一面向後一期程平均較前一期程上升（各期程至少 2 筆）。<br><b>❝ 回饋摘錄</b>：直接引用肯定語氣的原文回饋。<br>排除自評、非數值與負值；只標示正向亮點，不顯示評核者姓名。標示隨後台資料每次更新重新計算。';
+
+/* ---------- 各儀表板的強化區塊 ---------- */
+var AX_PANELS = {
+  '學生學習成效': axStudentGroup,
+  '單位組別成效': axUnitGroup,
+  '教師教學成效': axTeacherGroup,
+  '病例導向討論（CbD）整體成效': axCbdGroup,
+  'UGY 學生個人成績': axStudentPersonal,
+  'PGY 學員個人成績': axTraineePersonal,
+  '教師教學評核（個人）': axTeacherPersonal
+};
+function enhanceDashboard(d, box) {
+  var name = dashName(S.dashId) || d.name; var fn = AX_PANELS[name]; if (!fn) return;
+  var host = axEl('div', 'ax-host'); box.insertBefore(host, box.firstChild);
+  var ld = axEl('div', 'chart ax-card ax-loading'); ld.innerHTML = '<div class="ax-spin" aria-hidden="true"></div><span>分析資料載入中…</span>'; host.appendChild(ld);
+  var gen = S.dashReq;
+  Promise.resolve().then(function () { return fn(host, d); }).then(function () { ld.remove(); }, function (e) {
+    if (gen !== S.dashReq) return; ld.classList.remove('ax-loading'); ld.className = 'chart ax-card';
+    ld.innerHTML = ''; ld.appendChild(axEl('div', 'state', e && e.code === 'NO_PERMISSION' ? '目前角色無法讀取此分析資料（依權限矩陣；若剛更新權限設定，需重新部署 Apps Script 後生效）。' : '分析資料暫時無法載入：' + ((e && e.message) || e)));
+  });
+}
+function axResolveKeys() {
+  if (AX.resolved) return; AX.resolved = {};
+  ['stu', 'tea', 'unit'].forEach(function (k) { var t = AX_SHEET_TITLES[AX.KEYS[k]]; var s = (S.catalog && S.catalog.sheets || []).concat(S.catalogHidden || []).filter(function (x) { return x.title === t; })[0]; if (s) AX.resolved[k] = s.key; });
+  if (AX_FIXED_KEYS) Object.keys(AX_FIXED_KEYS).forEach(function (k) { if (!AX.resolved[k]) AX.resolved[k] = AX_FIXED_KEYS[k]; });
+}
+var AX_FIXED_KEYS = { stu: 'eb909b5ef78a1d2f', tea: '4b1b100f6ff586a8', unit: '020dfa0741ec0cb2' };
+
+/* 規格：各分析分頁的欄位辨識 */
+var AX_SPEC = {
+  stu: { dims: { year: /^年份/, subj: /學生姓名/, unit: /教學單位/, view: /評核視角/ }, item: /^\d+\.\s*/, max: 6, selfCol: /評核視角/ },
+  tea: { dims: { year: /^年份/, view: /評核視角/, subj: /受評者姓名/, unit: /教學單位/ }, item: /^\d+\.\s*/, max: 6, selfCol: /評核關係/ },
+  unit: { dims: { year: /^年份/, role: /我的身份|身份/, unit: /教學單位/ }, item: /^\d+\.\s*/, max: 6 }
+};
+function axPrep(kind) {
+  axResolveKeys();
+  return axLoad(axKey(kind)).then(function (src) { if (!src.rows.length) throw { code: 'NO_PERMISSION', message: '無可讀資料' }; var M = axMelt(src, AX_SPEC[kind]); M.src = src; return M; });
+}
+function axFlagNote(f) { var a = []; if (f.self) a.push('已排除自評 ' + f.self + ' 筆'); if (f.bad) a.push('非數值（如 #DIV/0!）' + f.bad + ' 格視為缺值'); if (f.neg) a.push('負值 ' + f.neg + ' 格判定為資料錯誤未納入'); return a.join('；'); }
+
+function axStudentGroup(host) {
+  return axPrep('stu').then(function (M) {
+    axMatrix(host, { recs: M.recs, dims: [{ k: 'unit', label: '教學單位' }, { k: 'item', label: '評分題目' }, { k: 'year', label: '年份' }, { k: 'view', label: '評核視角' }] }, {
+      title: '學生學習成效：年份 × 教學單位 × 評分題目', desc: '同時比較不同年份、教學單位與評分題目（1–6 分量表）。可切換列、欄、分面，並以評核視角篩選。', row: 'unit', col: 'item', facet: 'year',
+      note: '資料：分析_學生成效（學生教學成效鏡像）。' + axFlagNote(M.flags) + '。每格為該條件下所有評分的平均；改選「最高分比例」可避開天花板效應。'
+    });
+    var hl = axHighlights(M.recs, 'subj', 'year'), cards = [];
+    Object.keys(hl).sort(function (a, b) { return a.localeCompare(b, 'zh-Hant'); }).forEach(function (s) {
+      Object.keys(hl[s]).forEach(function (y) { var h = hl[s][y]; if (h.star.length || h.diamond) cards.push(axHLCard(s, y + '｜' + h.n + ' 份評核', h, [])); });
+    });
+    axBoard(host, '學生亮點（依年份同期群）', cards);
+  });
+}
+function axUnitGroup(host) {
+  return axPrep('unit').then(function (M) {
+    axMatrix(host, { recs: M.recs, dims: [{ k: 'unit', label: '教學單位' }, { k: 'item', label: '評分題目' }, { k: 'year', label: '年份' }, { k: 'role', label: '評核身份' }] }, {
+      title: '單位組別成效：年份 × 評核身份 × 教學單位 × 評分題目', desc: '四個維度同時比較：列與欄為主要比較，分面再展開一個維度，第四個維度以篩選切換。', row: 'unit', col: 'item', facet: 'year',
+      note: '資料：分析_組別成效（組別教學成效鏡像，不含填答者姓名）。' + axFlagNote(M.flags) + '。'
+    });
+    var hl = axHighlights(M.recs, 'unit', 'year'), cards = [];
+    Object.keys(hl).sort().forEach(function (u) { Object.keys(hl[u]).forEach(function (y) { var h = hl[u][y]; if (h.star.length || h.diamond) cards.push(axHLCard(u, y + '｜' + h.n + ' 份評核', h, [])); }); });
+    axBoard(host, '單位組別亮點（依年份同期群）', cards);
+  });
+}
+function axTeacherGroup(host) {
+  return axPrep('tea').then(function (M) {
+    var mx = axMatrix(host, { recs: M.recs, dims: [{ k: 'unit', label: '教學單位' }, { k: 'item', label: '評分題目' }, { k: 'year', label: '年份' }, { k: 'view', label: '評核視角' }] }, {
+      title: '教師教學成效：年份 × 評核視角 × 教學單位 × 評分題目', desc: '四個維度同時比較；教師個別亮點見下方看板（同期群＝全部年份，可用年份篩選重算）。', row: 'unit', col: 'item', facet: 'view',
+      note: '資料：分析_教師成效（教師教學成效鏡像，不含評量者姓名）。' + axFlagNote(M.flags) + '。'
+    });
+    var boardHost = axEl('div'); host.appendChild(boardHost);
+    var years = axSortKeys(Object.keys(axGroup(M.recs, 'year')), 'year'), sel = '';
+    function drawBoard() {
+      boardHost.innerHTML = '';
+      var recs = sel ? M.recs.filter(function (r) { return r.year === sel; }) : M.recs;
+      var hl = axHighlights(recs, 'subj', null), cards = [];
+      Object.keys(hl).sort(function (a, b) { return axName(a).localeCompare(axName(b), 'zh-Hant'); }).forEach(function (t) { var h = hl[t].__all; if (h && (h.star.length || h.diamond)) cards.push(axHLCard(axName(t) || t, h.n + ' 份評核', h, [])); });
+      var b = axBoard(boardHost, '教師亮點' + (sel ? '（' + sel + '）' : '（全部年份）'), cards);
+      var row = b.querySelector('.ax-keyrow'); row.insertBefore(axSelect('年份', [{ v: '', t: '全部年份' }].concat(years.map(function (y) { return { v: y, t: y }; })), sel, function (v) { sel = v; drawBoard(); }), row.firstChild);
+    }
+    drawBoard();
+  });
+}
+var AX_DOMAINS = /^[一二三四五]、\s*[^\[]+$/;
+function axCbdSpec() { return { dims: { subj: /^學員姓名$/, stage: /^期程$/, source: /^病例來源$/, view: /^評核視角$/ }, item: AX_DOMAINS, shortFn: function (c) { return c.replace(/\s+/g, ' ').replace(/^([一二三四五])、\s*/, '$1、'); } }; }
+function axCbdGroup(host) {
+  return axLoad(AX.KEYS.cbd).then(function (src) {
+    var M = axMelt(src, axCbdSpec());
+    axMatrix(host, { recs: M.recs, dims: [{ k: 'source', label: '病例來源' }, { k: 'stage', label: '期程' }, { k: 'view', label: '評核視角' }, { k: 'item', label: '五大面向' }] }, {
+      title: '病例導向討論（CbD）：病例來源 × 期程 × 評核視角', desc: '三向同時比較：列＝病例來源、欄＝期程、分面＝評核視角；可用五大面向篩選單一面向。數值為面向分數（0–100）。', row: 'source', col: 'stage', facet: 'view', measures: [{ v: 'mean', t: '平均' }, { v: 'median', t: '中位數' }], dec: 1,
+      note: '資料：學員CbD 五大面向分數（W:AA）。' + axFlagNote(M.flags) + '。'
+    });
+  });
+}
+
+
+/* 依欄位區塊取某人的質性回饋：回饋欄的所屬對象＝回饋欄左側最近一個「姓名」欄 */
+function axFeedbackFor(src, nameRe, fbRe, who) {
+  if (!src) return [];
+  var cols = src.cols, f0 = -1, fb = [];
+  cols.forEach(function (c, i) { if (fbRe.test(c)) { fb.push(i); if (f0 < 0) f0 = i; } });
+  if (f0 < 0) return [];
+  var ni = -1; for (var i = f0 - 1; i >= 0; i--) { if (nameRe.test(cols[i])) { ni = i; break; } }
+  if (ni < 0) return [];
+  var out = []; src.rows.forEach(function (r) { if (axName(r[ni]) === who) fb.forEach(function (i) { if (r[i]) out.push(r[i]); }); });
+  return out;
+}
+
+/* ---------- 個人頁 ---------- */
+function axSubjName(d) { var lab = ''; (d.subjects || []).forEach(function (s) { if (s.pid === (d.subject || S.subject)) lab = s.label; }); return axName(lab); }
+function axStudentPersonal(host, d) {
+  var who = axSubjName(d); if (!who) return Promise.resolve();
+  return Promise.all([axPrep('stu'), axLoad(AX.KEYS.stuScore).catch(function () { return null; })]).then(function (r) {
+    var M = r[0], sc = r[1];
+    var mine = M.recs.filter(function (x) { return axName(x.subj) === who; });
+    if (!mine.length) { host.appendChild(axEl('div', 'chart ax-card state', '「' + who + '」在學生學習成效資料中沒有評分紀錄。')); return; }
+    var years = Object.keys(axGroup(mine, 'year'));
+    var cohort = M.recs.filter(function (x) { return years.indexOf(x.year) >= 0; });
+    var hl = axHighlights(cohort, 'subj', 'year'), key = Object.keys(hl).filter(function (k) { return axName(k) === who; })[0];
+    var quotes = axFeedbackFor(sc, /學生姓名/, /具體內容/, who);
+    var cards = [];
+    years.forEach(function (y) { var h = key && hl[key] && hl[key][y]; cards.push(axHLCard(who, y + '｜同期群 ' + Object.keys(axGroup(cohort.filter(function (x) { return x.year === y; }), 'subj')).length + ' 人', h, axQuotes(quotes, 3))); });
+    axBoard(host, '個人亮點', cards);
+    // 本人 × 同期群：各題比較
+    var tag = function (arr, w) { return arr.map(function (x) { var o = Object.assign({}, x); o.who = w; return o; }); };
+    var M2 = { recs: tag(mine, '本人').concat(tag(cohort, '同期群')), dims: [{ k: 'item', label: '評分題目' }, { k: 'who', label: '本人／同期群' }, { k: 'unit', label: '教學單位' }, { k: 'year', label: '年份' }] };
+    axMatrix(host, M2, { title: '本人與同期群比較（評分題目 × 教學單位）', desc: '左欄本人、右欄同年份全體學生；可改看最高分比例。', row: 'item', col: 'who', facet: '', note: axFlagNote(M.flags) });
+  });
+}
+function axTeacherPersonal(host, d) {
+  var who = axSubjName(d); if (!who) return Promise.resolve();
+  return Promise.all([axPrep('tea'), axLoad(AX.KEYS.teaScore).catch(function () { return null; })]).then(function (rr) {
+    var M = rr[0];
+    var mine = M.recs.filter(function (x) { return axName(x.subj) === who; });
+    if (!mine.length) { host.appendChild(axEl('div', 'chart ax-card state', '「' + who + '」在教師教學成效資料中沒有評分紀錄。')); return; }
+    var hl = axHighlights(M.recs, 'subj', null), key = Object.keys(hl).filter(function (k) { return axName(k) === who; })[0];
+    var qs = axQuotes(axFeedbackFor(rr[1], /受評者姓名/, /具體內容/, who), 3);
+    axBoard(host, '個人亮點（同期群＝全部教師、全部年份）', [axHLCard(who, axRows(mine) + ' 份評核', key && hl[key].__all, qs)]);
+    var M2 = { recs: mine.map(function (x) { var o = Object.assign({}, x); o.who = '本人'; return o; }).concat(M.recs.map(function (x) { var o = Object.assign({}, x); o.who = '全體教師'; return o; })), dims: [{ k: 'item', label: '評分題目' }, { k: 'who', label: '本人／全體' }, { k: 'year', label: '年份' }, { k: 'view', label: '評核視角' }, { k: 'unit', label: '教學單位' }] };
+    axMatrix(host, M2, { title: '本人與全體教師比較', desc: '依評分題目比較本人與全體；可用年份、評核視角、教學單位篩選。', row: 'item', col: 'who', facet: '', measure: 'top', note: axFlagNote(M.flags) });
+  });
+}
+function axTraineePersonal(host, d) {
+  var who = axSubjName(d); if (!who) return Promise.resolve();
+  return Promise.all([axLoad(AX.KEYS.cbd), axLoad(AX.KEYS.morning).catch(function () { return null; })]).then(function (r) {
+    var src = r[0], mo = r[1];
+    var M = axMelt(src, axCbdSpec());
+    var mine = M.recs.filter(function (x) { return axName(x.subj) === who; });
+    if (!mine.length) { host.appendChild(axEl('div', 'chart ax-card state', '「' + who + '」目前沒有 CbD 評核紀錄。')); return; }
+    // 質性回饋（依期程／病例來源／評核視角）
+    var cols = src.cols, nI = axCol(cols, /^學員姓名$/), sI = axCol(cols, /^期程$/), pI = axCol(cols, /^病例來源$/), vI = axCol(cols, /^評核視角$/), cI = axCol(cols, /討論案例概要/);
+    var grp = function (re) { var a = []; cols.forEach(function (c, i) { if (re.test(c)) a.push(i); }); return a; };
+    var gI = grp(/表現良好/), wI = grp(/未來可加強/), aI = grp(/具體改進行動/);
+    var rows = src.rows.filter(function (row) { return axName(row[nI]) === who; });
+    var side = axEl('aside', 'ax-side'); side.hidden = true;
+    function showCell(st, rk, ck, f) {
+      var sel = rows.filter(function (row) {
+        var m = { source: row[pI], stage: row[sI], view: row[vI] };
+        return String(m[st.row] || '') === rk && String(m[st.col] || '') === ck && (!st.facet || String(m[st.facet] || '') === f);
+      });
+      side.hidden = false; side.innerHTML = '';
+      var h = axEl('div', 'ax-side-h'); h.appendChild(axEl('b', '', rk + '｜' + ck + (f ? '｜' + f : ''))); var x = axEl('button', 'ax-x', '×'); x.type = 'button'; x.setAttribute('aria-label', '關閉'); x.addEventListener('click', function () { side.hidden = true; }); h.appendChild(x); side.appendChild(h);
+      if (!sel.length) { side.appendChild(axEl('p', 'ax-muted', '此格沒有紀錄。')); return; }
+      sel.forEach(function (row) {
+        var c = axEl('div', 'kcard');
+        c.appendChild(axEl('div', 'ax-case', normGlyph(row[cI] || '（未填案例概要）')));
+        [[gI, '表現良好', 'pos'], [wI, '未來可加強', 'warn'], [aI, '具體改進行動計畫', 'act']].forEach(function (g) {
+          var seen = {}, vals = g[0].map(function (i) { return normGlyph(row[i] || '').trim(); }).filter(function (t) { if (!t || /^(無|none)$/i.test(t) || seen[t]) return false; seen[t] = 1; return true; });
+          if (!vals.length) return; var sec = axEl('div', 'ksec ' + g[2]); sec.appendChild(axEl('div', 'ksec-h', g[1])); vals.forEach(function (t) { var li = axEl('div', 'kline'); li.appendChild(linkifyText(t)); sec.appendChild(li); }); c.appendChild(sec);
+        });
+        side.appendChild(c);
+      });
+      side.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+    // 亮點：◆ 最強面向、↑ 進步、❝ 表現良好摘錄
+    var byItem = axGroup(mine, 'item'), own = axMean(mine.map(function (x) { return x.v; })), best = null;
+    Object.keys(byItem).forEach(function (it) { var v = byItem[it].map(function (x) { return x.v; }); if (v.length < AX.MIN_N) return; var m = axMean(v); if (!best || m - own > best.rel) best = { item: it, mean: m, rel: m - own, n: v.length, cohMed: axMedian(M.recs.filter(function (x) { return x.item === it; }).map(function (x) { return x.v; })) }; });
+    if (best && best.mean < best.cohMed) best = null;
+    var stages = axSortKeys(Object.keys(axGroup(mine, 'stage')), 'stage'), ups = [];
+    Object.keys(byItem).forEach(function (it) {
+      var prev = null;
+      stages.forEach(function (s) { var v = byItem[it].filter(function (x) { return x.stage === s; }).map(function (x) { return x.v; }); if (v.length < 2) return; var m = axMean(v); if (prev && m > prev.m) ups.push({ item: it, from: prev.s, to: s, d: m - prev.m }); prev = { s: s, m: m }; });
+    });
+    ups.sort(function (a, b) { return b.d - a.d; });
+    var extra = ups.slice(0, 2).map(function (u) { return axBadge('↑', 'up', u.item.replace(/^[一二三四五]、/, '') + '（' + u.from + '→' + u.to + '，+' + axFmt(u.d, 1) + '）', '同一面向後一期程平均高於前一期程（各期程至少 2 筆）'); });
+    var qs = []; rows.forEach(function (row) { gI.forEach(function (i) { qs.push(row[i]); }); });
+    axBoard(host, '個人亮點（CbD）', [axHLCard(who, 'CbD 評核 ' + rows.length + ' 份｜期程 ' + stages.join('、'), { star: [], diamond: best }, axQuotes(qs, 3), extra)], AX_RULE_HTML.replace('<b>★ 群體亮點</b>', '<b>★ 群體亮點</b>（PGY 樣本小，本頁不做群體比較）'));
+    // 三向矩陣
+    var wrap = axEl('div', 'ax-split'); host.appendChild(wrap);
+    var left = axEl('div'); wrap.appendChild(left); wrap.appendChild(side);
+    axMatrix(left, { recs: mine, dims: [{ k: 'source', label: '病例來源' }, { k: 'stage', label: '期程' }, { k: 'view', label: '評核視角' }, { k: 'item', label: '五大面向' }] }, {
+      title: '病例導向討論（CbD）三向比較：病例來源 × 期程 × 評核視角', desc: '點任一格，右側顯示該格的案例概要與質性回饋（表現良好／未來可加強／具體改進行動計畫）。', row: 'source', col: 'stage', facet: 'view', measures: [{ v: 'mean', t: '平均' }, { v: 'median', t: '中位數' }], dec: 1, onCell: showCell, minN: 1,
+      note: '數值為五大面向分數（0–100）。本頁為本人資料，每格皆呈現數值並以 n 標示評核份數；判讀時請留意 n＝1 的格子僅代表單次評核。' + axFlagNote(M.flags)
+    });
+    // 同期晨會簡報（依日期）
+    if (mo) {
+      var nm = axCol(mo.cols, /簡報者姓名/), dI = axCol(mo.cols, /簡報日期/), tI = axCol(mo.cols, /簡報主題/), kI = axCol(mo.cols, /簡報分類/), uI = axCol(mo.cols, /簡報檔|上傳/);
+      var mrows = mo.rows.filter(function (row) { return axName(row[nm]) === who; });
+      if (mrows.length) {
+        var sec = axEl('section', 'chart ax-card'); sec.appendChild(axEl('h3', 'ax-title', '晨會病例簡報（' + mrows.length + ' 場）'));
+        var tl = axEl('ol', 'ax-tl');
+        mrows.sort(function (a, b) { return String(b[dI]).localeCompare(String(a[dI])); }).forEach(function (row) {
+          var li = axEl('li'); li.appendChild(axEl('time', '', row[dI] || '')); li.appendChild(axEl('b', '', normGlyph(row[tI] || ''))); li.appendChild(axEl('small', '', row[kI] || ''));
+          if (row[uI] && /^https?:/.test(row[uI])) li.appendChild(kanbanMedia(String(row[uI]).trim(), normGlyph(row[tI] || '簡報')));
+          tl.appendChild(li);
+        });
+        sec.appendChild(tl); host.appendChild(sec);
+      }
+    }
+  });
+}
+/*AX-END*/
+
 </script>
 </body>
 </html>
