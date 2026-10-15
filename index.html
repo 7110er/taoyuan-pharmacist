@@ -626,6 +626,13 @@ table.grid td{max-width:320px}
 .ax-cbme{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
 @media (min-width:1000px){.ax-cbme{grid-template-columns:minmax(260px,.9fr) minmax(0,1.6fr);align-items:start}}
 .ax-traj{min-width:0}
+.ax-trend{width:100%;height:auto;display:block;margin-top:6px}
+.ax-trend .ln{fill:none;stroke-width:2.5}
+.ax-trend .grid{stroke:var(--rule-2);stroke-width:1}
+.ax-trend text{font-size:11px;fill:var(--ink-3)}
+.ax-trend .val{font-size:11px;fill:var(--ink);font-weight:600}
+.ax-tlg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--ink-2);margin-top:6px}
+.ax-tlg i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
 .ax-trajt th.ax-ch small{display:block;font-size:.62rem;font-weight:500;color:var(--ink-3)}
 .ax-trajt td{min-width:64px}
 .ax-trajt .ax-rh{font-size:.8rem}
@@ -855,7 +862,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.11.0';
+var APP_VERSION = '2.12.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -1954,11 +1961,11 @@ function dispName(n) { var k = normName(n); for (var x in DASH_RENAME) if (normN
 /* 各儀表板的版面：order＝由上而下的順序（'ax:代碼'＝分析區塊；正規式＝後台圖表標題），hide＝不顯示的後台圖表（僅網頁隱藏，後台設定保留） */
 var DASH_LAYOUT = {
   'PGY 學員個人成績': {
-    order: ['ax:cbmeHL', 'ax:cbmeYr', /里程碑（Milestones）/, /可信賴專業活動（EPAs）/, /^CBME 教師質性回饋/, /^綜合分數/, 'ax:cbdHL', 'ax:cbdMatrix', 'ax:morning', /（CbD）質性回饋/, /^藥事照會紀錄/, /^藥品諮詢紀錄/],
+    order: ['ax:cbmeHL', 'ax:cbmeYr', /^臨床能力委員會CCC：里程碑/, /^臨床能力委員會CCC：可信賴專業活動/, /里程碑（Milestones）/, /可信賴專業活動（EPAs）/, /^CBME 教師質性回饋/, /^綜合分數/, 'ax:cbdHL', 'ax:cbdMatrix', 'ax:morning', /（CbD）質性回饋/, /^藥事照會紀錄/, /^藥品諮詢紀錄/],
     hide: [/（CbD）五大面向/, /（CbD）晨會簡報/, /^簡報分數/, /^簡報各評核面向/, /^簡報文字回饋/]
   },
   'UGY 學生個人成績': { hide: [/^實習總成績組成/, /^個人整體實習分數/] },
-  'CBME 成效': { order: ['ax:yr', 'ax:hl', 'ax:yrcmp', 'ax:ind2', 'ax:ind'] },
+  'CBME 成效': { order: ['ax:yr', 'ax:hl', 'ax:trend', 'ax:yrcmp', 'ax:ind2', 'ax:ind'] },
   '學生學習成效': { order: ['ax:board', 'ax:ind', 'ax:matrix'], hide: [/^實習總成績組成/] },
   '單位組別成效': { order: ['ax:board', 'ax:matrix'] },
   '教師教學成效': { order: ['ax:board', 'ax:matrix'] },
@@ -3479,7 +3486,7 @@ function axCohortBoard(host, title, groups, opt) {
     var nStar = items.filter(function (x) { return x.hl && x.hl.star && x.hl.star.length; }).length;
     [[opt.cohortWord || '同期群', g.n + ' ' + (opt.unit || '人')], ['★ 群體亮點', nStar + ' ' + (opt.unit || '人')], ['有任一亮點', items.length + ' ' + (opt.unit || '人')]].concat(g.facts || []).forEach(function (f) { var c = axEl('span', 'ax-fact'); c.appendChild(axEl('small', '', f[0])); c.appendChild(axEl('b', '', f[1])); sum.appendChild(c); });
     items.forEach(function (it) { grid.appendChild(axHLCard(it.name, it.sub, it.hl, it.quotes, it.extra)); });
-    if (!items.length) grid.appendChild(axEl('div', 'state', '此同期群目前沒有達標示門檻的對象。'));
+    if (!items.length) grid.appendChild(axEl('div', 'state', g.empty || '此同期群目前沒有達標示門檻的對象。'));
     var rest = g.n - items.length; foot.textContent = rest > 0 ? '其餘 ' + rest + ' ' + (opt.unit || '人') + '未達標示門檻（評核份數不足，或各題未高於同期群）。' : '';
   }
   draw();
@@ -3491,7 +3498,9 @@ function axGroupsByCohort(hl, recs, subjKey, cohKey, nameFn) {
   return axSortKeys(Object.keys(byC).filter(function (c) { return c !== '（未填）'; }), cohKey).map(function (c) {
     var subs = Object.keys(axGroup(byC[c], subjKey)), items = [];
     subs.forEach(function (s) { var h = hl[s] && hl[s][c]; if (h && (h.star.length || h.diamond)) items.push({ name: (nameFn ? nameFn(s) : s) || s, sub: h.n + ' 份評核', hl: h, quotes: [] }); });
-    return { key: c, label: c, n: subs.length, items: items };
+    var bySub = axGroup(byC[c], subjKey), per = Object.keys(bySub).map(function (k) { return axRows(bySub[k]); }), tot = axRows(byC[c]), mx = per.length ? Math.max.apply(null, per) : 0, ge = per.filter(function (x) { return x >= AX.MIN_N; }).length;
+    var empty = mx < AX.MIN_N ? c + ' 目前共 ' + tot + ' 份評核，每位最多 ' + mx + ' 份，尚無人達「每題至少 ' + AX.MIN_N + ' 份」門檻，故暫不標示亮點（資料已同步，評核累積後自動出現）。' : '';
+    return { key: c, label: c, n: subs.length, items: items, facts: [['評核份數', tot + ' 份'], ['達 ' + AX.MIN_N + ' 份者', ge + ' 人']], empty: empty };
   });
 }
 
@@ -3719,6 +3728,58 @@ function axCbmeYearSel(P, key, onChange) {
   var w = axSelect('年份', [{ v: '', t: '全部年份' }].concat(P.years.slice().reverse().map(function (y) { return { v: y, t: y }; })), sel, function (v) { uiSet(key, v); onChange(v); });
   return { sel: sel, el: w };
 }
+/* 年份趨勢：每年份「學員×期程」的里程碑、EPAs 中位等級（每筆先取該期程各項中位數，再取年份中位數）；n＜5 不畫點 */
+function axCbmeTrend(host, P) {
+  if (!P.years.length) return;
+  var sec = axEl('section', 'chart ax-card'); sec.dataset.ax = 'trend'; host.appendChild(sec);
+  var h = axEl('div', 'ax-head'); h.appendChild(axEl('h3', 'ax-title', 'CBME 年份趨勢（Milestones & EPAs）')); sec.appendChild(h);
+  var bar = axEl('div', 'ax-bar'); sec.appendChild(bar);
+  var body = axEl('div'); sec.appendChild(body);
+  var stages = axSortKeys(Object.keys(axGroup(P.rows.filter(function (r) { return r.any && r.year; }), 'stage')).filter(function (x) { return x !== '（未填）'; }), 'stage');
+  var st = uiGet('cbme:trend') || { stage: '', src: '' }; uiSet('cbme:trend', st);
+  if (st.stage && stages.indexOf(st.stage) < 0) st.stage = '';
+  bar.appendChild(axSelect('期程', [{ v: '', t: '全部期程' }].concat(stages.map(function (x) { return { v: x, t: x }; })), st.stage, function (v) { st.stage = v; draw(); }));
+  bar.appendChild(axSelect('等級來源', [{ v: '', t: 'CCC 優先' }, { v: 'CCC', t: '只看 CCC 判定' }, { v: 'T', t: '只看教師評核' }], st.src, function (v) { st.src = v; draw(); }));
+  function draw() {
+    body.innerHTML = '';
+    var S2 = [{ k: 'ms', t: '里程碑（Milestones）', c: 'var(--s1)' }, { k: 'epa', t: 'EPAs', c: 'var(--s3)' }];
+    var pts = S2.map(function (se) {
+      return P.years.map(function (y) {
+        var v = [];
+        P.rows.forEach(function (r) {
+          if (r.year !== y || (st.stage && r.stage !== st.stage)) return;
+          var use = st.src === 'CCC' ? r.C : st.src === 'T' ? r.T : r.use, a = [];
+          Object.keys(use).forEach(function (k) { if (P.kinds[k] === se.k) a.push(use[k].v); });
+          if (a.length) v.push(axMedian(a));
+        });
+        return { y: y, n: v.length, v: v.length >= AX.MIN_N ? axMedian(v) : null, q: v.length >= AX.MIN_N ? axIQR(v) : null };
+      });
+    });
+    var W = 640, H = 230, L = 34, R = 16, T = 14, B = 46, n = P.years.length, NS = 'http://www.w3.org/2000/svg';
+    var x = function (i) { return n === 1 ? (L + W - R) / 2 : L + i * (W - L - R) / (n - 1); }, yv = function (v) { return T + (H - T - B) * (1 - (v - 1) / 4); };
+    var svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('class', 'ax-trend'); svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'CBME 各年份中位等級：' + pts.map(function (ps, si) { return S2[si].t + ' ' + ps.map(function (p) { return p.y + ' ' + (p.v === null ? '樣本少' : axLvText(p.v, S2[si].k)); }).join('、'); }).join('；'));
+    var add = function (tag, at, txt) { var e = document.createElementNS(NS, tag); Object.keys(at).forEach(function (k) { e.setAttribute(k, at[k]); }); if (txt !== undefined) e.textContent = txt; svg.appendChild(e); return e; };
+    [1, 2, 3, 4, 5].forEach(function (lv) { add('line', { x1: L, x2: W - R, y1: yv(lv), y2: yv(lv), 'class': 'grid' }); add('text', { x: 4, y: yv(lv) + 4 }, 'L' + lv); });
+    P.years.forEach(function (y, i) { add('text', { x: x(i), y: H - 26, 'text-anchor': 'middle' }, y); add('text', { x: x(i), y: H - 10, 'text-anchor': 'middle' }, 'n=' + pts.map(function (ps) { return ps[i].n; }).join('/')); });
+    pts.forEach(function (ps, si) {
+      var seg = [];
+      ps.forEach(function (p, i) { if (p.v !== null) seg.push(x(i).toFixed(1) + ',' + yv(p.v).toFixed(1)); });
+      if (seg.length > 1) add('polyline', { points: seg.join(' '), 'class': 'ln', style: 'stroke:' + S2[si].c });
+      ps.forEach(function (p, i) {
+        if (p.v === null) return;
+        var c = add('circle', { cx: x(i), cy: yv(p.v), r: 4.5, style: 'fill:' + S2[si].c });
+        var t = document.createElementNS(NS, 'title'); t.textContent = S2[si].t + '｜' + p.y + '：中位 ' + axLvText(p.v, S2[si].k) + '（IQR ' + axLvText(p.q[0], S2[si].k) + '–' + axLvText(p.q[2], S2[si].k) + '；' + p.n + ' 筆學員×期程）'; c.appendChild(t);
+        add('text', { x: x(i), y: yv(p.v) - 8 - si * 0, 'text-anchor': 'middle', 'class': 'val', dy: si ? 18 : 0 }, axLvText(p.v, S2[si].k));
+      });
+    });
+    var sc = axEl('div', 'ax-scroll'); sc.appendChild(svg); body.appendChild(sc);
+    var lg = axEl('div', 'ax-tlg'); S2.forEach(function (se) { var s0 = axEl('span'); var i0 = axEl('i'); i0.style.background = se.c; s0.appendChild(i0); s0.appendChild(document.createTextNode(se.t)); lg.appendChild(s0); });
+    lg.appendChild(axEl('span', '', 'n＝里程碑／EPAs 的「學員×期程」筆數；少於 ' + AX.MIN_N + ' 筆不畫點')); body.appendChild(lg);
+    body.appendChild(axEl('p', 'ax-muted', '各年份學員組成與期程分布不同；判讀趨勢請先用「期程」限定同一訓練階段（例如只看 PGY12M），避免把訓練階段差異誤讀為年份差異。'));
+  }
+  draw();
+}
 /* 年份比較：每筆＝一位學員一個期程一個項目的等級（CCC 優先）；列＝項目、欄＝年份 */
 function axCbmeYearRecs(P) {
   var out = [];
@@ -3903,18 +3964,21 @@ function axCbmeGroup(host) {
     var yh = axEl('div', 'ax-head'); yh.appendChild(axEl('h3', 'ax-title', '年份篩選（學員CBME 欄BR）')); ys.appendChild(yh);
     var Y = axCbmeYearSel(P0, 'cbme:year', function () { renderDashboard(); });
     var yb = axEl('div', 'ax-bar'); yb.appendChild(Y.el); ys.appendChild(yb);
-    ys.appendChild(axEl('p', 'desc', (Y.sel ? '目前只看 ' + Y.sel + '：' : '目前為全部年份：') + '套用於下方「學員個人亮點」與「教學評量指標（CBME）」；「年份比較」固定列出全部年份。年份取自 CCC 日期所屬半年（1–6 月＝上、7–12 月＝下），欄BR 空白者以 CCC 日期推算，兩者皆無（如 PGY0 尚未 CCC）不列入年份。上方後台圖表請用頁首「年度」選單（學期年份）。'));
-    var P = axCbmeByYear(P0, Y.sel);
-    P.rows.forEach(function (r) { if (!r.any || !r.who) return; var c = axCohortLabel(axCode(r.name), starts); (byC[c] = byC[c] || {})[r.who] = 1; });
-    var groups = Object.keys(byC).map(function (c) {
-      var items = [];
-      Object.keys(byC[c]).forEach(function (w) {
-        var R = axCbmeCalc(P, w); if (!R) return;
-        if (R.stars.length || R.best || R.extra.length) items.push({ name: w, sub: '最近期程 ' + R.last.stage + '（' + R.last.src + '）｜同期程 ' + R.coh.length + ' 人', hl: { star: R.stars, diamond: R.best }, extra: R.extra, quotes: axQuotes(R.qs, 1) });
+    ys.appendChild(axEl('p', 'desc', (Y.sel ? '目前只看 ' + Y.sel + '：' : '目前為全部年份：') + '套用於「教學評量指標（CBME）」；「學員個人亮點」以年份分頁切換，「年份趨勢」與「年份比較」固定列出全部年份。年份取自 CCC 日期所屬半年（1–6 月＝上、7–12 月＝下），欄BR 空白者以 CCC 日期推算，兩者皆無（如 PGY0 尚未 CCC）不列入年份。上方後台圖表請用頁首「年度」選單（學期年份）。'));
+    // 亮點看板：依年份分組（114年(上)、115年(下)…）；每張卡＝該學員在該年份最近一個期程，比較對象＝同年份同期程的學員
+    var groups = P0.years.map(function (y) {
+      var Py = axCbmeByYear(P0, y), who = {}, items = [];
+      Py.rows.forEach(function (r) { if (r.any && r.who) who[r.who] = 1; });
+      Object.keys(who).forEach(function (w) {
+        var R = axCbmeCalc(Py, w); if (!R) return;
+        if (R.stars.length || R.best || R.extra.length) items.push({ name: w, sub: R.last.stage + '（' + R.last.src + '）｜同年份同期程 ' + R.coh.length + ' 人', hl: { star: R.stars, diamond: R.best }, extra: R.extra, quotes: axQuotes(R.qs, 1) });
       });
-      return { key: c, label: c, n: Object.keys(byC[c]).length, items: items, o: axCohortOrder(c, starts) };
-    }).sort(function (a, b) { return a.o - b.o; });
-    axCohortBoard(host, '學員個人亮點（CBME：Milestones & EPAs，依梯次同期群' + (Y.sel ? '，' + Y.sel : '') + '）', groups, { ax: 'hl', groupLabel: '梯次', note: AX_RULE_CBME + '<br>同期群（分頁）＝學員代碼字首（梯次），起訓年月由 CCC 日期與期程推估；等級比較基準為「同一期程」的全體學員，避免不同訓練階段直接比較。', desc: '一次只看一個梯次；每張卡為該學員最近一個期程的亮點' + (Y.sel ? '（只計 ' + Y.sel + ' 的期程）' : '') + '。' });
+      var nRow = Py.rows.filter(function (r) { return r.any; }).length, nCcc = Py.rows.filter(function (r) { return r.ccc; }).length;
+      return { key: y, label: y, n: Object.keys(who).length, items: items, facts: [['學員×期程', nRow + ' 筆'], ['CCC 判定', nCcc + ' 筆']], empty: y + ' 共 ' + Object.keys(who).length + ' 位學員、' + nRow + ' 筆期程評核，目前無人達標示條件（「同期程領先」需同年份同期程至少 ' + AX.MIN_N + ' 人）。' };
+    });
+    var defY = Y.sel && P0.years.indexOf(Y.sel) >= 0 ? P0.years.indexOf(Y.sel) : groups.length - 1;
+    axCohortBoard(host, '學員個人亮點（CBME：Milestones & EPAs，依年份）', groups, { ax: 'hl', groupLabel: '年份', def: defY, cohortWord: '學員', note: AX_RULE_CBME + '<br>分組＝學員CBME 欄BR「年份」（空白者以 CCC 日期推算：1–6 月＝上、7–12 月＝下）；每張卡為該學員在該年份最近一個期程的亮點，等級比較基準為「同年份、同一期程」的學員，避免不同訓練階段直接比較。', desc: '一次只看一個年份；預設最新年份。' });
+    axCbmeTrend(host, P0);
     var YR = axCbmeYearRecs(P0);
     if (YR.length) axMatrix(host, { recs: YR, dims: [{ k: 'item', label: '項目' }, { k: 'year', label: '年份' }, { k: 'stage', label: '期程' }, { k: 'kind', label: '類別' }, { k: 'src', label: '等級來源' }] }, {
       ax: 'yrcmp', title: 'CBME 年份比較：項目 × 年份', desc: '預設：里程碑、全部期程、列＝項目、欄＝年份（由舊到新）。可改看 EPAs 或綜合分數、限定期程或等級來源；列、欄、分面可切換（例如欄＝期程、分面＝年份）。', row: 'item', col: 'year', facet: '', filterAll: true, fdef: { kind: '里程碑（Milestones）' },
