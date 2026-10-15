@@ -862,7 +862,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.12.0';
+var APP_VERSION = '2.13.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -2408,6 +2408,7 @@ function metaLine(c) {
     if (m.assessment_n) parts.push('紀錄 ' + m.assessment_n + ' 筆');
     if (m.ka) parts.push('評核者匿名門檻 ' + m.ka + ' 人');
   }
+  if (c.agg === '平均') parts.push('平均＝四分位距平均（去除最高、最低各 25%）');
   if (c.instrument) parts.push('評量工具 ' + c.instrument);
   return parts.join('｜');
 }
@@ -2770,7 +2771,7 @@ function drawProgression(c, A) {
   // 摘要：各期程平均（選定等級）
   var colMean = stages.map(function (st) {
     var xs = items.map(function (it) { return (cell[it + '\u0001' + st] || [])[lv]; }).filter(function (v) { return typeof v === 'number'; });
-    return xs.length ? xs.reduce(function (s, x) { return s + x; }, 0) / xs.length : null;
+    return xs.length ? axIQM(xs) : null;
   });
   var sm = document.createElement('p'); sm.className = 'mtx-sum prog-sum';
   sm.textContent = levelShort(c.series[lv]) + ' 平均達成率：' + stages.map(function (st, i) { return st.replace('PGY', '') + ' ' + (colMean[i] === null ? '—' : pf(pct(colMean[i])) + '%'); }).join(' → ');
@@ -3140,7 +3141,10 @@ function axNum(v) {
   var m = /^\s*(-?\d+(?:\.\d+)?)/.exec(String(v));
   return m ? parseFloat(m[1]) : null;
 }
-function axMean(a) { if (!a.length) return null; var s = 0; a.forEach(function (x) { s += x; }); return s / a.length; }
+/* 「平均」一律為四分位距平均（IQM，2026-10-16 使用者裁決）：排序後去除最高 25% 與最低 25%，取中間 50% 的平均；
+   第 i 筆佔 [i/n,(i+1)/n]，只計與 [0.25,0.75] 重疊的比例，n 非 4 的倍數時邊界值按比例計入；n=1、2 等於一般平均。後台 statsOf_ 用同一定義。 */
+function axIQM(a) { var b = a.filter(function (x) { return typeof x === 'number' && isFinite(x); }).sort(function (x, y) { return x - y; }), n = b.length, s = 0; if (!n) return null; for (var i = 0; i < n; i++) { var w = Math.min((i + 1) / n, .75) - Math.max(i / n, .25); if (w > 0) s += b[i] * w; } return s / .5; }
+function axMean(a) { return a && a.length ? axIQM(a) : null; }
 function axMedian(a) { if (!a.length) return null; var b = a.slice().sort(function (x, y) { return x - y; }); var m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; }
 function axWilsonLB(k, n, z) { if (!n) return 0; var p = k / n, d = 1 + z * z / n, c = p + z * z / (2 * n), r = z * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)); return (c - r) / d; }
 function axName(s) { return String(s || '').replace(/（.*$/, '').replace(/^\s*[A-Za-z]{0,2}\d+\s+/, '').replace(/\s+/g, '').trim(); }
@@ -3390,7 +3394,7 @@ function axBoard(host, title, cards, note, axId) {
   if (!cards.length) grid.appendChild(axEl('div', 'state', '目前沒有可標示的對象。'));
   sec.appendChild(grid); host.appendChild(sec); return sec;
 }
-var AX_RULE_HTML = '<b>★ 群體亮點</b>：該題給「6 分（最高分）」的比例，比同期群高至少 15 個百分點，且 Wilson 90% 信賴下界仍高於同期群，且至少 5 筆評分。<br><b>◆ 個人強項</b>：本人表現最好的一題（題目平均減本人總平均最大），且不低於同期群該題中位數，且至少 5 筆。<br><b>↑ 進步</b>：同一面向後一期程平均較前一期程上升（各期程至少 2 筆）。<br><b>❝ 回饋摘錄</b>：直接引用肯定語氣的原文回饋。<br>排除自評、非數值與負值；只標示正向亮點，不顯示評核者姓名。標示隨後台資料每次更新重新計算。';
+var AX_RULE_HTML = '<b>平均</b>：本網站所有「平均」皆為四分位距平均（去除最高 25% 與最低 25%，取中間 50% 的平均）。<br><b>★ 群體亮點</b>：該題給「6 分（最高分）」的比例，比同期群高至少 15 個百分點，且 Wilson 90% 信賴下界仍高於同期群，且至少 5 筆評分。<br><b>◆ 個人強項</b>：本人表現最好的一題（題目平均減本人總平均最大），且不低於同期群該題中位數，且至少 5 筆。<br><b>↑ 進步</b>：同一面向後一期程平均較前一期程上升（各期程至少 2 筆）。<br><b>❝ 回饋摘錄</b>：直接引用肯定語氣的原文回饋。<br>排除自評、非數值與負值；只標示正向亮點，不顯示評核者姓名。標示隨後台資料每次更新重新計算。';
 
 /* ---------- 各儀表板的強化區塊 ---------- */
 var AX_PANELS = {
@@ -3550,7 +3554,7 @@ function axContHighlights(byP, minRec, minCoh) {
   });
   return res;
 }
-var AX_RULE_CONT = '<b>★ 群體亮點</b>：本人在該面向的平均，達同期群第 75 百分位以上且高於中位數；本人該面向至少 3 份評核，同期群至少 4 人有足夠評核。<br><b>◆ 個人強項</b>：本人平均最高（相對本人總平均）的面向，且不低於同期群中位數。<br><b>↑ 進步</b>：同一面向後一期程平均高於前一期程（各期程至少 2 份）。<br><b>❝ 回饋摘錄</b>：直接引用肯定語氣的原文回饋。<br>只標示正向亮點，不顯示評核者姓名；同期群內比較，不跨梯次排名。';
+var AX_RULE_CONT = '<b>平均</b>：四分位距平均（去除最高、最低各 25%，取中間 50%）。<br><b>★ 群體亮點</b>：本人在該面向的平均，達同期群第 75 百分位以上且高於中位數；本人該面向至少 3 份評核，同期群至少 4 人有足夠評核。<br><b>◆ 個人強項</b>：本人平均最高（相對本人總平均）的面向，且不低於同期群中位數。<br><b>↑ 進步</b>：同一面向後一期程平均高於前一期程（各期程至少 2 份）。<br><b>❝ 回饋摘錄</b>：直接引用肯定語氣的原文回饋。<br>只標示正向亮點，不顯示評核者姓名；同期群內比較，不跨梯次排名。';
 
 /* ---------- 學生學習成效（群體） ---------- */
 function axStudentGroup(host) {
@@ -3559,7 +3563,7 @@ function axStudentGroup(host) {
     var sy = axSortKeys(Object.keys(axGroup(M.recs, 'year')), 'year');
     axMatrix(host, { recs: M.recs, dims: [{ k: 'year', label: '年份' }, { k: 'view', label: '評核視角' }, { k: 'unit', label: '教學單位' }, { k: 'item', label: '評分題目' }] }, {
       ax: 'matrix', title: '學生學習成效：年份 × 教學單位 × 評分題目', desc: '預設：最新年份、不分評核視角。四個維度皆可篩選；列、欄、分面可自由切換（例如分面選「年份」即可跨年比較）。', row: 'unit', col: 'item', facet: '', filterAll: true, fdef: { year: sy[sy.length - 1] || '' },
-      note: '資料：分析_學生成效（學生教學成效鏡像）。' + axFlagNote(M.flags) + '。每格為該條件下所有評分的平均；改選「最高分比例」可避開天花板效應。'
+      note: '資料：分析_學生成效（學生教學成效鏡像）。' + axFlagNote(M.flags) + '。每格為該條件下所有評分的平均（四分位距平均：去除最高、最低各 25%）；改選「最高分比例」可避開天花板效應。'
     });
     var hl = axHighlights(M.recs, 'subj', 'year');
     axCohortBoard(host, '學生亮點（依年份同期群）', axGroupsByCohort(hl, M.recs, 'subj', 'year', axName), { ax: 'board', groupLabel: '年份', desc: '一次只看一個年份；同期群＝同一年份的全體學生。卡片依亮點強度排序（★ 優先）。' });
