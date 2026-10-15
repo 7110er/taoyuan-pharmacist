@@ -855,7 +855,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.10.0';
+var APP_VERSION = '2.11.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -1923,6 +1923,14 @@ document.addEventListener('keydown', function (e) {
 
 /* ---------- 分析與成績（統計與隱私閘門一律在伺服器；本頁只送條件、畫圖） ---------- */
 S.dash = null; S.dashId = null; S.filt = {}; S.subject = ''; S.dashReq = 0;
+/* 儀表板內互動選擇（年份分頁、矩陣列欄與篩選、表格檢視）：手機捲動造成的 resize、背景資料更新重繪時保留使用者選擇；切換儀表板時才清除（2.11.0） */
+var UIS = {};
+function uiKey(k) { return (S.dashId || '') + '\u0001' + (S.subject || '') + '\u0001' + k; }
+function uiGet(k) { return UIS[uiKey(k)]; }
+function uiSet(k, v) { UIS[uiKey(k)] = v; }
+/* 期間代碼顯示：西元年 2026 → 2026 年（民國 115）；學期代碼 115B → 115年(下) */
+function periodLabel(yy) { var m = /^(\d{3})([AB])$/.exec(String(yy || '')); if (m) return m[1] + '年(' + (m[2] === 'A' ? '上' : '下') + ')'; return yy + ' 年（民國 ' + (Number(yy) - 1911) + '）'; }
+function periodShort(yy) { var m = /^(\d{3})([AB])$/.exec(String(yy || '')); return m ? m[1] + '年(' + (m[2] === 'A' ? '上' : '下') + ')' : yy + ' 年'; }
 var MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 /* 成效儀表板資訊架構：總覽 → 四大類 → 各儀表板。分類依控制台名稱（使用者裁決之對照）；控制台若提供 category 欄位則優先採用 */
 /* 已併入成效儀表板、不在資料查詢列出的分頁（分頁代碼＝控制台「分頁開放」K 欄；標題為代碼變動時的備援比對） */
@@ -1946,11 +1954,11 @@ function dispName(n) { var k = normName(n); for (var x in DASH_RENAME) if (normN
 /* 各儀表板的版面：order＝由上而下的順序（'ax:代碼'＝分析區塊；正規式＝後台圖表標題），hide＝不顯示的後台圖表（僅網頁隱藏，後台設定保留） */
 var DASH_LAYOUT = {
   'PGY 學員個人成績': {
-    order: ['ax:cbmeHL', /里程碑（Milestones）/, /可信賴專業活動（EPAs）/, /^CBME 教師質性回饋/, /^綜合分數/, 'ax:cbdHL', 'ax:cbdMatrix', 'ax:morning', /（CbD）質性回饋/, /^藥事照會紀錄/, /^藥品諮詢紀錄/],
+    order: ['ax:cbmeHL', 'ax:cbmeYr', /里程碑（Milestones）/, /可信賴專業活動（EPAs）/, /^CBME 教師質性回饋/, /^綜合分數/, 'ax:cbdHL', 'ax:cbdMatrix', 'ax:morning', /（CbD）質性回饋/, /^藥事照會紀錄/, /^藥品諮詢紀錄/],
     hide: [/（CbD）五大面向/, /（CbD）晨會簡報/, /^簡報分數/, /^簡報各評核面向/, /^簡報文字回饋/]
   },
   'UGY 學生個人成績': { hide: [/^實習總成績組成/, /^個人整體實習分數/] },
-  'CBME 成效': { order: ['ax:hl', 'ax:ind2', 'ax:ind'] },
+  'CBME 成效': { order: ['ax:yr', 'ax:hl', 'ax:yrcmp', 'ax:ind2', 'ax:ind'] },
   '學生學習成效': { order: ['ax:board', 'ax:ind', 'ax:matrix'], hide: [/^實習總成績組成/] },
   '單位組別成效': { order: ['ax:board', 'ax:matrix'] },
   '教師教學成效': { order: ['ax:board', 'ax:matrix'] },
@@ -2086,7 +2094,7 @@ $('subjSel').addEventListener('change', function () { S.subject = this.value; lo
 
 function openDashboard(id) {
   unfocusChart();
-  S.dashId = id; if ($('dashSel').querySelector('option[value="' + id + '"]')) $('dashSel').value = id; S.dash = null; S.filt = {}; S.subject = '';
+  S.dashId = id; if ($('dashSel').querySelector('option[value="' + id + '"]')) $('dashSel').value = id; S.dash = null; S.filt = {}; S.subject = ''; UIS = {};
   $('yearSel').innerHTML = ''; $('monthSel').innerHTML = '';
   S.dashCat = catOfId(id);
   renderDashNav();
@@ -2124,10 +2132,13 @@ function loadDashboard(first) {
 function fillPeriods(years, hasTime, first) {
   var ys = $('yearSel'), ms = $('monthSel'), y = ys.value, m = ms.value;
   ys.innerHTML = '<option value="">全部年度</option>'; ms.innerHTML = '<option value="">全部月份</option>';
-  (years || []).forEach(function (yy) { var o = document.createElement('option'); o.value = yy; o.textContent = yy + ' 年（民國 ' + (yy - 1911) + '）'; ys.appendChild(o); });
+  (years || []).forEach(function (yy) { var o = document.createElement('option'); o.value = yy; o.textContent = periodLabel(yy); ys.appendChild(o); });
   MONTHS.forEach(function (mm) { var o = document.createElement('option'); o.value = mm; o.textContent = Number(mm) + ' 月'; ms.appendChild(o); });
   if (!first) { ys.value = y; ms.value = m; }
   ys.hidden = ms.hidden = !hasTime;
+  // 全部為學期代碼（如 115年(下)）時沒有月份可選
+  if (hasTime && (years || []).length && (years || []).every(function (yy) { return /^\d{3}[AB]$/.test(yy); })) { ms.hidden = true; ms.value = ''; }
+  if (/^\d{3}[AB]$/.test(ys.value)) { ms.value = ''; ms.disabled = true; } else ms.disabled = false;
 }
 function fillSubjects(list) {
   var s = $('subjSel'); s.innerHTML = '';
@@ -2188,7 +2199,7 @@ function renderDashboard() {
   $('slicerReset').hidden = !(y || m || S.subject && d.subjects && d.subjects[0] && S.subject !== d.subjects[0].pid || Object.keys(S.filt || {}).some(function (k) { return S.filt[k]; }));
   var subjLabel = '';
   (d.subjects || []).forEach(function (s) { if (s.pid === d.subject) subjLabel = s.label; });
-  setCrumb(dashName(S.dashId) || d.name, [(y ? y + ' 年' : '全部年度') + (m ? ' ' + Number(m) + ' 月' : ''), subjLabel].filter(Boolean).join('｜'));
+  setCrumb(dashName(S.dashId) || d.name, [(y ? periodShort(y) : '全部年度') + (m ? ' ' + Number(m) + ' 月' : ''), subjLabel].filter(Boolean).join('｜'));
   if (!d.charts.length && !AX_PANELS[dashName(S.dashId)]) { // 後端未回任何圖表：可能是資料重建中，或目前角色沒有此儀表板的圖表；不直接斷言「無權限」
     box.innerHTML = '';
     var em = document.createElement('div'); em.className = 'panel state';
@@ -2429,7 +2440,9 @@ function chartCard(c) {
   var desc = String(c.desc || '').replace(/用標題旁的選單[^；;]*[；;]?/g, '').trim();
   if (desc) { var ds = document.createElement('p'); ds.className = 'desc'; ds.textContent = desc; card.appendChild(ds); }
   var body = document.createElement('div'); card.appendChild(body);
-  var showTable = false;
+  var tbKey = 'tb:' + (c.title || '') + ':' + (c.order || '');
+  var showTable = !!uiGet(tbKey);
+  if (tbtn && showTable) tbtn.textContent = '圖表檢視';
   function draw() {
     body.innerHTML = '';
     if (c.status !== 'OK') {
@@ -2448,7 +2461,7 @@ function chartCard(c) {
       else body.appendChild(drawBars(c, A, c.type === '長條圖'));
     } catch (e) { body.innerHTML = '<div class="state err">圖表繪製失敗</div>'; }
   }
-  if (tbtn) tbtn.addEventListener('click', function () { showTable = !showTable; tbtn.textContent = showTable ? '圖表檢視' : '表格檢視'; draw(); });
+  if (tbtn) tbtn.addEventListener('click', function () { showTable = !showTable; uiSet(tbKey, showTable); tbtn.textContent = showTable ? '圖表檢視' : '表格檢視'; draw(); });
   draw();
   var ml = metaLine(c);
   if (ml) { var mp = document.createElement('p'); mp.className = 'chart-meta'; mp.textContent = ml; card.appendChild(mp); }
@@ -3087,8 +3100,8 @@ function loadImprovement() {
     t.innerHTML = h + '</tbody>'; v.appendChild(t);
   }).catch(function (e) { $('impStatus').textContent = e.code === 'NO_PERMISSION' ? EMPTY_TEXT.NO_PERMISSION : e.message; });
 }
-var rsTimer = null;
-window.addEventListener('resize', function () { clearTimeout(rsTimer); rsTimer = setTimeout(function () { if (!$('dashPanel').hidden && S.dash && !/^overview/.test(S.dashId || '') && !/^metrics:/.test(S.dashId || '') && !document.querySelector('.chart.focused')) renderDashboard(); }, 250); });
+var rsTimer = null, rsWidth = window.innerWidth;
+window.addEventListener('resize', function () { clearTimeout(rsTimer); rsTimer = setTimeout(function () { if (Math.abs(window.innerWidth - rsWidth) < 40) return; rsWidth = window.innerWidth; if (!$('dashPanel').hidden && S.dash && !/^overview/.test(S.dashId || '') && !/^metrics:/.test(S.dashId || '') && !document.querySelector('.chart.focused')) renderDashboard(); }, 250); });
 
 /* 測試用介面（不含任何資料或憑證） */
 window.__taoe = { sanitizeHtml: sanitizeHtml, renderCell: renderCell, plainText: plainText, hasHtml: hasHtml, isFullDoc: isFullDoc,
@@ -3249,10 +3262,12 @@ function axColor(t) { // 0..1 → 青綠序列（淺→深），文字顏色自�
 }
 function axMatrix(host, M, cfg) {
   // M: { recs, items, dims:[{k,label}] }  cfg: {title, desc, measure, row, col, facet, scale:[lo,hi], unit, marks:fn(rowKey,colKey,facetKey)->badge}
-  var st = { row: cfg.row, col: cfg.col, facet: cfg.facet || '', measure: cfg.measure || 'mean', filt: Object.assign({}, cfg.fdef || {}), pre: {} };
+  var stKey = 'mx:' + (cfg.ax || '') + ':' + cfg.title, saved = uiGet(stKey);
+  var st = saved || { row: cfg.row, col: cfg.col, facet: cfg.facet || '', measure: cfg.measure || 'mean', filt: Object.assign({}, cfg.fdef || {}), pre: {} };
+  uiSet(stKey, st);
   var minN = cfg.minN || AX.MIN_N;
   var preK = (cfg.pre || []).map(function (p) { return p.k; });
-  (cfg.pre || []).forEach(function (p) { if (p.def !== undefined) st.pre[p.k] = p.def; });
+  if (!saved) (cfg.pre || []).forEach(function (p) { if (p.def !== undefined) st.pre[p.k] = p.def; });
   var card = axEl('section', 'chart ax-card'); host.appendChild(card); if (cfg.ax) card.dataset.ax = cfg.ax;
   var h = axEl('div', 'ax-head'); var ht = axEl('h3', 'ax-title', cfg.title); h.appendChild(ht);
   var info = axEl('button', 'ax-info', 'ⓘ'); info.type = 'button'; info.setAttribute('aria-label', '計算方式說明'); h.appendChild(info); card.appendChild(h);
@@ -3269,6 +3284,7 @@ function axMatrix(host, M, cfg) {
     var recs = M.recs;
     (cfg.pre || []).forEach(function (p) { // 全域篩選（如年份）：固定在最前，不參與列／欄／分面
       var keys = axSortKeys(Object.keys(axGroup(M.recs, p.k)), p.k);
+      if (st.pre[p.k] && keys.indexOf(st.pre[p.k]) < 0) st.pre[p.k] = '';
       bar.appendChild(axSelect(p.label, [{ v: '', t: p.all || '全部' }].concat(keys.map(function (k) { return { v: k, t: k }; })), st.pre[p.k] || '', function (v) { st.pre[p.k] = v; draw(); }));
       if (st.pre[p.k]) recs = recs.filter(function (r) { return r[p.k] === st.pre[p.k]; });
     });
@@ -3282,6 +3298,7 @@ function axMatrix(host, M, cfg) {
     DIMS.forEach(function (d) {
       if (!cfg.filterAll && used.indexOf(d.k) >= 0) return;
       var keys = axSortKeys(Object.keys(axGroup(M.recs, d.k)), d.k);
+      if (st.filt[d.k] && keys.indexOf(st.filt[d.k]) < 0) st.filt[d.k] = '';
       if (keys.length < 2) return;
       filters.appendChild(axSelect(d.label, [{ v: '', t: '全部' }].concat(keys.map(function (k) { return { v: k, t: k }; })), st.filt[d.k] || '', function (v) { st.filt[d.k] = v; draw(); }));
       if (st.filt[d.k]) recs = recs.filter(function (r) { return r[d.k] === st.filt[d.k]; });
@@ -3439,6 +3456,8 @@ function axCohortBoard(host, title, groups, opt) {
   if (opt.desc) sec.appendChild(axEl('p', 'desc', opt.desc));
   if (!groups.length) { sec.appendChild(axEl('div', 'state', '目前沒有可分析的同期群資料。')); return sec; }
   var cur = opt.def !== undefined ? opt.def : groups.length - 1;
+  var cbKey = 'cb:' + (opt.ax || '') + ':' + title, pick = uiGet(cbKey);
+  if (pick !== undefined) groups.forEach(function (g, i) { if (g.key === pick) cur = i; });
   var tl = axEl('div', 'ax-seg'); tl.setAttribute('role', 'tablist'); tl.setAttribute('aria-label', opt.groupLabel || '同期群'); sec.appendChild(tl);
   var sum = axEl('div', 'ax-cohsum'); sec.appendChild(sum);
   var key = axEl('div', 'ax-keyrow'); key.innerHTML = opt.keyHtml || '<span class="ax-b star"><i>★</i>群體亮點</span><span class="ax-b dia"><i>◆</i>個人強項</span><span class="ax-b up"><i>↑</i>進步</span><span class="ax-b q"><i>❝</i>回饋摘錄</span>'; sec.appendChild(key);
@@ -3448,8 +3467,8 @@ function axCohortBoard(host, title, groups, opt) {
     var b = axEl('button', 'ax-segb'); b.type = 'button'; b.setAttribute('role', 'tab');
     b.appendChild(axEl('span', '', g.label)); b.appendChild(axEl('em', '', String(g.items.length)));
     b.title = g.label + '：同期群 ' + g.n + ' ' + (opt.unit || '人') + '，有亮點 ' + g.items.length + ' ' + (opt.unit || '人');
-    b.addEventListener('click', function () { cur = i; draw(); });
-    b.addEventListener('keydown', function (e) { var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!d) return; e.preventDefault(); cur = (cur + d + groups.length) % groups.length; draw(); btns[cur].focus(); });
+    b.addEventListener('click', function () { cur = i; uiSet(cbKey, groups[i].key); draw(); });
+    b.addEventListener('keydown', function (e) { var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!d) return; e.preventDefault(); cur = (cur + d + groups.length) % groups.length; uiSet(cbKey, groups[cur].key); draw(); btns[cur].focus(); });
     tl.appendChild(b); return b;
   });
   function draw() {
@@ -3667,7 +3686,7 @@ function axLvText(v, kind) {
   var best = AX_EPA_STEPS[0]; AX_EPA_STEPS.forEach(function (s) { if (Math.abs(s[0] - v) < Math.abs(best[0] - v)) best = s; }); return 'L' + best[1];
 }
 function axCbmeParse(src) {
-  var cols = src.cols, ccc = axCol(cols, /CCC】?\s*日期/), nI = axCol(cols, /^學員姓名$/), sI = axCol(cols, /^期程$/);
+  var cols = src.cols, ccc = axCol(cols, /CCC】?\s*日期/), nI = axCol(cols, /^學員姓名$/), sI = axCol(cols, /^期程$/), yI = axCol(cols, /^年份$/);
   var sumT = axCol(cols, /^綜合分數$/), sumC = axCol(cols, /^綜合分數_?CCC/);
   var isMs = function (c) { return /^(PC\d|PK|SBP\d|ICS\d|PROF\d|CPD\d)\s*：/.test(c); };
   var isEpa = function (c) { return /^(藥事基礎作業|\d+\.\s*\S|藥師全人照護)/.test(c) && !/綜合/.test(c); };
@@ -3679,7 +3698,9 @@ function axCbmeParse(src) {
     (ccc >= 0 && i > ccc ? C : T).push({ i: i, kind: kind, key: nm });
   });
   var rows = src.rows.map(function (r) {
-    var o = { who: axName(r[nI]), name: r[nI], stage: String(r[sI] || ''), mo: axStageMonths(r[sI]), date: ccc >= 0 ? axDate(r[ccc]) : null, T: {}, C: {}, use: {}, kind: {}, fb: FB.map(function (i) { return r[i]; }).filter(function (t) { return String(t || '').trim(); }) };
+    var dt = ccc >= 0 ? axDate(r[ccc]) : null, yr = yI >= 0 ? String(r[yI] == null ? '' : r[yI]).replace(/\s+/g, '').replace(/（/g, '(').replace(/）/g, ')') : '';
+    if (!/^\d{3}年\((上|下)\)$/.test(yr)) yr = dt ? (dt.getFullYear() - 1911) + '年(' + (dt.getMonth() < 6 ? '上' : '下') + ')' : '';
+    var o = { who: axName(r[nI]), name: r[nI], stage: String(r[sI] || ''), mo: axStageMonths(r[sI]), date: dt, year: yr, T: {}, C: {}, use: {}, kind: {}, fb: FB.map(function (i) { return r[i]; }).filter(function (t) { return String(t || '').trim(); }) };
     T.forEach(function (c) { var l = axLv(r[c.i]); if (l) o.T[c.key] = l; o.kind[c.key] = c.kind; });
     C.forEach(function (c) { var l = axLv(r[c.i]); if (l) o.C[c.key] = l; o.kind[c.key] = c.kind; });
     o.ccc = Object.keys(o.C).length > 0; o.src = o.ccc ? 'CCC' : '教師評核';
@@ -3688,7 +3709,25 @@ function axCbmeParse(src) {
     return o;
   });
   var kinds = {}; T.concat(C).forEach(function (c) { kinds[c.key] = c.kind; });
-  return { rows: rows, kinds: kinds, T: T, C: C };
+  var years = axSortKeys(Object.keys(axGroup(rows.filter(function (x) { return x.year; }), 'year')).filter(function (y) { return y !== '（未填）'; }), 'year');
+  return { rows: rows, kinds: kinds, T: T, C: C, years: years, hasYearCol: yI >= 0 };
+}
+/* 年份篩選（學員CBME 欄BR）：回傳只含該年份「學員×期程」的副本；sel 空白＝全部年份 */
+function axCbmeByYear(P, sel) { if (!sel) return P; return { rows: P.rows.filter(function (r) { return r.year === sel; }), kinds: P.kinds, T: P.T, C: P.C, years: P.years, hasYearCol: P.hasYearCol }; }
+function axCbmeYearSel(P, key, onChange) {
+  var sel = uiGet(key) || ''; if (sel && P.years.indexOf(sel) < 0) sel = '';
+  var w = axSelect('年份', [{ v: '', t: '全部年份' }].concat(P.years.slice().reverse().map(function (y) { return { v: y, t: y }; })), sel, function (v) { uiSet(key, v); onChange(v); });
+  return { sel: sel, el: w };
+}
+/* 年份比較：每筆＝一位學員一個期程一個項目的等級（CCC 優先）；列＝項目、欄＝年份 */
+function axCbmeYearRecs(P) {
+  var out = [];
+  P.rows.forEach(function (r, ri) {
+    if (!r.any || !r.year) return;
+    Object.keys(r.use).forEach(function (k) { out.push({ year: r.year, stage: r.stage, kind: P.kinds[k] === 'ms' ? '里程碑（Milestones）' : 'EPAs', item: k, src: r.src, v: r.use[k].v, _row: ri }); });
+    if (r.sum !== null && r.sum !== undefined) out.push({ year: r.year, stage: r.stage, kind: '綜合分數', item: '綜合分數', src: r.src, v: r.sum, _row: ri });
+  });
+  return out;
 }
 var AX_RULE_CBME = '<b>★ 同期程領先</b>：最近一期程某項目的等級，高於同期程學員中位數且達第 75 百分位；同期程至少 5 人。<br><b>◆ 個人強項</b>：最近一期程中，高於本人各項中位數最多的項目，且不低於同期程中位數。<br><b>↑ 進步</b>：同一項目最早期程到最近期程的等級提升（取提升最多的 2 項）。<br><b>❝ 回饋摘錄</b>：學員CBME 的質性回饋中肯定語氣的句子。<br>等級來源：該期程有 CCC 判定時採 CCC，否則採教師評核。EPA 次等級換算：2a＜2b＜3a＜3b＜3c＜4。';
 function axCbmeMed(row, kind, kinds) { var a = []; Object.keys(row.use).forEach(function (k) { if (kinds[k] === kind) a.push(row.use[k].v); }); return a.length ? axMedian(a) : null; }
@@ -3717,19 +3756,22 @@ function axCbmeCalc(P, who) {
   return { mine: mine, last: last, coh: coh, stars: stars, best: best, ups: ups, extra: extra, qs: qs };
 }
 function axCbmeBlock(host, who, cb) {
-  var P = axCbmeParse(cb), R = axCbmeCalc(P, who); if (!R) return;
+  var P0 = axCbmeParse(cb), Y = axCbmeYearSel(P0, 'cbme:pyear', function () { renderDashboard(); });
+  var P = axCbmeByYear(P0, Y.sel), R = axCbmeCalc(P, who);
+  if (!R) { if (Y.sel) { var e0 = axEl('section', 'chart ax-card'); e0.dataset.ax = 'cbmeHL'; var b0 = axEl('div', 'ax-bar'); b0.appendChild(Y.el); e0.appendChild(b0); e0.appendChild(axEl('div', 'state', '「' + who + '」在 ' + Y.sel + ' 沒有 CBME 等級資料。請改選其他年份。')); host.appendChild(e0); } return; }
   var mine = R.mine, last = R.last, coh = R.coh, stars = R.stars, best = R.best, extra = R.extra, qs = R.qs;
   var sec = axEl('section', 'chart ax-card ax-board'); sec.dataset.ax = 'cbmeHL'; host.appendChild(sec);
-  var h = axEl('div', 'ax-head'); h.appendChild(axEl('h3', 'ax-title', '個人亮點（CBME：Milestones & EPAs）'));
+  var h = axEl('div', 'ax-head'); h.appendChild(axEl('h3', 'ax-title', '個人亮點（CBME：Milestones & EPAs' + (Y.sel ? '，' + Y.sel : '') + '）'));
   var info = axEl('button', 'ax-info', 'ⓘ'); info.type = 'button'; info.setAttribute('aria-label', '亮點規則說明'); h.appendChild(info); sec.appendChild(h);
   var nt = axEl('div', 'ax-note'); nt.hidden = true; nt.innerHTML = AX_RULE_CBME; sec.appendChild(nt);
   info.addEventListener('click', function () { nt.hidden = !nt.hidden; });
+  if (P0.years.length) { var yb = axEl('div', 'ax-bar'); yb.appendChild(Y.el); sec.appendChild(yb); sec.appendChild(axEl('p', 'desc', Y.sel ? '只看 ' + Y.sel + '：本人該年份的期程，同期程比較對象限同年份同期程。' : '全部年份：同期程比較對象為所有年份同一期程的學員。各期程欄下方標示所屬年份。')); }
   var grid = axEl('div', 'ax-cbme'); sec.appendChild(grid);
-  var card = axHLCard(who, '最近期程 ' + last.stage + '（' + last.src + '）｜同期程 ' + coh.length + ' 人', { star: stars, diamond: best }, axQuotes(qs, 2), extra);
+  var card = axHLCard(who, '最近期程 ' + last.stage + (last.year ? '｜' + last.year : '') + '（' + last.src + '）｜同期程 ' + coh.length + ' 人', { star: stars, diamond: best }, axQuotes(qs, 2), extra);
   grid.appendChild(card);
   // 期程軌跡：Milestones／EPAs 中位等級與綜合分數，附同期程中位數
   var tw = axEl('div', 'ax-traj'); var t = axEl('table', 'ax-heat ax-trajt'); var thd = document.createElement('thead'), tr0 = document.createElement('tr'); tr0.appendChild(axEl('th', 'ax-corner', ''));
-  mine.forEach(function (r) { var th = axEl('th', 'ax-ch', ''); th.appendChild(axEl('span', '', r.stage)); th.appendChild(axEl('small', '', r.src)); tr0.appendChild(th); });
+  mine.forEach(function (r) { var th = axEl('th', 'ax-ch', ''); th.appendChild(axEl('span', '', r.stage)); th.appendChild(axEl('small', '', (r.year ? r.year + '｜' : '') + r.src)); tr0.appendChild(th); });
   thd.appendChild(tr0); t.appendChild(thd); var tb = document.createElement('tbody');
   [['里程碑（中位）', 'ms'], ['EPAs（中位）', 'epa'], ['綜合分數', 'sum']].forEach(function (rw) {
     var tr = document.createElement('tr'); tr.appendChild(axEl('th', 'ax-rh', rw[0]));
@@ -3746,7 +3788,7 @@ function axCbmeBlock(host, who, cb) {
     });
     tb.appendChild(tr);
   });
-  t.appendChild(tb); var sc = axEl('div', 'ax-scroll'); sc.appendChild(t); tw.appendChild(axEl('div', 'ax-ftitle', '期程軌跡（本人／同期程中位數）')); tw.appendChild(sc); grid.appendChild(tw);
+  t.appendChild(tb); var sc = axEl('div', 'ax-scroll'); sc.appendChild(t); tw.appendChild(axEl('div', 'ax-ftitle', '期程軌跡（本人／同期程中位數' + (Y.sel ? '，限 ' + Y.sel : '') + '）')); tw.appendChild(sc); grid.appendChild(tw);
 }
 
 /* ---------- 個人頁 ---------- */
@@ -3856,7 +3898,13 @@ function axTraineeCbd(host, who, src, M, mine) {
 function axCbmeGroup(host) {
   return axLoad(AX.KEYS.cbme).then(function (cb) {
     if (!cb.rows.length) throw { code: 'NO_PERMISSION' };
-    var P = axCbmeParse(cb), starts = axCohortStarts(cb), byC = {};
+    var P0 = axCbmeParse(cb), starts = axCohortStarts(cb), byC = {};
+    var ys = axEl('section', 'chart ax-card'); ys.dataset.ax = 'yr'; host.appendChild(ys);
+    var yh = axEl('div', 'ax-head'); yh.appendChild(axEl('h3', 'ax-title', '年份篩選（學員CBME 欄BR）')); ys.appendChild(yh);
+    var Y = axCbmeYearSel(P0, 'cbme:year', function () { renderDashboard(); });
+    var yb = axEl('div', 'ax-bar'); yb.appendChild(Y.el); ys.appendChild(yb);
+    ys.appendChild(axEl('p', 'desc', (Y.sel ? '目前只看 ' + Y.sel + '：' : '目前為全部年份：') + '套用於下方「學員個人亮點」與「教學評量指標（CBME）」；「年份比較」固定列出全部年份。年份取自 CCC 日期所屬半年（1–6 月＝上、7–12 月＝下），欄BR 空白者以 CCC 日期推算，兩者皆無（如 PGY0 尚未 CCC）不列入年份。上方後台圖表請用頁首「年度」選單（學期年份）。'));
+    var P = axCbmeByYear(P0, Y.sel);
     P.rows.forEach(function (r) { if (!r.any || !r.who) return; var c = axCohortLabel(axCode(r.name), starts); (byC[c] = byC[c] || {})[r.who] = 1; });
     var groups = Object.keys(byC).map(function (c) {
       var items = [];
@@ -3866,7 +3914,13 @@ function axCbmeGroup(host) {
       });
       return { key: c, label: c, n: Object.keys(byC[c]).length, items: items, o: axCohortOrder(c, starts) };
     }).sort(function (a, b) { return a.o - b.o; });
-    axCohortBoard(host, '學員個人亮點（CBME：Milestones & EPAs，依年份同期群）', groups, { ax: 'hl', groupLabel: '梯次', note: AX_RULE_CBME + '<br>同期群（分頁）＝學員代碼字首（梯次），起訓年月由 CCC 日期與期程推估；等級比較基準為「同一期程」的全體學員，避免不同訓練階段直接比較。', desc: '一次只看一個梯次；每張卡為該學員最近一個期程的亮點。' });
+    axCohortBoard(host, '學員個人亮點（CBME：Milestones & EPAs，依梯次同期群' + (Y.sel ? '，' + Y.sel : '') + '）', groups, { ax: 'hl', groupLabel: '梯次', note: AX_RULE_CBME + '<br>同期群（分頁）＝學員代碼字首（梯次），起訓年月由 CCC 日期與期程推估；等級比較基準為「同一期程」的全體學員，避免不同訓練階段直接比較。', desc: '一次只看一個梯次；每張卡為該學員最近一個期程的亮點' + (Y.sel ? '（只計 ' + Y.sel + ' 的期程）' : '') + '。' });
+    var YR = axCbmeYearRecs(P0);
+    if (YR.length) axMatrix(host, { recs: YR, dims: [{ k: 'item', label: '項目' }, { k: 'year', label: '年份' }, { k: 'stage', label: '期程' }, { k: 'kind', label: '類別' }, { k: 'src', label: '等級來源' }] }, {
+      ax: 'yrcmp', title: 'CBME 年份比較：項目 × 年份', desc: '預設：里程碑、全部期程、列＝項目、欄＝年份（由舊到新）。可改看 EPAs 或綜合分數、限定期程或等級來源；列、欄、分面可切換（例如欄＝期程、分面＝年份）。', row: 'item', col: 'year', facet: '', filterAll: true, fdef: { kind: '里程碑（Milestones）' },
+      measure: 'median', measures: [{ v: 'median', t: '中位數' }, { v: 'mean', t: '平均' }], dec: 2, nUnit: '人次',
+      note: '資料：學員CBME（每一「學員×期程」一筆；該期程有 CCC 判定採 CCC，否則採教師評核）。等級換算：里程碑 Level 1–5；EPA 2a＝2、2b≈2.33、3a＝3、3b≈3.33、3c≈3.67、4＝4。每格人次少於 ' + AX.MIN_N + ' 不呈現數值。不同年份的學員組成、期程分布不同，年份差異須同時看「期程」篩選，避免把訓練階段差異誤讀為年份差異。'
+    });
   }).catch(function (e) { if (e && e.code === 'NO_PERMISSION') throw e; }).then(function () { return axTraineeIndicators(host); });
 }
 /* ---------- 教學評量指標（適用版，2026-10-14 取代原「指標：學員／學生」） ---------- */
@@ -3939,14 +3993,14 @@ function axTraineeIndicators(host) {
       { name: '面向分數資料品質', kind: 'rate', num: tot - bad, den: tot, numDef: '有效分數（0–100）', denDef: '已填寫之面向分數格', warn: bad > 0, note: bad ? '發現 ' + bad + ' 格異常值（負值、超過 100 或非數值），已排除於所有統計，請於來源表確認。' : '' }
     ];
     if (cbme && cbme.cols.length > 5) {
-      var P = axCbmeParse(cbme), today = new Date();
+      var cbY = uiGet('cbme:year') || '', P = axCbmeByYear(axCbmeParse(cbme), cbY), today = new Date();
       var due = P.rows.filter(function (x) { return x.date && x.date <= today; }), done = due.filter(function (x) { return x.ccc; });
       var agree = 0, pairs = 0; P.rows.forEach(function (x) { Object.keys(x.C).forEach(function (k) { if (x.T[k]) { pairs++; if (x.T[k].t === x.C[k].t) agree++; } }); });
       var byW = {}; P.rows.forEach(function (x) { if (x.ccc && x.mo !== null) (byW[x.who] = byW[x.who] || []).push(x); });
       var pg = 0, pgD = 0; Object.keys(byW).forEach(function (w) { var a = byW[w].sort(function (p, q) { return p.mo - q.mo; }); if (a.length < 2) return; pgD++; if (axCbmeMed(a[a.length - 1], 'ms', P.kinds) > axCbmeMed(a[0], 'ms', P.kinds)) pg++; });
       var withLv = P.rows.filter(function (x) { return x.any; }), fbDone = withLv.filter(function (x) { return x.fb.length; }).length;
       var pend = due.filter(function (x) { return !x.ccc; }).map(function (x) { return x.who + ' ' + x.stage; });
-      axKpiSection(host, '教學評量指標：PGY 學員（CBME：Milestones／EPAs）', '以學員CBME 為資料來源。「學員×期程」為一個評核單位；CCC 日期晚於今天者尚未到期，不列入分母。等級比較時 EPA 次等級依 2a＜2b＜3a＜3b＜3c＜4 換算。', [
+      axKpiSection(host, '教學評量指標：PGY 學員（CBME：Milestones／EPAs）' + (cbY ? '（' + cbY + '）' : ''), (cbY ? '只計 ' + cbY + ' 的「學員×期程」（依上方年份篩選）。' : '') + '以學員CBME 為資料來源。「學員×期程」為一個評核單位；CCC 日期晚於今天者尚未到期，不列入分母。等級比較時 EPA 次等級依 2a＜2b＜3a＜3b＜3c＜4 換算。', [
         { name: 'CCC 判定完成率', kind: 'rate', num: done.length, den: due.length, numDef: '已有 CCC 等級判定', denDef: 'CCC 日期已到之「學員×期程」', warn: pend.length > 0, note: pend.length ? '待補判定：' + pend.slice(0, 6).join('、') + (pend.length > 6 ? ' 等 ' + pend.length + ' 筆' : '') : '' },
         { name: '教師評核與 CCC 判定一致率', kind: 'rate', num: agree, den: pairs, numDef: '同一項目教師評核等級＝CCC 判定', denDef: '兩者皆有等級之項目' },
         { name: '里程碑進展率', kind: 'rate', num: pg, den: pgD, numDef: '最近一次 CCC 里程碑中位等級高於最早一次', denDef: '有 ≥2 個期程 CCC 判定之學員', na: !pgD, naText: '尚無學員具 ≥2 個期程的 CCC 判定' },
@@ -3961,7 +4015,7 @@ function axStudentIndicators(host, M) {
   var items = []; cols.forEach(function (c, i) { if (/^\d+\.\s*/.test(c)) items.push(i); });
   var years = axSortKeys(Object.keys(axGroup(src.rows.map(function (r) { return { year: String(r[yI] || '') }; }), 'year')), 'year');
   var wrap = axEl('div'); wrap.dataset.ax = 'ind'; host.appendChild(wrap);
-  var sel = years[years.length - 1] || '';
+  var selSaved = uiGet('ind:stuYear'), sel = selSaved !== undefined && (selSaved === '' || years.indexOf(selSaved) >= 0) ? selSaved : (years[years.length - 1] || '');
   function draw() {
     wrap.innerHTML = '';
     var rows = src.rows.filter(function (r) { return !sel || String(r[yI]) === sel; });
@@ -3981,7 +4035,7 @@ function axStudentIndicators(host, M) {
       { name: '最高分（6 分）比例', kind: 'rate', num: six, den: cnt, numDef: '6 分評分數', denDef: '他評有效題目評分數', warn: cnt && six / cnt > .4, note: cnt && six / cnt > .4 ? '超過四成給滿分，題目鑑別度有限；比較時建議改看「最高分比例」或中位數。' : '' },
       { name: '題目分數有效率', kind: 'rate', num: cells - miss, den: cells, numDef: '有效分數（1–6）', denDef: '他評題目格數', warn: miss / (cells || 1) > .05, note: miss ? miss + ' 格為 #DIV/0! 或空白，視為缺值。' : '' }
     ];
-    var ctrl = axEl('div', 'ax-bar'); ctrl.appendChild(axSelect('年份', [{ v: '', t: '全部年份' }].concat(years.map(function (y) { return { v: y, t: y }; })), sel, function (v) { sel = v; draw(); }));
+    var ctrl = axEl('div', 'ax-bar'); ctrl.appendChild(axSelect('年份', [{ v: '', t: '全部年份' }].concat(years.map(function (y) { return { v: y, t: y }; })), sel, function (v) { sel = v; uiSet('ind:stuYear', v); draw(); }));
     axKpiSection(wrap, '教學評量指標：UGY 學生' + (sel ? '（' + sel + '）' : ''), '「指標：學生」原有的評核完成率、評核者參與率等因後台未設定應評次數與評核者身分而無法計算，已改為上列可由現有資料計算的指標。', K, ctrl);
   }
   draw();
