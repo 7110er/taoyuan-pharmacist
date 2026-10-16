@@ -676,6 +676,116 @@ table.grid td{max-width:320px}
 .ax-kpi-nd{font-size:.72rem;color:var(--ink-3);line-height:1.5}
 .ax-kpi-nd b{color:var(--ink);font-variant-numeric:tabular-nums}
 .ax-kpi-note{font-size:.72rem;color:#8A5D0E;background:#FBF1DE;border-radius:6px;padding:4px 8px}
+/* ===== 臨床成效駕駛艙（CX） ===== */
+#dashPanel.cx-mode:not(.cx-showraw) #charts > section.chart[data-title],#dashPanel.cx-mode:not(.cx-showraw) #charts > section.tile{display:none}
+#dashPanel.cx-mode #dashKpis,#dashPanel.cx-mode #dashChips,#dashPanel.cx-mode .slicer.subj{display:none}
+.cx-root{grid-column:1/-1;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;font-variant-numeric:tabular-nums;--cx-good:#2B6A4B;--cx-bad:#A3261D;--cx-warn:#8A4B00}
+.cx-root>*{grid-column:1/-1;min-width:0}
+.cx-hero{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between;padding:22px 24px;border-radius:var(--r-lg);background:linear-gradient(135deg,#0A3F4B 0%,#0F5E6E 62%,#1C7384 100%);color:#fff;position:relative;overflow:hidden}
+.cx-hero::after{content:"";position:absolute;right:-60px;top:-80px;width:260px;height:260px;border-radius:50%;border:1px solid rgba(255,255,255,.12);box-shadow:0 0 0 40px rgba(255,255,255,.03),0 0 0 80px rgba(255,255,255,.02);pointer-events:none}
+.cx-eyebrow{margin:0 0 4px;font-size:.78rem;letter-spacing:.12em;color:#BFE0E5;font-weight:600}
+.cx-h{margin:0;font-family:var(--display);font-size:clamp(1.4rem,1rem + 1.4vw,2rem);text-wrap:balance;line-height:1.2;letter-spacing:.02em}
+.cx-lede{margin:6px 0 0;max-width:60ch;color:#DCEFF1;font-size:.92rem;line-height:1.6}
+.cx-hero>div:first-child{flex:1 1 420px;min-width:0;position:relative;z-index:1}
+.cx-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;position:relative;z-index:1}
+.cx-meta>span{font-size:.76rem;color:#DCEFF1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px 10px}
+.cx-raw.btn{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);min-height:32px}
+.cx-raw[aria-pressed="true"]{background:#fff;color:var(--teal-deep)}
+.cx-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:12px}
+@media(max-width:560px){.cx-kpis{grid-template-columns:1fr 1fr;gap:8px}.cx-kpi{padding:12px}.cx-kval{font-size:1.5rem}}
+.cx-kpi{position:relative;background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r-lg);padding:14px 16px 12px;display:flex;flex-direction:column;gap:4px;min-width:0;overflow:hidden}
+.cx-kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--teal-soft)}
+.cx-kpi.ok::before{background:var(--cx-good)}.cx-kpi.warn::before{background:#D98A1C}.cx-kpi.bad::before{background:var(--cx-bad)}
+.cx-ktop{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.cx-klab{font-size:.8rem;color:var(--ink-2);font-weight:600;line-height:1.35}
+.cx-kst{flex:none;font-size:.7rem;font-weight:700;border-radius:999px;padding:2px 8px}
+.cx-kst.ok{background:var(--ok-soft);color:var(--cx-good)}.cx-kst.warn{background:var(--warn-soft);color:var(--cx-warn)}.cx-kst.bad{background:var(--err-soft);color:var(--cx-bad)}
+.cx-kval{font-size:clamp(1.6rem,1.3rem + 1vw,2.1rem);font-weight:700;color:var(--ink);line-height:1.1;letter-spacing:-.01em}
+.cx-kval small{font-size:.8rem;font-weight:600;color:var(--ink-3);margin-left:4px;letter-spacing:0}
+.cx-delta{font-size:.76rem;font-weight:600;align-self:flex-start;border-radius:6px;padding:1px 6px}
+.cx-delta.good{color:var(--cx-good);background:var(--ok-soft)}.cx-delta.bad{color:var(--cx-bad);background:var(--err-soft)}.cx-delta.neu,.cx-delta.flat{color:var(--ink-2);background:var(--wash-2)}
+.cx-spark{width:100%;height:28px;margin-top:2px}.cx-spark polyline{fill:none;stroke:var(--s1);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.cx-ksub{margin:0;font-size:.76rem;color:var(--ink-3);line-height:1.45;overflow-wrap:anywhere}
+.cx-ins{list-style:none;margin:0;padding:14px 16px;background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r-lg);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:10px 20px}
+.cx-ins li{position:relative;padding-left:18px;font-size:.88rem;line-height:1.6;color:var(--ink)}
+.cx-ins li::before{content:"";position:absolute;left:2px;top:.55em;width:8px;height:8px;border-radius:50%;background:var(--teal)}
+.cx-ins li.good::before{background:var(--cx-good)}.cx-ins li.warn::before{background:#D98A1C;border-radius:2px;transform:rotate(45deg)}
+.cx-card{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r-lg);padding:16px 18px;min-width:0;grid-column:span 12}
+@media(min-width:900px){.cx-card{grid-column:span 6}.cx-card.wide{grid-column:1/-1}}
+@media(min-width:1100px){.cx-card.third{grid-column:span 4}}
+.cx-chead{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.cx-chead>div{flex:1;min-width:0}
+.cx-title{margin:0;font-size:1.02rem;line-height:1.4;color:var(--ink)}
+.cx-sub{margin:2px 0 0;font-size:.78rem;color:var(--ink-3);line-height:1.5}
+.cx-plot{position:relative;width:100%}
+.cx-svg{display:block;width:100%;height:auto;overflow:visible}
+.cx-grid{stroke:var(--grid);stroke-width:1}
+.cx-ax{font-size:11px;fill:var(--ink-3)}
+.cx-band{fill:#0F5E6E;opacity:.07}
+.cx-cl{stroke:var(--ink-3);stroke-width:1.25;stroke-dasharray:5 4}
+.cx-lim{fill:none;stroke:#7FC0C9;stroke-width:1.5;stroke-dasharray:2 3}
+.cx-bar{opacity:.9}.cx-bar.partial{opacity:.32}
+.cx-line{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.cx-dot{stroke:var(--sheet);stroke-width:2}
+.cx-dot.sig{fill:#D98A1C;stroke:#fff;stroke-width:2}
+.cx-dot.partial{fill:var(--sheet)!important;stroke:var(--ink-3);stroke-dasharray:2 2}
+.cx-phase{stroke:var(--ink-3);stroke-width:1;stroke-dasharray:1 3}
+.cx-phtx{font-size:10px}
+.cx-partx{font-size:10px;fill:var(--ink-3)}
+.cx-hit{fill:transparent;cursor:crosshair}
+.cx-hit:hover{fill:rgba(15,94,110,.06)}
+.cx-tip{position:fixed;z-index:1000;pointer-events:none;max-width:260px;background:#10313B;color:#fff;font-size:.78rem;line-height:1.55;padding:8px 10px;border-radius:8px;box-shadow:0 8px 24px rgba(16,49,59,.25)}
+.cx-sigtx{color:#FFD59A;font-weight:600}
+.cx-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:.76rem;color:var(--ink-2)}
+.cx-legend span{display:inline-flex;align-items:center;gap:6px}
+.cx-legend .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+.cx-legend .sw.band{background:rgba(15,94,110,.14);border:1px dashed #7FC0C9}
+.cx-legend .sw.sig{background:#D98A1C;border-radius:50%}
+.cx-legend .muted{color:var(--ink-3);font-style:italic}
+.cx-table{margin-top:8px;font-size:.8rem}
+.cx-table summary{cursor:pointer;color:var(--teal);font-weight:600;padding:4px 0;min-height:32px;display:flex;align-items:center}
+.cx-table table{width:100%;margin-top:6px}
+.cx-table table td,.cx-table table th{text-align:right;padding:4px 8px}.cx-table table td:first-child,.cx-table table th:first-child{text-align:left}
+.cx-pareto{display:flex;flex-direction:column;gap:6px}
+.cx-prow{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr) auto;grid-template-areas:"lab track val" "lab cum cum";gap:2px 10px;align-items:center;padding:4px 0;border-bottom:1px solid var(--rule-2)}
+.cx-prow:last-child{border-bottom:0}
+.cx-plab{grid-area:lab;font-size:.84rem;color:var(--ink);line-height:1.35;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cx-ptrack{grid-area:track;height:12px;background:var(--wash-2);border-radius:6px;overflow:hidden;display:block}
+.cx-pbar{display:block;height:100%;background:var(--s1);border-radius:0 6px 6px 0;opacity:.55}
+.cx-prow.vital .cx-pbar{opacity:1}.cx-prow.vital .cx-plab{font-weight:600}
+.cx-prow.other .cx-pbar{background:#9FB3B9!important}
+.cx-pval{grid-area:val;font-size:.86rem;color:var(--ink)}
+.cx-pcum{grid-area:cum;font-size:.72rem;color:var(--ink-3)}
+.cx-foot{margin:8px 0 0;font-size:.76rem;color:var(--ink-3)}
+.cx-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media(max-width:899px){.cx-board{grid-template-columns:repeat(4,minmax(232px,1fr));overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;margin:0 -4px;padding-inline:4px}.cx-col{scroll-snap-align:start}}
+.cx-col{background:var(--wash-2);border-radius:var(--r-md);padding:10px;display:flex;flex-direction:column;gap:8px;border-top:4px solid var(--teal-soft);min-width:0}
+.cx-col.c1{border-top-color:var(--s1)}.cx-col.c2{border-top-color:var(--s2)}.cx-col.c3{border-top-color:var(--s3)}.cx-col.c4{border-top-color:#D98A1C}
+.cx-colh{display:flex;align-items:center;justify-content:space-between;font-size:.82rem;color:var(--ink-2)}
+.cx-colc{font-size:.72rem;background:var(--sheet);border-radius:999px;padding:1px 8px;color:var(--ink-3);border:1px solid var(--rule)}
+.cx-item{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:9px 11px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;align-items:baseline;box-shadow:0 1px 0 rgba(16,49,59,.04);transition:transform .15s var(--ease),box-shadow .15s var(--ease)}
+.cx-item:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(16,49,59,.08)}
+.cx-item.warn{border-left:3px solid #D98A1C}
+.cx-ih{font-size:.8rem;color:var(--ink-2);line-height:1.4;overflow-wrap:anywhere}
+.cx-iv{font-size:1rem;color:var(--ink);white-space:nowrap}
+.cx-in{grid-column:1/-1;font-size:.72rem;color:var(--ink-3)}
+.cx-empty{margin:0;font-size:.78rem;color:var(--ink-3);padding:10px;text-align:center;border:1px dashed var(--rule);border-radius:8px}
+.cx-sat{display:flex;flex-direction:column;gap:14px}
+.cx-satit{display:grid;grid-template-columns:3.2em auto 1fr;gap:4px 12px;align-items:center}
+.cx-satl{font-size:.86rem;font-weight:600;color:var(--ink-2)}
+.cx-satit>b{font-size:1.4rem;color:var(--ink)}
+.cx-satit .cx-ptrack{height:10px;grid-area:auto}
+.cx-card.wide .cx-sat{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px 28px}
+.cx-satit small{grid-column:1/-1;font-size:.74rem;color:var(--ink-3)}
+.cx-mat td{text-align:center;font-size:.86rem}
+.cx-small{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px;margin-top:14px}
+.cx-mini{border:1px solid var(--rule-2);border-radius:var(--r-md);padding:10px;display:flex;flex-direction:column;gap:2px}
+.cx-mini>b{font-size:.84rem}.cx-mini>small{font-size:.72rem;color:var(--ink-3)}
+.cx-hatch{stroke:#B9CBD0;stroke-width:2}
+.cx-legend .sw.supp{background:repeating-linear-gradient(45deg,#B9CBD0 0 2px,transparent 2px 5px);border:1px solid #D3E0E3}
+@media(prefers-reduced-motion:reduce){.cx-item{transition:none}.cx-item:hover{transform:none}}
+@media print{.cx-hero{background:#fff;color:var(--ink);border:1px solid var(--rule)}.cx-raw,.cx-table summary{display:none}}
+@media(min-width:900px){.cx-card.wide>.cx-pareto{display:grid;grid-template-columns:1fr 1fr;column-gap:32px}.cx-card.wide>.cx-pareto .cx-prow:nth-last-child(2){border-bottom:0}}
 </style>
 </head>
 <body>
@@ -862,7 +972,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '2.13.0';
+var APP_VERSION = '2.14.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -1970,7 +2080,11 @@ var DASH_LAYOUT = {
   '單位組別成效': { order: ['ax:board', 'ax:matrix'] },
   '教師教學成效': { order: ['ax:board', 'ax:matrix'] },
   '病例導向討論(CbD)': { order: ['ax:board', 'ax:matrix'], hide: [/每月晨會病例簡報場次/] },
-  '簡報評核': { order: ['ax:board', 'ax:matrix'], hide: [/每月晨會病例簡報場次/] }
+  '簡報評核': { order: ['ax:board', 'ax:matrix'], hide: [/每月晨會病例簡報場次/] },
+  '藥事照會介入成效': { order: ['ax:cx'] },
+  '衛教諮詢成效': { order: ['ax:cx'] },
+  '諮詢服務': { order: ['ax:cx'] },
+  '整合病房減藥成效': { order: ['ax:cx'] }
 };
 function layoutMatch(el, o) { if (typeof o === 'string') return o.indexOf('ax:') === 0 && el.dataset && el.dataset.ax === o.slice(3); return !!(el.dataset && el.dataset.title && o.test(el.dataset.title)); }
 function visibleCharts(d, name) { var L = DASH_LAYOUT[name] || {}, H = L.hide || []; return (d.charts || []).filter(function (c) { return !H.some(function (re) { return re.test(c.title || ''); }); }); }
@@ -3408,10 +3522,14 @@ var AX_PANELS = {
   'PGY 學員個人成績': axTraineePersonal,
   '教師教學評核（個人）': axTeacherPersonal,
   '教師個人成績': axTeacherPersonal,
-  '簡報評核': axPresGroup
+  '簡報評核': axPresGroup,
+  '藥事照會介入成效': cxConsult,
+  '衛教諮詢成效': cxEdu,
+  '諮詢服務': cxQuery,
+  '整合病房減藥成效': cxWard
 };
 function enhanceDashboard(d, box) {
-  var name = dashName(S.dashId) || d.name; var fn = AX_PANELS[name]; if (!fn) return;
+  var name = dashName(S.dashId) || d.name; var fn = AX_PANELS[name]; $('dashPanel').classList.remove('cx-mode'); cxHideTip(); if (!fn) return;
   var host = axEl('div', 'ax-host'); box.insertBefore(host, box.firstChild);
   var ld = axEl('div', 'chart ax-card ax-loading'); ld.innerHTML = '<div class="ax-spin" aria-hidden="true"></div><span>分析資料載入中…</span>'; host.appendChild(ld);
   var gen = S.dashReq;
@@ -4107,6 +4225,444 @@ function axStudentIndicators(host, M) {
     axKpiSection(wrap, '教學評量指標：UGY 學生' + (sel ? '（' + sel + '）' : ''), '「指標：學生」原有的評核完成率、評核者參與率等因後台未設定應評次數與評核者身分而無法計算，已改為上列可由現有資料計算的指標。', K, ctrl);
   }
   draw();
+}
+/* ================= 臨床成效駕駛艙（CX，v2.14.0） =================
+ * 資料來源：只用後台已彙總、已經過隱私閘門的圖表格（cells），前端不讀任何逐筆資料。
+ * 統計方法（每張卡的 ⓘ 皆有說明）：
+ *  - 平均：一律為四分位距平均（IQM，去除最高／最低各 25%）。
+ *  - 月趨勢管制：中位數中心線的 XmR（個別值－移動全距）管制圖；管制界限＝中位數 ± 3.14 × 移動全距中位數（Wheeler 穩健版）。
+ *    訊號規則（IHI run chart）：超出管制界限；連續 ≥6 點在中心線同側（偏移）；連續 ≥5 點遞增或遞減（趨勢）。需 ≥10 個完整月份才判讀。
+ *  - 比率（接受率）：合併比例 p̄，月 p 管制界限 p̄ ± 3√(p̄(1−p̄)/nᵢ)；整體比率附 Wilson 95% 信賴區間。
+ *  - 本月尚未結束：以「本月至今」標示，不納入中心線、界限與月增減比較。
+ */
+var CX_TIP = null;
+function cxTip() {
+  if (CX_TIP) return CX_TIP;
+  CX_TIP = axEl('div', 'cx-tip'); CX_TIP.setAttribute('role', 'tooltip'); CX_TIP.hidden = true; document.body.appendChild(CX_TIP);
+  return CX_TIP;
+}
+function cxShowTip(e, html) { var t = cxTip(); t.innerHTML = html; t.hidden = false; var x = e.clientX, y = e.clientY, w = t.offsetWidth, h = t.offsetHeight; t.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, x + 14)) + 'px'; t.style.top = Math.max(8, (y - h - 12 < 8 ? y + 16 : y - h - 12)) + 'px'; }
+function cxHideTip() { if (CX_TIP) CX_TIP.hidden = true; }
+function cxNowMonth() { var d = new Date(Date.now() + 8 * 3600000); return d.toISOString().slice(0, 7); }
+function cxMonthLabel(p) { var m = /^(\d{4})-(\d{2})$/.exec(p); return m ? (m[1] - 1911) + '/' + m[2] : p; }
+function cxNum(v, d) { return v === null || v === undefined || !isFinite(v) ? '—' : (Math.round(v * Math.pow(10, d || 0)) / Math.pow(10, d || 0)).toLocaleString('zh-TW'); }
+function cxPct(v, d) { return v === null || v === undefined || !isFinite(v) ? '—' : cxNum(v * 100, d === undefined ? 1 : d) + '%'; }
+function cxMedian(a) { return axMedian(a.filter(function (x) { return x !== null && isFinite(x); })); }
+function cxChart(d, re) { return (d.charts || []).filter(function (c) { return re.test(c.title || '') && c.status === 'OK'; })[0] || null; }
+function cxSeriesName(s) { return String(s || '').replace(/^.*[|｜]/, '').trim(); }
+/* 月合計（筆數類）：{ months:[...], v:{p:n}, supp:{p:1} } */
+function cxMonthly(c) {
+  var v = {}, supp = {};
+  (c && c.cells || []).forEach(function (x) { if (!x[0]) return; if (x[11]) { supp[x[0]] = 1; return; } v[x[0]] = (v[x[0]] || 0) + (x[4] || 0); });
+  var months = Object.keys(v).concat(Object.keys(supp)).filter(function (p, i, a) { return a.indexOf(p) === i; }).sort();
+  return { months: months, v: v, supp: supp };
+}
+/* 月×分組（筆數類）：{ months, m:{p:{g:n}}, tot:{g:n} } */
+function cxMonthlyBy(c) {
+  var m = {}, tot = {}, supp = 0;
+  (c && c.cells || []).forEach(function (x) { if (!x[0]) return; if (x[11]) { supp++; return; } var g = String(x[2] || '（未填）'); (m[x[0]] = m[x[0]] || {})[g] = (m[x[0]][g] || 0) + (x[4] || 0); tot[g] = (tot[g] || 0) + (x[4] || 0); });
+  return { months: Object.keys(m).sort(), m: m, tot: tot, supp: supp };
+}
+/* 月×系列（平均類，如整合病房各月比率）：{ months, s:[ {name, v:{p:val}} ] } */
+function cxMonthlySeries(c) {
+  var out = (c ? c.series : []).map(function (s) { return { name: cxSeriesName(s), v: {} }; }), months = {};
+  (c && c.cells || []).forEach(function (x) { if (!x[0] || x[11]) return; var si = +x[3]; if (!out[si]) return; var val = x[6] ? x[5] / x[6] : null; if (val === null) return; out[si].v[x[0]] = val; months[x[0]] = 1; });
+  return { months: Object.keys(months).sort(), s: out };
+}
+/* 分類合計（由大到小）＋被合併隱藏的格數 */
+function cxCats(c) {
+  if (!c) return { list: [], supp: 0, total: 0 };
+  var A = aggregateChart(c), out = [], supp = 0, total = 0;
+  A.groups.forEach(function (g) { var a = A.get(g, 0); if (!a) return; if (a.supp) { supp++; return; } var v = aggValue(c.agg, a); if (typeof v !== 'number') return; out.push({ g: String(g), v: v }); total += v; });
+  out.sort(function (a, b) { return b.v - a.v; });
+  return { list: out, supp: supp, total: total };
+}
+/* 單一數值（平均類數字卡／橫條圖的各系列） */
+function cxSeriesValues(c) {
+  if (!c) return [];
+  var A = aggregateChart(c), g = A.groups[0];
+  return c.series.map(function (s, i) { var a = A.get(g, i); return { name: cxSeriesName(s), v: a && !a.supp ? aggValue(c.agg, a) : null }; });
+}
+function cxWilson(k, n) { if (!n) return null; var z = 1.96, p = k / n, d = 1 + z * z / n, c = p + z * z / (2 * n), r = z * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)); return [(c - r) / d, (c + r) / d]; }
+/* XmR（中位數中心線）＋ IHI 規則；vals 為完整月份 */
+function cxXmR(vals) {
+  var v = vals.filter(function (x) { return x !== null && isFinite(x); });
+  if (v.length < 2) return null;
+  var cl = axMedian(v), mr = []; for (var i = 1; i < v.length; i++) mr.push(Math.abs(v[i] - v[i - 1]));
+  var mrm = axMedian(mr), half = 3.14 * mrm;
+  return { cl: cl, ucl: cl + half, lcl: Math.max(0, cl - half), n: v.length };
+}
+/* 階段：起始期若出現 ≥6 點同側的偏移（導入期／流程改變），且其後仍有 ≥10 個月，則以偏移後為新階段重算中心線與界限 */
+function cxPhases(vals) {
+  var out = [], s = 0, guard = 0;
+  while (guard++ < 5) {
+    var seg = vals.slice(s), x = cxXmR(seg); if (!x) { out.push({ s: s, e: vals.length, x: null }); break; }
+    var run = 0, side = 0, cut = -1;
+    for (var i = 0; i < seg.length; i++) { var v = seg[i]; if (v === null || v === x.cl) break; var sd = v > x.cl ? 1 : -1; if (side && sd !== side) break; side = sd; run++; }
+    if (run >= 6 && seg.length - run >= 10) cut = run;
+    if (cut < 0) { out.push({ s: s, e: vals.length, x: x }); break; }
+    out.push({ s: s, e: s + cut, x: cxXmR(seg.slice(0, cut)) }); s += cut;
+  }
+  return out;
+}
+function cxSignals(vals, x) {
+  var sig = vals.map(function () { return null; }); if (!x || x.n < 10) return { sig: sig, note: '完整月份不足 10 個，暫不判讀管制訊號' };
+  vals.forEach(function (v, i) { if (v === null) return; if (v > x.ucl) sig[i] = '高於管制上限'; else if (v < x.lcl) sig[i] = '低於管制下限'; });
+  var run = 0, side = 0;
+  vals.forEach(function (v, i) { if (v === null || v === x.cl) { run = 0; side = 0; return; } var s = v > x.cl ? 1 : -1; run = s === side ? run + 1 : 1; side = s; if (run >= 6) for (var k = i - run + 1; k <= i; k++) sig[k] = sig[k] || (s > 0 ? '連續 ≥6 點高於中位數（偏移）' : '連續 ≥6 點低於中位數（偏移）'); });
+  var up = 1, dn = 1;
+  for (var i = 1; i < vals.length; i++) {
+    if (vals[i] === null || vals[i - 1] === null) { up = dn = 1; continue; }
+    up = vals[i] > vals[i - 1] ? up + 1 : 1; dn = vals[i] < vals[i - 1] ? dn + 1 : 1;
+    if (up >= 5) for (var k = i - up + 1; k <= i; k++) sig[k] = sig[k] || '連續 ≥5 點遞增（趨勢）';
+    if (dn >= 5) for (var k2 = i - dn + 1; k2 <= i; k2++) sig[k2] = sig[k2] || '連續 ≥5 點遞減（趨勢）';
+  }
+  return { sig: sig, note: '' };
+}
+/* 加權四分位距平均（分數分布 {score:count}） */
+function cxIQMDist(dist) {
+  var keys = Object.keys(dist).map(Number).filter(isFinite).sort(function (a, b) { return a - b; }), N = 0;
+  keys.forEach(function (k) { N += dist[k]; }); if (!N) return null;
+  var s = 0, acc = 0;
+  keys.forEach(function (k) { var lo = acc / N, hi = (acc + dist[k]) / N, w = Math.min(hi, .75) - Math.max(lo, .25); if (w > 0) s += k * w; acc += dist[k]; });
+  return s / .5;
+}
+/* ---------- 繪圖元件 ---------- */
+var CX_NS = 'http://www.w3.org/2000/svg', CX_UID = 0;
+function cxSvg(w, h, label) { var s = document.createElementNS(CX_NS, 'svg'); s.setAttribute('viewBox', '0 0 ' + w + ' ' + h); s.setAttribute('class', 'cx-svg'); s.setAttribute('role', 'img'); s.setAttribute('aria-label', label || ''); return s; }
+function cxAdd(svg, tag, at, txt) { var e = document.createElementNS(CX_NS, tag); for (var k in at) e.setAttribute(k, at[k]); if (txt !== undefined) e.textContent = txt; svg.appendChild(e); return e; }
+function cxMonthAdd(p, k) { var y = +p.slice(0, 4), m = +p.slice(5, 7) - 1 + k; y += Math.floor(m / 12); m = ((m % 12) + 12) % 12; return y + '-' + (m < 9 ? '0' : '') + (m + 1); }
+function cxSpan(months) { var cur = cxNowMonth(); var a = months.filter(function (p) { return /^\d{4}-\d{2}$/.test(p) && p <= cur; }).sort(); if (!a.length) return []; var out = [], p = a[0], end = a[a.length - 1], g = 0; while (p <= end && g++ < 600) { out.push(p); p = cxMonthAdd(p, 1); } return out; }
+function cxTicks(mx, isRate) { if (!(mx > 0)) mx = 1; var raw = mx / 4, p = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / p, st = (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * p; if (!isRate && st < 1) st = 1; var top = Math.ceil(mx / st - 1e-9) * st; if (isRate && mx <= 1) top = Math.min(1, top); var t = []; for (var v = 0; v <= top + 1e-9; v += st) t.push(+v.toFixed(10)); return { top: top, t: t }; }
+function cxW(def) { var c = $('charts'), w = c && c.clientWidth ? c.clientWidth - 40 : def; return Math.max(300, Math.min(1180, w || def)); }
+function cxSegs(a) { var out = [], cur = []; a.forEach(function (p) { if (p === null) { if (cur.length > 1) out.push(cur.join(' ')); cur = []; } else cur.push(p); }); if (cur.length > 1) out.push(cur.join(' ')); return out; }
+function cxNiceMax(v) { if (!(v > 0)) return 1; var p = Math.pow(10, Math.floor(Math.log10(v))), n = v / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * p; }
+/* 月趨勢＋管制圖：opt = { months, vals:{p:v}, fmt, kind:'count'|'rate'|'value', color, limits:'xmr'|{p:[lcl,ucl]}|null, cl, label, extra:[{name,color,vals}] } */
+function cxTrend(opt) {
+  var cur = cxNowMonth(), months = cxSpan(opt.months).slice(-36), W = opt.w || cxW(720), H = opt.h || (W < 520 ? 220 : 260), L = 44, R = 14, T = 16, B = 30;
+  if (opt.zeroFill) months.forEach(function (p) { if (opt.vals[p] === undefined && !(opt.suppNote && opt.suppNote[p])) opt.vals[p] = 0; });
+  var full = months.filter(function (p) { return p < cur; }), vals = months.map(function (p) { return opt.vals[p] === undefined ? null : opt.vals[p]; });
+  var fullVals = full.map(function (p) { return opt.vals[p] === undefined ? null : opt.vals[p]; });
+  var ph = opt.limits === 'xmr' ? cxPhases(fullVals) : null, x = ph ? ph[ph.length - 1].x : null, sg;
+  if (ph) { sg = { sig: [], note: '' }; ph.forEach(function (f) { var r = cxSignals(fullVals.slice(f.s, f.e), f.x); sg.sig = sg.sig.concat(r.sig); if (r.note) sg.note = r.note; }); }
+  else sg = cxSignals(fullVals, opt.cl !== undefined ? { cl: opt.cl, ucl: Infinity, lcl: -Infinity, n: fullVals.length } : null);
+  var mx = 0; vals.forEach(function (v) { if (v > mx) mx = v; }); (opt.extra || []).forEach(function (e) { months.forEach(function (p) { if (e.vals[p] > mx) mx = e.vals[p]; }); });
+  (ph || []).forEach(function (f) { if (f.x && f.x.ucl > mx) mx = f.x.ucl; }); if (opt.kind === 'rate') mx = Math.max(mx, opt.rateMax || 0);
+  var TK = cxTicks(mx, opt.kind === 'rate'), ymax = TK.top, ymin = 0;
+  if (opt.kind === 'value' && opt.mark === 'line') { // 線圖不必從 0 起：以資料範圍取刻度，避免變化被壓平
+    var mn = Infinity; vals.forEach(function (v) { if (v !== null && v < mn) mn = v; }); (opt.extra || []).forEach(function (e) { months.forEach(function (p) { var v = e.vals[p]; if (v !== undefined && v !== null && v < mn) mn = v; }); }); (ph || []).forEach(function (f) { if (f.x && f.x.lcl < mn) mn = f.x.lcl; });
+    if (isFinite(mn) && mn > mx * .4) { var rg = mx - mn || mx * .1 || 1, raw = rg / 4, pw = Math.pow(10, Math.floor(Math.log10(raw))), nn = raw / pw, st = (nn <= 1 ? 1 : nn <= 2 ? 2 : nn <= 2.5 ? 2.5 : nn <= 5 ? 5 : 10) * pw; ymin = Math.floor(mn / st) * st; ymax = Math.ceil(mx / st - 1e-9) * st; if (opt.vmax !== undefined) ymax = Math.min(ymax, opt.vmax); if (ymax <= ymin) ymax = ymin + st; TK = { top: ymax, t: [] }; for (var tv = ymin; tv <= ymax + 1e-9; tv += st) TK.t.push(+tv.toFixed(10)); }
+  }
+  var n = months.length, bw = (W - L - R) / Math.max(1, n), y = function (v) { return T + (H - T - B) * (1 - (Math.max(ymin, Math.min(ymax, v)) - ymin) / (ymax - ymin)); }, cx = function (i) { return L + bw * (i + .5); };
+  var svg = cxSvg(W, H, opt.label);
+  var defs = cxAdd(svg, 'defs', {}); var pat = document.createElementNS(CX_NS, 'pattern'); var pid = 'cxh' + (++CX_UID); pat.setAttribute('id', pid); pat.setAttribute('width', '6'); pat.setAttribute('height', '6'); pat.setAttribute('patternUnits', 'userSpaceOnUse'); pat.setAttribute('patternTransform', 'rotate(45)'); cxAdd(pat, 'line', { x1: 0, y1: 0, x2: 0, y2: 6, 'class': 'cx-hatch' }); defs.appendChild(pat);
+  TK.t.forEach(function (v) { cxAdd(svg, 'line', { x1: L, x2: W - R, y1: y(v), y2: y(v), 'class': 'cx-grid' }); cxAdd(svg, 'text', { x: L - 6, y: y(v) + 4, 'text-anchor': 'end', 'class': 'cx-ax' }, opt.fmt(v, true)); });
+  var maxLab = Math.max(2, Math.floor((W - L - R) / 58)), step = Math.max(1, Math.ceil(n / maxLab)), lastLab = -1e9;
+  months.forEach(function (p, i) { if (i % step === 0 || i === n - 1 && i - lastLab >= step * .75) { lastLab = i; cxAdd(svg, 'text', { x: cx(i), y: H - 10, 'text-anchor': 'middle', 'class': 'cx-ax' }, cxMonthLabel(p)); } });
+  if (opt.suppNote) months.forEach(function (p, i) { if (opt.suppNote[p] && vals[i] === null) cxAdd(svg, 'rect', { x: cx(i) - Math.min(24, bw * .62) / 2, y: T, width: Math.min(24, bw * .62), height: H - T - B, rx: 3, fill: 'url(#' + pid + ')', 'class': 'cx-supp' }); });
+  (ph || []).forEach(function (f, k) {
+    var fx = f.x; if (!fx) return; var x0 = k === 0 ? L : cx(f.s) - bw / 2, x1 = k === ph.length - 1 ? W - R : cx(f.e - 1) + bw / 2;
+    cxAdd(svg, 'rect', { x: x0, y: y(Math.min(fx.ucl, ymax)), width: Math.max(0, x1 - x0), height: Math.max(0, y(fx.lcl) - y(Math.min(fx.ucl, ymax))), 'class': 'cx-band' });
+    cxAdd(svg, 'line', { x1: x0, x2: x1, y1: y(fx.cl), y2: y(fx.cl), 'class': 'cx-cl' });
+    if (k > 0) { cxAdd(svg, 'line', { x1: x0, x2: x0, y1: T, y2: H - B, 'class': 'cx-phase' }); cxAdd(svg, 'text', { x: x0 + 4, y: T + 10, 'class': 'cx-ax cx-phtx' }, '新階段（重算界限）'); }
+    if (k === ph.length - 1 && W >= 400) cxAdd(svg, 'text', { x: W - R, y: y(fx.cl) - 5, 'text-anchor': 'end', 'class': 'cx-ax' }, '中位數 ' + opt.fmt(fx.cl));
+  });
+  if (false) {
+  }
+  if (opt.pLimits) { // p 管制圖：逐月界限（階梯）
+    var up = [], lo = [];
+    months.forEach(function (p, i) { var l = opt.pLimits[p]; if (!l) return; up.push((cx(i) - bw / 2) + ',' + y(Math.min(l[1], ymax)) + ' ' + (cx(i) + bw / 2) + ',' + y(Math.min(l[1], ymax))); lo.push((cx(i) - bw / 2) + ',' + y(Math.max(l[0], 0)) + ' ' + (cx(i) + bw / 2) + ',' + y(Math.max(l[0], 0))); });
+    if (up.length) { cxAdd(svg, 'polyline', { points: up.join(' '), 'class': 'cx-lim' }); cxAdd(svg, 'polyline', { points: lo.join(' '), 'class': 'cx-lim' }); }
+    if (opt.cl !== undefined) { cxAdd(svg, 'line', { x1: L, x2: W - R, y1: y(opt.cl), y2: y(opt.cl), 'class': 'cx-cl' }); cxAdd(svg, 'text', { x: W - R, y: y(opt.cl) - 5, 'text-anchor': 'end', 'class': 'cx-ax' }, '整體 ' + opt.fmt(opt.cl)); }
+  }
+  var col = opt.color || 'var(--s1)';
+  if (opt.mark === 'bar') {
+    months.forEach(function (p, i) { var v = vals[i]; if (v === null) return; var bwid = Math.min(24, bw * .62), h = Math.max(0, y(0) - y(v)); cxAdd(svg, 'path', { d: 'M' + (cx(i) - bwid / 2) + ',' + y(0) + ' v' + (-Math.max(0, h - 3)) + ' q0,-3 3,-3 h' + (bwid - 6) + ' q3,0 3,3 v' + Math.max(0, h - 3) + ' z', 'class': 'cx-bar' + (p >= cur ? ' partial' : ''), style: 'fill:' + col }); });
+  } else {
+    cxSegs(months.map(function (p, i) { return vals[i] !== null && p < cur ? cx(i) + ',' + y(vals[i]) : null; })).forEach(function (pts) { cxAdd(svg, 'polyline', { points: pts, 'class': 'cx-line', style: 'stroke:' + col }); });
+  }
+  if (opt.zeroFill) (opt.extra || []).forEach(function (e) { months.forEach(function (p) { if (e.vals[p] === undefined && opt.vals[p] !== undefined) e.vals[p] = 0; }); });
+  (opt.extra || []).forEach(function (e) { cxSegs(months.map(function (p, i) { return e.vals[p] !== undefined && e.vals[p] !== null && p < cur ? cx(i) + ',' + y(e.vals[p]) : null; })).forEach(function (pts) { cxAdd(svg, 'polyline', { points: pts, 'class': 'cx-line', style: 'stroke:' + e.color }); }); });
+  // 訊號點與本月至今
+  var fi = 0;
+  months.forEach(function (p, i) {
+    var v = vals[i]; if (v === null) return;
+    var s = p < cur ? sg.sig[fi++] : null;
+    if (opt.mark === 'bar' && p >= cur) { cxAdd(svg, 'text', { x: cx(i), y: y(v) - 6, 'text-anchor': 'middle', 'class': 'cx-ax cx-partx' }, '至今'); return; }
+    if (opt.mark !== 'bar' || s || p >= cur) cxAdd(svg, 'circle', { cx: cx(i), cy: y(v), r: s ? 5.5 : 4, 'class': 'cx-dot' + (s ? ' sig' : '') + (p >= cur ? ' partial' : ''), style: s ? '' : 'fill:' + col });
+  });
+  // 懸停：每月一個大於標記的感應區
+  months.forEach(function (p, i) {
+    var hit = cxAdd(svg, 'rect', { x: cx(i) - bw / 2, y: T, width: bw, height: H - T - B, 'class': 'cx-hit' });
+    var k = full.indexOf(p), s = k >= 0 ? sg.sig[k] : null;
+    var html = '<b>' + cxMonthLabel(p) + (p >= cur ? '（本月至今）' : '') + '</b><br>' + esc(opt.name || '數值') + '：' + (vals[i] === null ? (opt.suppNote && opt.suppNote[p] ? '人數不足已隱藏' : '—') : esc(opt.fmt(vals[i])))
+      + (opt.extra || []).map(function (e) { return '<br>' + esc(e.name) + '：' + (e.vals[p] === undefined ? '—' : esc(opt.fmt(e.vals[p]))); }).join('')
+      + (opt.tipExtra ? opt.tipExtra(p) : '') + (s ? '<br><span class="cx-sigtx">⚑ ' + esc(s) + '</span>' : '');
+    hit.addEventListener('mousemove', function (e) { cxShowTip(e, html); }); hit.addEventListener('mouseleave', cxHideTip);
+    hit.addEventListener('touchstart', function (e) { var t = e.touches[0]; cxShowTip(t, html); }, { passive: true });
+  });
+  var nSig = sg.sig.filter(function (s) { return s; }).length, has = full.filter(function (p) { return opt.vals[p] !== undefined && opt.vals[p] !== null; });
+  return { svg: svg, x: x, sig: sg, nSig: nSig, last: has.length ? { p: has[has.length - 1], v: opt.vals[has[has.length - 1]] } : null, prev: has.length > 1 ? { p: has[has.length - 2], v: opt.vals[has[has.length - 2]] } : null, full: full, has: has, future: opt.months.filter(function (p) { return p > cur; }), idle: (function () { var k = 0; for (var i = full.length - 1; i >= 0 && opt.vals[full[i]] === 0; i--) k++; return k; })(), months: months, nSupp: opt.suppNote ? months.filter(function (p) { return opt.suppNote[p]; }).length : 0 };
+}
+/* 帕雷托：橫條＋累積百分比（前 n 名，其餘併為「其他」） */
+function cxPareto(list, opt) {
+  opt = opt || {}; var n = opt.top || 8, total = 0; list.forEach(function (x) { total += x.v; });
+  var rows = list.slice(0, n); if (list.length > n) { var o = 0; list.slice(n).forEach(function (x) { o += x.v; }); rows.push({ g: '其他（' + (list.length - n) + ' 類）', v: o, other: true }); }
+  var wrap = axEl('div', 'cx-pareto'), cum = 0, max = rows.reduce(function (m, x) { return Math.max(m, x.v); }, 0) || 1;
+  rows.forEach(function (r, i) {
+    cum += r.v; var row = axEl('div', 'cx-prow' + (cum / total <= .8 || i === 0 ? ' vital' : '') + (r.other ? ' other' : ''));
+    var lab = axEl('span', 'cx-plab', r.g); lab.title = r.g; row.appendChild(lab);
+    var track = axEl('span', 'cx-ptrack'); var bar = axEl('i', 'cx-pbar'); bar.style.width = Math.max(1.5, r.v / max * 100) + '%'; if (opt.color) bar.style.background = opt.color; track.appendChild(bar); row.appendChild(track);
+    row.appendChild(axEl('b', 'cx-pval', (opt.fmt || cxNum)(r.v)));
+    row.appendChild(axEl('small', 'cx-pcum', cxPct(r.v / total, 0) + ' · 累計 ' + cxPct(cum / total, 0)));
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+/* 卡片外框 */
+function cxCard(cls, title, sub, info) {
+  var c = axEl('section', 'cx-card ' + (cls || '')); var h = axEl('div', 'cx-chead'); var tt = axEl('div');
+  tt.appendChild(axEl('h3', 'cx-title', title)); if (sub) tt.appendChild(axEl('p', 'cx-sub', sub)); h.appendChild(tt);
+  if (info) { var b = axEl('button', 'ax-info', 'ⓘ'); b.type = 'button'; b.setAttribute('aria-label', title + '：定義與計算方式'); h.appendChild(b); var nt = axEl('div', 'ax-note cx-note'); nt.hidden = true; nt.innerHTML = info; b.addEventListener('click', function () { nt.hidden = !nt.hidden; }); c.appendChild(h); c.appendChild(nt); }
+  else c.appendChild(h);
+  return c;
+}
+/* KPI 磚：{label, value, unit, delta:{v, good:'up'|'down', text}, sub, spark:[...], status:'ok'|'warn'|'bad'|'' , info} */
+function cxKpi(k) {
+  var t = axEl('article', 'cx-kpi' + (k.status ? ' ' + k.status : ''));
+  var top = axEl('div', 'cx-ktop'); top.appendChild(axEl('span', 'cx-klab', k.label));
+  if (k.status) { var st = axEl('span', 'cx-kst ' + k.status, k.status === 'ok' ? '✓ 穩定' : k.status === 'warn' ? '⚑ 留意' : '⚠ 異常'); top.appendChild(st); }
+  t.appendChild(top);
+  var v = axEl('div', 'cx-kval'); v.appendChild(document.createTextNode(k.value)); if (k.unit) v.appendChild(axEl('small', '', k.unit)); t.appendChild(v);
+  if (k.delta && k.delta.text) { var up = k.delta.v > 0, good = k.delta.good ? (k.delta.good === 'up' ? up : !up) : null; t.appendChild(axEl('span', 'cx-delta ' + (k.delta.v === 0 ? 'flat' : good === null ? 'neu' : good ? 'good' : 'bad'), (k.delta.v > 0 ? '▲ ' : k.delta.v < 0 ? '▼ ' : '＝ ') + k.delta.text)); }
+  if (k.spark && k.spark.length > 2) { var s = k.spark, W = 120, H = 28, mx = Math.max.apply(null, s), mn = Math.min.apply(null, s.concat([0])); var svg = cxSvg(W, H, k.label + ' 走勢'); svg.setAttribute('class', 'cx-spark'); cxAdd(svg, 'polyline', { points: s.map(function (v, i) { return (i * W / (s.length - 1)).toFixed(1) + ',' + (H - 3 - (H - 6) * (mx > mn ? (v - mn) / (mx - mn) : .5)).toFixed(1); }).join(' ') }); t.appendChild(svg); }
+  if (k.sub) t.appendChild(axEl('p', 'cx-ksub', k.sub));
+  if (k.title) t.title = k.title;
+  return t;
+}
+function cxDelta(cur, prev, fmt, good) { if (cur === null || cur === undefined || prev === null || prev === undefined) return null; var d = cur - prev; return { v: d, good: good, text: (fmt ? fmt(Math.abs(d)) : cxNum(Math.abs(d))) + '（較 ' + '前月）' }; }
+function cxPctDelta(cur, prev, label, good) { if (!prev || cur === null || cur === undefined) return null; var d = (cur - prev) / prev; return { v: d, good: good, text: cxPct(Math.abs(d), 0) + '（' + (label || '較前月') + '）' }; }
+/* 看板欄：[{title, tone, cards:[{h, v, note}]}] */
+function cxBoard(cols) {
+  var b = axEl('div', 'cx-board');
+  cols.forEach(function (col) {
+    var c = axEl('div', 'cx-col ' + (col.tone || '')); var hd = axEl('div', 'cx-colh'); hd.appendChild(axEl('b', '', col.title)); hd.appendChild(axEl('span', 'cx-colc', String(col.cards.length))); c.appendChild(hd);
+    if (!col.cards.length) c.appendChild(axEl('p', 'cx-empty', col.empty || '目前沒有項目'));
+    col.cards.forEach(function (k) { var it = axEl('div', 'cx-item' + (k.tone ? ' ' + k.tone : '')); it.appendChild(axEl('span', 'cx-ih', k.h)); if (k.v !== undefined) it.appendChild(axEl('b', 'cx-iv', k.v)); if (k.note) it.appendChild(axEl('small', 'cx-in', k.note)); c.appendChild(it); });
+    b.appendChild(c);
+  });
+  return b;
+}
+function cxFinish(host, d, sections) {
+  var root = axEl('div', 'cx-root'); root.dataset.ax = 'cx'; host.appendChild(root);
+  var y = $('yearSel').value, m = $('monthSel').value;
+  var hd = axEl('div', 'cx-hero');
+  var ht = axEl('div'); ht.appendChild(axEl('p', 'cx-eyebrow', (sections.name || '臨床成效') + ' · ' + ((y ? periodShort(y) : '全部期間') + (m ? ' ' + Number(m) + ' 月' : ''))));
+  ht.appendChild(axEl('h2', 'cx-h', sections.headline)); if (sections.lede) ht.appendChild(axEl('p', 'cx-lede', sections.lede)); hd.appendChild(ht);
+  var meta = axEl('div', 'cx-meta'); meta.appendChild(axEl('span', '', '資料更新 ' + (d.updatedAt || '—'))); meta.appendChild(axEl('span', '', '全科層級統計，不顯示個人'));
+  var tg = axEl('button', 'btn small cx-raw', '原始圖表'); tg.type = 'button'; tg.setAttribute('aria-pressed', 'false');
+  tg.addEventListener('click', function () { var on = $('dashPanel').classList.toggle('cx-showraw'); tg.setAttribute('aria-pressed', String(on)); uiSet('cx:raw', on); });
+  if (uiGet('cx:raw')) { $('dashPanel').classList.add('cx-showraw'); tg.setAttribute('aria-pressed', 'true'); }
+  meta.appendChild(tg); hd.appendChild(meta); root.appendChild(hd);
+  if (sections.kpis && sections.kpis.length) { var ks = axEl('div', 'cx-kpis'); sections.kpis.forEach(function (k) { if (k) ks.appendChild(cxKpi(k)); }); root.appendChild(ks); }
+  if (sections.insights && sections.insights.length) { var ins = axEl('ul', 'cx-ins'); ins.setAttribute('aria-label', '重點發現'); sections.insights.forEach(function (s) { if (s) ins.appendChild(axEl('li', s.tone || '', s.t || s)); }); root.appendChild(ins); }
+  (sections.blocks || []).forEach(function (b) { if (b) root.appendChild(b); });
+  $('dashPanel').classList.add('cx-mode');
+}
+var CX_SPC_INFO = '<b>管制圖（XmR，中位數中心線）</b>：中心線＝完整月份的中位數；管制界限＝中位數 ± 3.14 × 相鄰兩月差值的中位數。若起始期連續 ≥6 點落在同側（導入期或流程改變）且其後仍有 ≥10 個月，自動切為「新階段」並重算中心線與界限。超出界限、連續 6 點在中心線同側、或連續 5 點遞增／遞減，以 ⚑ 標示為「特殊原因訊號」，代表值得追查的真實變化，而非隨機波動。需 ≥10 個完整月份才判讀；本月尚未結束以淡色「本月至今」標示，不納入計算。';
+function cxTrendCard(title, sub, opt, info) {
+  var card = cxCard('wide', title, sub, (info ? info + '<br>' : '') + CX_SPC_INFO);
+  var r = cxTrend(opt); var sc = axEl('div', 'cx-plot'); sc.appendChild(r.svg); card.appendChild(sc);
+  var lg = axEl('div', 'cx-legend');
+  lg.innerHTML = '<span><i class="sw" style="background:' + (opt.color || 'var(--s1)') + '"></i>' + esc(opt.name || '') + '</span>' + (opt.extra || []).map(function (e) { return '<span><i class="sw" style="background:' + e.color + '"></i>' + esc(e.name) + '</span>'; }).join('') + (r.x || opt.pLimits ? '<span><i class="sw band"></i>管制界限</span>' : '') + '<span><i class="sw sig"></i>特殊原因訊號 ' + r.nSig + '</span>' + (r.nSupp ? '<span><i class="sw supp"></i>人數不足已隱藏 ' + r.nSupp + ' 個月</span>' : '') + (r.sig.note ? '<span class="muted">' + esc(r.sig.note) + '</span>' : '');
+  card.appendChild(lg);
+  // 表格檢視
+  var det = axEl('details', 'cx-table'); det.appendChild(axEl('summary', '', '表格檢視'));
+  var t = document.createElement('table'); t.className = 'grid'; var h = '<thead><tr><th>月份</th><th>' + esc(opt.name || '數值') + '</th>' + (opt.extra || []).map(function (e) { return '<th>' + esc(e.name) + '</th>'; }).join('') + '</tr></thead><tbody>';
+  r.months.slice().reverse().forEach(function (p) { h += '<tr><td>' + cxMonthLabel(p) + '</td><td>' + (opt.vals[p] === undefined ? (opt.suppNote && opt.suppNote[p] ? '人數不足已隱藏' : '—') : esc(opt.fmt(opt.vals[p]))) + '</td>' + (opt.extra || []).map(function (e) { return '<td>' + (e.vals[p] === undefined ? '—' : esc(opt.fmt(e.vals[p]))) + '</td>'; }).join('') + '</tr>'; });
+  t.innerHTML = h + '</tbody>'; det.appendChild(t); card.appendChild(det);
+  return { card: card, r: r };
+}
+function cxParetoCard(title, sub, cats, opt, info) {
+  var card = cxCard(opt && opt.wide ? 'wide' : opt && opt.third ? 'third' : '', title, sub, info || '<b>帕雷托分析</b>：類別由多到少排列，右側為占比與累計占比；深色列為累計約 80% 的「關鍵少數」，是優先改善的標的。被隱私門檻合併的格不列入。');
+  if (!cats.list.length) { card.appendChild(axEl('div', 'state', '此條件下沒有資料。')); return card; }
+  card.appendChild(cxPareto(cats.list, opt));
+  if (cats.supp) card.appendChild(axEl('p', 'cx-foot', '另有 ' + cats.supp + ' 格因人數不足已合併隱藏。'));
+  return card;
+}
+/* 資料品質提示：近期連續無紀錄、未來日期 */
+function cxDataIns(ins, r, what) {
+  if (r.idle >= 2) ins.push({ t: '最近 ' + r.idle + ' 個完整月（至 ' + cxMonthLabel(r.full[r.full.length - 1]) + '）沒有任何' + what + '紀錄；請確認是否漏登，或流程已暫停。', tone: 'warn' });
+  if (r.future.length) ins.push({ t: '有紀錄的日期落在未來月份（' + r.future.map(cxMonthLabel).join('、') + '），疑為日期誤植，未納入趨勢；請至原始表單更正。', tone: 'warn' });
+}
+function cxDataCards(r) { return [].concat(r.idle >= 2 ? [{ h: '近期無紀錄', v: r.idle + ' 個月', note: '確認是否漏登', tone: 'warn' }] : []).concat(r.future.length ? [{ h: '未來日期紀錄', v: r.future.length + ' 個月', note: '疑為日期誤植', tone: 'warn' }] : []); }
+function cxLatestDelta(r, fmt, good) {
+  if (!r.last || !r.prev) return null;
+  return cxDelta(r.last.v, r.prev.v, fmt, good);
+}
+
+/* ---------- 1. 藥事照會介入成效 ---------- */
+var CX_ACCEPT = /^(完全)?接受$|^接受[（(]?全部|^同意/;
+var CX_PARTIAL = /部分/;
+var CX_PENDING = /未回覆|未回應|待|無回應|不知|未知|（未填）|^$/;
+function cxConsult(host, d) {
+  var cnt = cxMonthly(cxChart(d, /^每月照會件數$/)), by = cxMonthlyBy(cxChart(d, /每月照會件數（依接受結果）/));
+  var acc = cxCats(cxChart(d, /^介入接受結果$/)), reason = cxCats(cxChart(d, /^照會原因$/)), result = cxCats(cxChart(d, /^介入結果$/)), aspect = cxCats(cxChart(d, /^原因面向$/));
+  var total = cxCats(cxChart(d, /^照會件數$/)).total;
+  var cls = function (g) { return CX_PARTIAL.test(g) ? 'partial' : CX_ACCEPT.test(g) || /^接受/.test(g) && !/不接受/.test(g) ? 'yes' : CX_PENDING.test(g) ? 'pending' : 'no'; };
+  var k = { yes: 0, partial: 0, no: 0, pending: 0 }; acc.list.forEach(function (x) { k[cls(x.g)] += x.v; });
+  var decided = k.yes + k.partial + k.no, rate = decided ? (k.yes + k.partial) / decided : null, ci = cxWilson(k.yes + k.partial, decided);
+  // 月接受率（p 管制圖）
+  var rv = {}, rn = {}, pl = {}, months = by.months;
+  months.forEach(function (p) { var o = by.m[p] || {}, y = 0, n = 0; Object.keys(o).forEach(function (g) { var c = cls(g); if (c === 'pending') return; n += o[g]; if (c !== 'no') y += o[g]; }); if (n) { rv[p] = y / n; rn[p] = n; } });
+  var pbar = rate;
+  if (pbar !== null) Object.keys(rn).forEach(function (p) { var s = 3 * Math.sqrt(pbar * (1 - pbar) / rn[p]); pl[p] = [Math.max(0, pbar - s), Math.min(1, pbar + s)]; });
+  var T1 = cxTrendCard('每月照會件數', '量的管制：判讀是否為真實的增減', { months: cnt.months, vals: cnt.v, fmt: function (v) { return cxNum(v); }, kind: 'count', zeroFill: true, mark: 'bar', limits: 'xmr', name: '照會件數', color: 'var(--s1)', suppNote: cnt.supp, label: '每月照會件數管制圖' });
+  var T2 = Object.keys(rv).length ? cxTrendCard('每月接受率（p 管制圖）', '分母＝已有回覆的照會；未回覆不計', { months: Object.keys(rv).sort(), vals: rv, fmt: function (v) { return cxPct(v, 0); }, kind: 'rate', rateMax: 1, mark: 'line', pLimits: pl, cl: pbar, name: '接受率', color: 'var(--s3)', label: '每月接受率', tipExtra: function (p) { return '<br>已回覆 ' + (rn[p] || 0) + ' 件'; } }, '<b>接受率</b>＝（接受＋部分接受）÷ 已回覆照會。月界限依當月件數計算，件數少的月份界限較寬。') : null;
+  var last = T1.r.last, prev = T1.r.prev, top = reason.list[0], dose = aspect.list.filter(function (x) { return /劑量/.test(x.g); })[0];
+  var kpis = [
+    { label: '照會總件數', value: cxNum(total), unit: '件', sub: '選定期間內藥師照會紀錄', spark: T1.r.has.slice(-12).map(function (p) { return cnt.v[p]; }) },
+    last ? { label: '最近完整月', value: cxNum(last.v), unit: '件', sub: cxMonthLabel(last.p) + (T1.r.x ? '｜中位數 ' + cxNum(T1.r.x.cl) : ''), delta: cxPctDelta(last.v, prev && prev.v), status: T1.r.sig.sig[T1.r.sig.sig.length - 1] ? 'warn' : '' } : null,
+    { label: '醫療端接受率', value: rate === null ? '—' : cxNum(rate * 100, 1), unit: rate === null ? '' : '%', sub: ci ? '95% CI ' + cxPct(ci[0], 1) + '–' + cxPct(ci[1], 1) + '｜已回覆 ' + decided + ' 件' : '尚無回覆資料', status: rate === null ? '' : rate >= .8 ? 'ok' : rate >= .6 ? 'warn' : 'bad', title: '接受 ' + k.yes + '、部分接受 ' + k.partial + '、不接受 ' + k.no + '、未回覆 ' + k.pending },
+    top ? { label: '最常見照會原因', value: cxPct(top.v / (reason.total || 1), 0), sub: top.g } : null,
+    dose ? { label: '劑量相關問題占比', value: cxPct(dose.v / (aspect.total || 1), 0), sub: '原因面向：' + dose.g } : null
+  ];
+  var ins = [];
+  if (rate !== null) ins.push({ t: '醫療端接受率 ' + cxPct(rate, 1) + '（95% CI ' + cxPct(ci[0], 1) + '–' + cxPct(ci[1], 1) + '）；' + (k.no ? '不接受 ' + k.no + ' 件，可逐案回溯原因作為下一輪改善題目。' : '期間內無不接受紀錄；接受率已近上限，改善重點宜轉向照會涵蓋率與問題型態。'), tone: rate >= .8 ? 'good' : 'warn' });
+  if (top) ins.push({ t: '「' + top.g + '」占照會原因 ' + cxPct(top.v / (reason.total || 1), 0) + '，為第一優先的標準化（Order set／劑量提示）標的。' });
+  cxDataIns(ins, T1.r, '照會');
+  if (T1.r.nSig) ins.push({ t: '照會件數出現 ' + T1.r.nSig + ' 個特殊原因訊號，請對照當月人力、病床數或流程變動。', tone: 'warn' });
+  if (cnt.months.some(function (p) { return cnt.supp[p]; })) ins.push({ t: '部分月份因人數門檻被隱藏；資料集改為「非個人營運統計」並重建後即完整顯示。', tone: 'warn' });
+  var board = cxBoard([
+    { title: '投入（量）', tone: 'c1', cards: [{ h: '照會總件數', v: cxNum(total) }, last ? { h: '最近完整月 ' + cxMonthLabel(last.p), v: cxNum(last.v) } : null].filter(Boolean) },
+    { title: '過程（問題型態）', tone: 'c2', cards: reason.list.slice(0, 3).map(function (x) { return { h: x.g, v: cxPct(x.v / (reason.total || 1), 0) }; }) },
+    { title: '結果（介入成效）', tone: 'c3', cards: [{ h: '醫療端接受率', v: rate === null ? '—' : cxPct(rate, 1), note: '接受 ' + k.yes + '｜部分 ' + k.partial + '｜不接受 ' + k.no }].concat(result.list.slice(0, 2).map(function (x) { return { h: x.g, v: cxNum(x.v) + ' 件' }; })) },
+    { title: '待追蹤訊號', tone: 'c4', cards: cxDataCards(T1.r).concat(T1.r.nSig ? [{ h: '件數管制訊號', v: T1.r.nSig + ' 點', tone: 'warn' }] : []).concat(T2 && T2.r.nSig ? [{ h: '接受率管制訊號', v: T2.r.nSig + ' 點', tone: 'warn' }] : []).concat(k.pending ? [{ h: '未回覆照會', v: k.pending + ' 件', note: '追蹤醫療端回覆', tone: 'warn' }] : []), empty: '無異常訊號' }
+  ]);
+  var bc = cxCard('wide', '成效看板', '由投入到結果的單向看板；卡片為選定期間統計', '<b>看板四欄</b>：投入（工作量）→ 過程（問題型態）→ 結果（醫療端接受與介入）→ 待追蹤訊號（管制圖異常、未回覆）。'); bc.appendChild(board);
+  cxFinish(host, d, { name: '藥事照會介入成效', headline: cxNum(total) + ' 件照會' + (rate === null ? '' : '，醫療端接受率 ' + cxPct(rate, 1)), lede: '藥師介入的量、問題型態與醫療端接受情形；全科層級統計，不呈現個別藥師。', kpis: kpis, insights: ins, blocks: [bc, T1.card, T2 && T2.card, cxParetoCard('照會原因', '帕雷托：找出關鍵少數', reason, { third: true }), cxParetoCard('介入結果', '建議被採納後的處方變更型態', result, { color: 'var(--s3)', third: true }), cxParetoCard('原因面向', 'PCNE 問題面向', aspect, { color: 'var(--s2)', third: true })] });
+}
+
+/* ---------- 2. 衛教諮詢成效 ---------- */
+function cxDist(c) { var dist = {}, tot = 0; cxCats(c).list.forEach(function (x) { var s = Number(x.g); if (!isFinite(s)) return; dist[s] = (dist[s] || 0) + x.v; tot += x.v; }); return { dist: dist, tot: tot }; }
+function cxSat(c) {
+  var D = cxDist(c), valid = {}, nv = 0, top = 0;
+  Object.keys(D.dist).forEach(function (s) { s = +s; if (s === 1) return; valid[s] = D.dist[s]; nv += D.dist[s]; if (s >= 9) top += D.dist[s]; });
+  return { iqm: cxIQMDist(valid), nv: nv, tot: D.tot, resp: D.tot ? nv / D.tot : null, top: nv ? top / nv : null };
+}
+function cxEdu(host, d) {
+  var cnt = cxMonthly(cxChart(d, /^每月照護件數$/)), type = cxCats(cxChart(d, /^疾病照護類型$/)), src = cxCats(cxChart(d, /^病人來源$/)), prob = cxCats(cxChart(d, /^問題分類$/)), find = cxCats(cxChart(d, /^發現問題/)), refer = cxCats(cxChart(d, /^跨職類照護需求轉介$/));
+  var byType = cxMonthlyBy(cxChart(d, /每月照護件數（依疾病照護類型）/));
+  var s1 = cxSat(cxChart(d, /^生理滿意度分數分布$/)), s2 = cxSat(cxChart(d, /^心理滿意度分數分布$/)), s3 = cxSat(cxChart(d, /^社會滿意度分數分布$/));
+  var total = cxCats(cxChart(d, /^照護件數$/)).total, special = type.list.filter(function (x) { return /特殊製劑/.test(x.g); })[0];
+  var nonSp = {}; byType.months.forEach(function (p) { var o = byType.m[p], s = 0; Object.keys(o).forEach(function (g) { if (!/特殊製劑/.test(g)) s += o[g]; }); nonSp[p] = s; });
+  var T1 = cxTrendCard('每月照護件數', '全部照護（長條）與「排除特殊製劑」的疾病照護（線）', { months: cnt.months, vals: cnt.v, fmt: function (v) { return cxNum(v); }, kind: 'count', zeroFill: true, mark: 'bar', limits: 'xmr', name: '全部照護件數', color: 'var(--s1)', extra: byType.months.length ? [{ name: '排除特殊製劑', color: 'var(--s2)', vals: nonSp }] : [], label: '每月照護件數管制圖' }, '特殊製劑衛教量體大，會掩蓋疾病照護（心衰竭、糖尿病等）的變化，故另以線條呈現排除後的件數。');
+  var mByS = cxMonthlyBy(cxChart(d, /^每月生理滿意度分數$/)), satM = {}, respM = {};
+  mByS.months.forEach(function (p) { var o = mByS.m[p], v = {}, n = 0, all = 0; Object.keys(o).forEach(function (g) { var s = Number(g); if (!isFinite(s)) return; all += o[g]; if (s !== 1) { v[s] = o[g]; n += o[g]; } }); if (n >= 5) satM[p] = cxIQMDist(v); if (all) respM[p] = n / all; });
+  var T2 = Object.keys(satM).length ? cxTrendCard('每月生理滿意度', '四分位距平均（排除未評分 1 分；當月有效評分 ≥5 筆才計）', { months: Object.keys(satM).sort(), vals: satM, fmt: function (v) { return cxNum(v, 1); }, kind: 'value', vmax: 10, mark: 'line', limits: 'xmr', name: '滿意度（IQM）', color: 'var(--s3)', label: '每月生理滿意度', tipExtra: function (p) { return respM[p] !== undefined ? '<br>填答率 ' + cxPct(respM[p], 0) : ''; } }) : null;
+  var last = T1.r.last, prev = T1.r.prev, refTot = refer.total;
+  var kpis = [
+    { label: '照護件數', value: cxNum(total), unit: '件', sub: '選定期間衛教諮詢紀錄', spark: T1.r.has.slice(-12).map(function (p) { return cnt.v[p]; }) },
+    last ? { label: '最近完整月', value: cxNum(last.v), unit: '件', sub: cxMonthLabel(last.p) + (T1.r.x ? '｜中位數 ' + cxNum(T1.r.x.cl) : ''), delta: cxPctDelta(last.v, prev && prev.v) } : null,
+    special ? { label: '疾病照護（排除特殊製劑）', value: cxNum(type.total - special.v), unit: '件', sub: '占 ' + cxPct((type.total - special.v) / (type.total || 1), 1) } : null,
+    { label: '生理滿意度', value: s1.iqm === null ? '—' : cxNum(s1.iqm, 1), unit: s1.iqm === null ? '' : '/ 10', sub: '填答率 ' + cxPct(s1.resp, 0) + '｜9–10 分占 ' + cxPct(s1.top, 0), status: s1.resp !== null && s1.resp < .5 ? 'warn' : '', title: '有效評分 ' + s1.nv + ' 筆（1 分視為未評分，不計）' },
+    refTot ? { label: '跨職類轉介', value: cxNum(refTot), unit: '次', sub: '轉介率 ' + cxPct(refTot / (total || 1), 2) + '（每百件 ' + cxNum(refTot / (total || 1) * 100, 2) + '）' } : null
+  ];
+  var ins = [];
+  if (special) ins.push({ t: '特殊製劑衛教占 ' + cxPct(special.v / (type.total || 1), 0) + '，疾病照護量需另外看「排除特殊製劑」線，避免被量體掩蓋。' });
+  if (s1.resp !== null) ins.push({ t: '滿意度填答率僅 ' + cxPct(s1.resp, 0) + '（1 分視為未評分）；結論以有效評分為準，建議提高回收或改為必填。', tone: s1.resp < .5 ? 'warn' : '' });
+  if (find.list[0]) ins.push({ t: '最常發現的問題：' + find.list.slice(0, 3).map(function (x) { return x.g + ' ' + cxNum(x.v); }).join('、') + '（可複選，分母為勾選次數）。' });
+  cxDataIns(ins, T1.r, '衛教');
+  if (T1.r.nSig) ins.push({ t: '照護件數出現 ' + T1.r.nSig + ' 個特殊原因訊號，請對照門診量或衛教人力。', tone: 'warn' });
+  var satCard = cxCard('wide', '生理／心理／社會滿意度', '四分位距平均（/10）與 9–10 分比例', '<b>計算</b>：1 分視為未評分不計（使用者裁決）；平均採四分位距平均（去除最高、最低各 25%）。<b>填答率</b>＝有效評分 ÷ 全部紀錄。');
+  var sg = axEl('div', 'cx-sat');
+  [['生理', s1], ['心理', s2], ['社會', s3]].forEach(function (x) { var it = axEl('div', 'cx-satit'); it.appendChild(axEl('span', 'cx-satl', x[0])); it.appendChild(axEl('b', '', x[1].iqm === null ? '—' : cxNum(x[1].iqm, 1))); var tr = axEl('span', 'cx-ptrack'); var bar = axEl('i', 'cx-pbar'); bar.style.width = ((x[1].iqm || 0) * 10) + '%'; bar.style.background = 'var(--s3)'; tr.appendChild(bar); it.appendChild(tr); it.appendChild(axEl('small', '', '9–10 分 ' + cxPct(x[1].top, 0) + '｜填答 ' + cxPct(x[1].resp, 0) + '（' + cxNum(x[1].nv) + ' 筆）')); sg.appendChild(it); });
+  satCard.appendChild(sg);
+  var board = cxBoard([
+    { title: '投入（量）', tone: 'c1', cards: [{ h: '照護件數', v: cxNum(total) }].concat(src.list.slice(0, 3).map(function (x) { return { h: '來源：' + x.g, v: cxPct(x.v / (src.total || 1), 1) }; })) },
+    { title: '過程（衛教主題）', tone: 'c2', cards: prob.list.slice(0, 3).map(function (x) { return { h: x.g, v: cxNum(x.v) }; }) },
+    { title: '結果（病人感受）', tone: 'c3', cards: [{ h: '生理滿意度（IQM）', v: s1.iqm === null ? '—' : cxNum(s1.iqm, 1), note: '9–10 分 ' + cxPct(s1.top, 0) }, { h: '跨職類轉介', v: cxNum(refTot) + ' 次' }] },
+    { title: '待追蹤訊號', tone: 'c4', cards: cxDataCards(T1.r).concat(s1.resp !== null && s1.resp < .5 ? [{ h: '滿意度填答率偏低', v: cxPct(s1.resp, 0), tone: 'warn' }] : []).concat(T1.r.nSig ? [{ h: '件數管制訊號', v: T1.r.nSig + ' 點', tone: 'warn' }] : []).concat(T2 && T2.r.nSig ? [{ h: '滿意度管制訊號', v: T2.r.nSig + ' 點', tone: 'warn' }] : []), empty: '無異常訊號' }
+  ]);
+  var bc = cxCard('wide', '成效看板', '由投入到結果；卡片為選定期間統計', '<b>看板四欄</b>：投入 → 過程 → 結果 → 待追蹤訊號。'); bc.appendChild(board);
+  cxFinish(host, d, { name: '衛教諮詢成效', headline: cxNum(total) + ' 件衛教照護' + (s1.iqm === null ? '' : '，生理滿意度 ' + cxNum(s1.iqm, 1) + ' / 10'), lede: '疾病全人照護衛教的量、主題、發現問題與病人滿意度（1 分視為未評分，不列入平均）。', kpis: kpis, insights: ins, blocks: [bc, T1.card, T2 && T2.card, satCard, cxParetoCard('疾病照護類型', '帕雷托', type), cxParetoCard('發現問題（可複選）', '分母為勾選次數', find, { color: 'var(--s2)' }), cxParetoCard('問題分類', '衛教主題', prob, { top: 10, color: 'var(--s3)' }), cxParetoCard('跨職類照護需求轉介', '轉介對象', refer, { color: 'var(--s7)' })] });
+}
+
+/* ---------- 3. 諮詢服務 ---------- */
+function cxQuery(host, d) {
+  var cnt = cxMonthly(cxChart(d, /^每月諮詢件數$/)), type = cxCats(cxChart(d, /^問題類型分布$/)), who = cxCats(cxChart(d, /^諮詢來源對象$/));
+  var bySrc = cxMonthlyBy(cxChart(d, /每月諮詢件數（依來源對象）/)), total = cxCats(cxChart(d, /^諮詢件數$/)).total;
+  var srcNames = Object.keys(bySrc.tot).sort(function (a, b) { return bySrc.tot[b] - bySrc.tot[a]; }).slice(0, 3), cols = ['var(--s2)', 'var(--s3)', 'var(--s7)'];
+  var extra = srcNames.map(function (g, i) { var v = {}; bySrc.months.forEach(function (p) { v[p] = (bySrc.m[p] || {})[g] || 0; }); return { name: g, color: cols[i], vals: v }; });
+  var T1 = cxTrendCard('每月諮詢件數', '總量（長條）與主要來源對象（線）', { months: cnt.months, vals: cnt.v, fmt: function (v) { return cxNum(v); }, kind: 'count', zeroFill: true, mark: 'bar', limits: 'xmr', name: '諮詢件數', color: 'var(--s1)', extra: extra, suppNote: cnt.supp, label: '每月諮詢件數管制圖' });
+  var last = T1.r.last, prev = T1.r.prev, pt = who.list.filter(function (x) { return /病人|家屬/.test(x.g); })[0], staff = who.list.filter(function (x) { return /醫師|護理/.test(x.g); }).reduce(function (s, x) { return s + x.v; }, 0);
+  var kpis = [
+    { label: '諮詢總件數', value: cxNum(total), unit: '件', sub: '選定期間', spark: T1.r.has.slice(-12).map(function (p) { return cnt.v[p]; }) },
+    last ? { label: '最近完整月', value: cxNum(last.v), unit: '件', sub: cxMonthLabel(last.p), delta: cxPctDelta(last.v, prev && prev.v) } : null,
+    pt ? { label: '病人／家屬諮詢占比', value: cxPct(pt.v / (who.total || 1), 0), sub: cxNum(pt.v) + ' 件' } : null,
+    staff ? { label: '醫療人員諮詢占比', value: cxPct(staff / (who.total || 1), 0), sub: '醫師＋護理師 ' + cxNum(staff) + ' 件' } : null,
+    type.list[0] ? { label: '最常見問題類型', value: cxPct(type.list[0].v / (type.total || 1), 0), sub: type.list[0].g } : null
+  ];
+  var ins = [];
+  if (type.list[0]) ins.push({ t: '「' + type.list[0].g + '」占 ' + cxPct(type.list[0].v / (type.total || 1), 0) + '；前 3 類合計 ' + cxPct(type.list.slice(0, 3).reduce(function (s, x) { return s + x.v; }, 0) / (type.total || 1), 0) + '，適合整理成常見問答或院內藥訊。' });
+  cxDataIns(ins, T1.r, '諮詢');
+  if (cnt.months.some(function (p) { return cnt.supp[p]; })) ins.push({ t: '部分月份因人數門檻被隱藏；資料集改為「非個人營運統計」並重建後即完整顯示。', tone: 'warn' });
+  var board = cxBoard([
+    { title: '投入（量）', tone: 'c1', cards: [{ h: '諮詢總件數', v: cxNum(total) }, last ? { h: '最近完整月 ' + cxMonthLabel(last.p), v: cxNum(last.v) } : null].filter(Boolean) },
+    { title: '來源對象', tone: 'c2', cards: who.list.slice(0, 4).map(function (x) { return { h: x.g, v: cxPct(x.v / (who.total || 1), 0) }; }) },
+    { title: '問題類型', tone: 'c3', cards: type.list.slice(0, 4).map(function (x) { return { h: x.g, v: cxNum(x.v) }; }) },
+    { title: '待追蹤訊號', tone: 'c4', cards: cxDataCards(T1.r).concat(T1.r.nSig ? [{ h: '件數管制訊號', v: T1.r.nSig + ' 點', tone: 'warn' }] : []), empty: '無異常訊號' }
+  ]);
+  var bc = cxCard('wide', '成效看板', '諮詢的量、對象與問題型態', '<b>看板四欄</b>：投入 → 來源對象 → 問題類型 → 待追蹤訊號。'); bc.appendChild(board);
+  cxFinish(host, d, { name: '諮詢服務', headline: cxNum(total) + ' 件藥品諮詢' + (type.list[0] ? '，最多為「' + type.list[0].g + '」' : ''), lede: '藥品諮詢的量、來源對象與問題型態；全科層級統計。', kpis: kpis, insights: ins, blocks: [bc, T1.card, cxParetoCard('問題類型', '帕雷托', type), cxParetoCard('諮詢來源對象', '', who, { color: 'var(--s2)' })] });
+}
+
+/* ---------- 4. 整合病房減藥成效 ---------- */
+function cxWard(host, d) {
+  var eff = cxMonthlySeries(cxChart(d, /^照會成效月趨勢/)), strata = cxMonthlySeries(cxChart(d, /^多重用藥病人處方優化率月趨勢/)), pills = cxMonthlySeries(cxChart(d, /^口服顆數：入院最高與出院平均/)), dis = cxMonthlySeries(cxChart(d, /^出院人數月趨勢/));
+  var sv = function (re) { return cxSeriesValues(cxChart(d, re)); };
+  var acc = sv(/^照會接受率/)[0], rate = sv(/^照會率/)[0], opt = sv(/^優化率（期間月平均/)[0];
+  var sOpt = sv(/^多重用藥病人處方優化率（期間/), dItem = sv(/^口服品項減少量/), dPill = sv(/^口服總顆數減少量/), dFreq = sv(/^口服服藥次數減少量/), scale = sv(/^各量表優化率/), scaleImp = sv(/^各量表改善幅度/);
+  var pick = function (S, re) { var s = S.s.filter(function (x) { return re.test(x.name); })[0]; return s ? s.v : {}; };
+  var accM = pick(eff, /接受率/), rateM = pick(eff, /照會率/), optM = pick(eff, /優化率/);
+  var fmtP = function (v) { return cxNum(v, 1) + '%'; };
+  var T1 = cxTrendCard('照會接受率（月）', 'XmR 管制圖', { months: eff.months, vals: accM, fmt: fmtP, kind: 'value', mark: 'line', limits: 'xmr', name: '接受率', color: 'var(--s3)', label: '月照會接受率' });
+  var T2 = cxTrendCard('照會率與優化率（月）', '照會率（管制）與處方優化率（參考線）', { months: eff.months, vals: rateM, fmt: fmtP, kind: 'value', mark: 'line', limits: 'xmr', name: '照會率', color: 'var(--s1)', extra: [{ name: '優化率', color: 'var(--s2)', vals: optM }], label: '月照會率與優化率' });
+  var dm = {}; (dis.s[0] ? Object.keys(dis.s[0].v) : []).forEach(function (p) { dm[p] = dis.s[0].v[p]; });
+  var T3 = dis.s[0] ? cxTrendCard('出院人數（月）', '分母規模：判讀比率時一併參考', { months: dis.months, vals: dm, fmt: function (v) { return cxNum(v); }, kind: 'count', mark: 'bar', limits: 'xmr', name: '出院人數', color: 'var(--s7)', label: '月出院人數' }) : null;
+  var last = T1.r.last;
+  var kpis = [
+    acc ? { label: '照會接受率', value: cxNum(acc.v, 1), unit: '%', sub: '月值四分位距平均' + (T1.r.x ? '｜中位數 ' + cxNum(T1.r.x.cl, 1) + '%' : ''), spark: T1.r.full.slice(-12).map(function (p) { return accM[p]; }).filter(function (v) { return v !== undefined; }), status: T1.r.nSig ? 'warn' : 'ok', delta: last && T1.r.prev ? { v: last.v - T1.r.prev.v, good: 'up', text: cxNum(Math.abs(last.v - T1.r.prev.v), 1) + ' 百分點（' + cxMonthLabel(last.p) + ' 較前月）' } : null } : null,
+    rate ? { label: '照會率', value: cxNum(rate.v, 1), unit: '%', sub: '月值四分位距平均', spark: T2.r.full.slice(-12).map(function (p) { return rateM[p]; }).filter(function (v) { return v !== undefined; }) } : null,
+    opt ? { label: '處方優化率', value: cxNum(opt.v, 1), unit: '%', sub: '月值四分位距平均' } : null,
+    dPill.length ? { label: '口服總顆數減少（≥20 顆組）', value: cxNum((dPill.filter(function (x) { return /20/.test(x.name); })[0] || dPill[0]).v, 1), unit: '顆/人', sub: '月值四分位距平均' } : null
+  ];
+  // 分層：用藥顆數 × 指標（矩陣）
+  var mat = cxCard('wide', '依用藥顆數分層', '每格為各月值的四分位距平均；顏色越深表示越高（同一列內比較）', '<b>分層</b>：入院用藥顆數分組。優化率（%）、品項／顆數／服藥次數減少量（每人）。');
+  var rowsDef = [['處方優化率（%）', sOpt, 1], ['口服品項減少（項/人）', dItem, 1], ['口服總顆數減少（顆/人）', dPill, 1], ['服藥次數減少（次/人）', dFreq, 1]];
+  var heads = sOpt.map(function (x) { return x.name; });
+  var t = document.createElement('table'); t.className = 'ax-heat cx-mat'; var h = '<thead><tr><th class="ax-corner"></th>' + heads.map(function (x) { return '<th class="ax-ch"><span>' + esc(x) + '</span></th>'; }).join('') + '</tr></thead><tbody>';
+  rowsDef.forEach(function (r) { var vals = r[1].map(function (x) { return x.v; }), mx = Math.max.apply(null, vals.filter(function (v) { return v !== null; }).concat([0])) || 1; h += '<tr><th class="ax-rh">' + esc(r[0]) + '</th>' + r[1].map(function (x) { var c = axColor((x.v || 0) / mx); return '<td style="background:' + c.bg + ';color:' + c.fg + '"><b>' + (x.v === null ? '—' : cxNum(x.v, r[2])) + '</b></td>'; }).join('') + '</tr>'; });
+  t.innerHTML = h + '</tbody>'; var sc = axEl('div', 'ax-scroll'); sc.appendChild(t); mat.appendChild(sc);
+  var sm = axEl('div', 'cx-small'); // 小倍數：各分層優化率月趨勢
+  strata.s.forEach(function (s, i) { var mini = cxTrend({ w: 340, h: 170, months: strata.months, vals: s.v, fmt: fmtP, kind: 'value', mark: 'line', limits: 'xmr', name: s.name, color: 'var(--s' + [1, 2, 3, 7][i % 4] + ')', label: s.name + ' 優化率' }); var b = axEl('div', 'cx-mini'); b.appendChild(axEl('b', '', s.name + ' 優化率')); b.appendChild(axEl('small', '', mini.x ? '中位數 ' + cxNum(mini.x.cl, 1) + '%｜訊號 ' + mini.nSig : '')); b.appendChild(mini.svg); sm.appendChild(b); });
+  mat.appendChild(sm);
+  var scaleCard = cxCard('wide', '各量表優化率與改善幅度', '月值四分位距平均', '<b>量表</b>：口服顆數、服藥次數、HK（>64 歲）等高齡用藥量表。');
+  var scN = (cxChart(d, /^各量表優化率/) || { series: [] }).series.map(function (x) { return String(x).split(/[|｜]/)[0].trim(); });
+  var sl = scale.map(function (x, i) { return { g: scN[i] || x.name, v: x.v || 0, imp: (scaleImp[i] || {}).v }; }).sort(function (a, b) { return b.v - a.v; });
+  scaleCard.appendChild(cxPareto(sl, { fmt: function (v) { return cxNum(v, 1) + '%'; }, color: 'var(--s3)', top: 12 }));
+  scaleCard.querySelectorAll('.cx-pcum').forEach(function (e, i) { e.textContent = sl[i] && sl[i].imp !== null && sl[i].imp !== undefined ? '改善幅度 ' + cxNum(sl[i].imp, 1) + '%' : ''; });
+  var ins = [];
+  if (acc && T1.r.x) ins.push({ t: '照會接受率月中位數 ' + cxNum(T1.r.x.cl, 1) + '%；' + (T1.r.nSig ? '出現 ' + T1.r.nSig + ' 個特殊原因訊號，請對照當月照會量與病房組成。' : '近期在管制界限內，屬穩定流程。'), tone: T1.r.nSig ? 'warn' : 'good' });
+  if (sOpt.length > 1) { var so = sOpt.filter(function (x) { return x.v !== null; }).sort(function (a, b) { return b.v - a.v; }), hi = so[0], lo = so[so.length - 1]; if (hi && lo && hi !== lo) ins.push({ t: '處方優化率最高為「' + hi.name + '」層（' + cxNum(hi.v, 1) + '%），最低為「' + lo.name + '」層（' + cxNum(lo.v, 1) + '%）；可據此將高用藥顆數病人列為優先照會對象。' }); }
+  var board = cxBoard([
+    { title: '投入（量）', tone: 'c1', cards: [rate ? { h: '照會率', v: cxNum(rate.v, 1) + '%' } : null, T3 && T3.r.last ? { h: '最近出院人數 ' + cxMonthLabel(T3.r.last.p), v: cxNum(T3.r.last.v) } : null].filter(Boolean) },
+    { title: '過程（接受）', tone: 'c2', cards: acc ? [{ h: '照會接受率', v: cxNum(acc.v, 1) + '%' }] : [] },
+    { title: '結果（減藥）', tone: 'c3', cards: [opt ? { h: '處方優化率', v: cxNum(opt.v, 1) + '%' } : null].concat(dPill.slice(0, 2).map(function (x) { return { h: '總顆數減少 ' + x.name, v: cxNum(x.v, 1) + ' 顆/人' }; })).filter(Boolean) },
+    { title: '待追蹤訊號', tone: 'c4', cards: [].concat(T1.r.nSig ? [{ h: '接受率管制訊號', v: T1.r.nSig + ' 點', tone: 'warn' }] : []).concat(T2.r.nSig ? [{ h: '照會率管制訊號', v: T2.r.nSig + ' 點', tone: 'warn' }] : []), empty: '無異常訊號' }
+  ]);
+  var bc = cxCard('wide', '成效看板', '整合病房減藥：照會 → 接受 → 處方優化', '<b>看板四欄</b>：投入 → 過程 → 結果 → 待追蹤訊號。卡片數值為月值的四分位距平均。'); bc.appendChild(board);
+  cxFinish(host, d, { name: '整合病房減藥成效', headline: (acc ? '照會接受率 ' + cxNum(acc.v, 1) + '%' : '整合病房減藥') + (opt ? '，處方優化率 ' + cxNum(opt.v, 1) + '%' : ''), lede: '藥師照會、醫療端接受與多重用藥處方優化（品管中心月報表；比率為各月值的四分位距平均）。', kpis: kpis, insights: ins, blocks: [bc, T1.card, T2.card, mat, scaleCard, T3 && T3.card] });
 }
 /*AX-END*/
 
