@@ -2060,13 +2060,13 @@ var DASH_CATS = [
     names: ['CBME 成效', '學生學習成效', '單位組別成效', '教師教學成效', '藥學生整體成效', '教學單位評核', '臨床教師概況（群體）'] },
   { key: 'tool', name: '評估工具', desc: '以評量工具為單位的整體表現：病例導向討論、簡報評核', cls: 'a',
     names: ['病例導向討論(CbD)', '病例導向討論（CbD）整體成效', '簡報評核'] },
-  { key: 'clinic', name: '臨床成效', desc: '藥事照護介入、衛教與諮詢服務的產出', cls: 'c',
-    names: ['藥事照會介入成效', '衛教諮詢成效', '諮詢服務', '整合病房減藥成效'] },
+  { key: 'clinic', name: '臨床成效', desc: '臨床藥學服務、病人用藥指導與正確用藥教育的產出', cls: 'c',
+    names: ['臨床藥學服務(一般)', '病人用藥指導', '正確用藥教育', '臨床藥學服務(整合)', '藥事照會介入成效', '衛教諮詢成效', '諮詢服務', '整合病房減藥成效'] },
   { key: 'res', name: '資源成果', desc: '教育訓練、學習風格與教材、教學與學術成果', cls: 'r',
     names: ['教育訓練成效', '學習風格與教材', '教學與學術成果'] }
 ];
 /* 控制台儀表板名稱 → 網頁顯示名稱（使用者裁決之更名；控制台未改名時仍以新名稱顯示） */
-var DASH_RENAME = { '教師教學評核（個人）': '教師個人成績', '病例導向討論（CbD）整體成效': '病例導向討論(CbD)', '藥學生整體成效': '學生學習成效', '教學單位評核': '單位組別成效', '臨床教師概況（群體）': '教師教學成效' };
+var DASH_RENAME = { '教師教學評核（個人）': '教師個人成績', '病例導向討論（CbD）整體成效': '病例導向討論(CbD)', '藥學生整體成效': '學生學習成效', '教學單位評核': '單位組別成效', '臨床教師概況（群體）': '教師教學成效', '藥事照會介入成效': '臨床藥學服務(一般)', '衛教諮詢成效': '病人用藥指導', '諮詢服務': '正確用藥教育', '整合病房減藥成效': '臨床藥學服務(整合)' };
 function dispName(n) { var k = normName(n); for (var x in DASH_RENAME) if (normName(x) === k) return DASH_RENAME[x]; return n; }
 /* 各儀表板的版面：order＝由上而下的順序（'ax:代碼'＝分析區塊；正規式＝後台圖表標題），hide＝不顯示的後台圖表（僅網頁隱藏，後台設定保留） */
 var DASH_LAYOUT = {
@@ -2081,6 +2081,10 @@ var DASH_LAYOUT = {
   '教師教學成效': { order: ['ax:board', 'ax:matrix'] },
   '病例導向討論(CbD)': { order: ['ax:board', 'ax:matrix'], hide: [/每月晨會病例簡報場次/] },
   '簡報評核': { order: ['ax:board', 'ax:matrix'], hide: [/每月晨會病例簡報場次/] },
+  '臨床藥學服務(一般)': { order: ['ax:cx'] },
+  '病人用藥指導': { order: ['ax:cx'] },
+  '正確用藥教育': { order: ['ax:cx'] },
+  '臨床藥學服務(整合)': { order: ['ax:cx'] },
   '藥事照會介入成效': { order: ['ax:cx'] },
   '衛教諮詢成效': { order: ['ax:cx'] },
   '諮詢服務': { order: ['ax:cx'] },
@@ -3523,6 +3527,10 @@ var AX_PANELS = {
   '教師教學評核（個人）': axTeacherPersonal,
   '教師個人成績': axTeacherPersonal,
   '簡報評核': axPresGroup,
+  '臨床藥學服務(一般)': cxConsult,
+  '病人用藥指導': cxEdu,
+  '正確用藥教育': cxQuery,
+  '臨床藥學服務(整合)': cxWard,
   '藥事照會介入成效': cxConsult,
   '衛教諮詢成效': cxEdu,
   '諮詢服務': cxQuery,
@@ -4540,7 +4548,7 @@ function cxConsult(host, d) {
     { title: '待追蹤訊號', tone: 'c4', cards: cxDataCards(T1.r).concat(T1.r.nSig ? [{ h: '件數管制訊號', v: T1.r.nSig + ' 點', tone: 'warn' }] : []).concat(T2 && T2.r.nSig ? [{ h: '接受率管制訊號', v: T2.r.nSig + ' 點', tone: 'warn' }] : []).concat(k.pending ? [{ h: '未回覆照會', v: k.pending + ' 件', note: '追蹤醫療端回覆', tone: 'warn' }] : []), empty: '無異常訊號' }
   ]);
   var bc = cxCard('wide', '成效看板', '由投入到結果的單向看板；卡片為選定期間統計', '<b>看板四欄</b>：投入（工作量）→ 過程（問題型態）→ 結果（醫療端接受與介入）→ 待追蹤訊號（管制圖異常、未回覆）。'); bc.appendChild(board);
-  cxFinish(host, d, { name: '藥事照會介入成效', headline: cxNum(total) + ' 件照會' + (rate === null ? '' : '，醫療端接受率 ' + cxPct(rate, 1)), lede: '藥師介入的量、問題型態與醫療端接受情形；全科層級統計，不呈現個別藥師。', kpis: kpis, insights: ins, blocks: [bc, T1.card, T2 && T2.card, cxParetoCard('照會原因', '帕雷托：找出關鍵少數', reason, { third: true }), cxParetoCard('介入結果', '建議被採納後的處方變更型態', result, { color: 'var(--s3)', third: true }), cxParetoCard('原因面向', 'PCNE 問題面向', aspect, { color: 'var(--s2)', third: true })] });
+  cxFinish(host, d, { name: '臨床藥學服務(一般)', headline: cxNum(total) + ' 件照會' + (rate === null ? '' : '，醫療端接受率 ' + cxPct(rate, 1)), lede: '藥師介入的量、問題型態與醫療端接受情形；全科層級統計，不呈現個別藥師。', kpis: kpis, insights: ins, blocks: [bc, T1.card, T2 && T2.card, cxParetoCard('照會原因', '帕雷托：找出關鍵少數', reason, { third: true }), cxParetoCard('介入結果', '建議被採納後的處方變更型態', result, { color: 'var(--s3)', third: true }), cxParetoCard('原因面向', 'PCNE 問題面向', aspect, { color: 'var(--s2)', third: true })] });
 }
 
 /* ---------- 2. 衛教諮詢成效 ---------- */
@@ -4585,7 +4593,7 @@ function cxEdu(host, d) {
     { title: '待追蹤訊號', tone: 'c4', cards: cxDataCards(T1.r).concat(s1.resp !== null && s1.resp < .5 ? [{ h: '滿意度填答率偏低', v: cxPct(s1.resp, 0), tone: 'warn' }] : []).concat(T1.r.nSig ? [{ h: '件數管制訊號', v: T1.r.nSig + ' 點', tone: 'warn' }] : []).concat(T2 && T2.r.nSig ? [{ h: '滿意度管制訊號', v: T2.r.nSig + ' 點', tone: 'warn' }] : []), empty: '無異常訊號' }
   ]);
   var bc = cxCard('wide', '成效看板', '由投入到結果；卡片為選定期間統計', '<b>看板四欄</b>：投入 → 過程 → 結果 → 待追蹤訊號。'); bc.appendChild(board);
-  cxFinish(host, d, { name: '衛教諮詢成效', headline: cxNum(total) + ' 件衛教照護' + (s1.iqm === null ? '' : '，生理滿意度 ' + cxNum(s1.iqm, 1) + ' / 10'), lede: '疾病全人照護衛教的量、主題、發現問題與病人滿意度（1 分視為未評分，不列入平均）。', kpis: kpis, insights: ins, blocks: [bc, T1.card, T2 && T2.card, satCard, cxParetoCard('疾病照護類型', '帕雷托', type), cxParetoCard('發現問題（可複選）', '分母為勾選次數', find, { color: 'var(--s2)' }), cxParetoCard('問題分類', '衛教主題', prob, { top: 10, color: 'var(--s3)' }), cxParetoCard('跨職類照護需求轉介', '轉介對象', refer, { color: 'var(--s7)' })] });
+  cxFinish(host, d, { name: '病人用藥指導', headline: cxNum(total) + ' 件衛教照護' + (s1.iqm === null ? '' : '，生理滿意度 ' + cxNum(s1.iqm, 1) + ' / 10'), lede: '疾病全人照護衛教的量、主題、發現問題與病人滿意度（1 分視為未評分，不列入平均）。', kpis: kpis, insights: ins, blocks: [bc, T1.card, T2 && T2.card, satCard, cxParetoCard('疾病照護類型', '帕雷托', type), cxParetoCard('發現問題（可複選）', '分母為勾選次數', find, { color: 'var(--s2)' }), cxParetoCard('問題分類', '衛教主題', prob, { top: 10, color: 'var(--s3)' }), cxParetoCard('跨職類照護需求轉介', '轉介對象', refer, { color: 'var(--s7)' })] });
 }
 
 /* ---------- 3. 諮詢服務 ---------- */
@@ -4614,7 +4622,7 @@ function cxQuery(host, d) {
     { title: '待追蹤訊號', tone: 'c4', cards: cxDataCards(T1.r).concat(T1.r.nSig ? [{ h: '件數管制訊號', v: T1.r.nSig + ' 點', tone: 'warn' }] : []), empty: '無異常訊號' }
   ]);
   var bc = cxCard('wide', '成效看板', '諮詢的量、對象與問題型態', '<b>看板四欄</b>：投入 → 來源對象 → 問題類型 → 待追蹤訊號。'); bc.appendChild(board);
-  cxFinish(host, d, { name: '諮詢服務', headline: cxNum(total) + ' 件藥品諮詢' + (type.list[0] ? '，最多為「' + type.list[0].g + '」' : ''), lede: '藥品諮詢的量、來源對象與問題型態；全科層級統計。', kpis: kpis, insights: ins, blocks: [bc, T1.card, cxParetoCard('問題類型', '帕雷托', type), cxParetoCard('諮詢來源對象', '', who, { color: 'var(--s2)' })] });
+  cxFinish(host, d, { name: '正確用藥教育', headline: cxNum(total) + ' 件藥品諮詢' + (type.list[0] ? '，最多為「' + type.list[0].g + '」' : ''), lede: '藥品諮詢的量、來源對象與問題型態；全科層級統計。', kpis: kpis, insights: ins, blocks: [bc, T1.card, cxParetoCard('問題類型', '帕雷托', type), cxParetoCard('諮詢來源對象', '', who, { color: 'var(--s2)' })] });
 }
 
 /* ---------- 4. 整合病房減藥成效 ---------- */
@@ -4662,7 +4670,7 @@ function cxWard(host, d) {
     { title: '待追蹤訊號', tone: 'c4', cards: [].concat(T1.r.nSig ? [{ h: '接受率管制訊號', v: T1.r.nSig + ' 點', tone: 'warn' }] : []).concat(T2.r.nSig ? [{ h: '照會率管制訊號', v: T2.r.nSig + ' 點', tone: 'warn' }] : []), empty: '無異常訊號' }
   ]);
   var bc = cxCard('wide', '成效看板', '整合病房減藥：照會 → 接受 → 處方優化', '<b>看板四欄</b>：投入 → 過程 → 結果 → 待追蹤訊號。卡片數值為月值的四分位距平均。'); bc.appendChild(board);
-  cxFinish(host, d, { name: '整合病房減藥成效', headline: (acc ? '照會接受率 ' + cxNum(acc.v, 1) + '%' : '整合病房減藥') + (opt ? '，處方優化率 ' + cxNum(opt.v, 1) + '%' : ''), lede: '藥師照會、醫療端接受與多重用藥處方優化（品管中心月報表；比率為各月值的四分位距平均）。', kpis: kpis, insights: ins, blocks: [bc, T1.card, T2.card, mat, scaleCard, T3 && T3.card] });
+  cxFinish(host, d, { name: '臨床藥學服務(整合)', headline: (acc ? '照會接受率 ' + cxNum(acc.v, 1) + '%' : '整合病房減藥') + (opt ? '，處方優化率 ' + cxNum(opt.v, 1) + '%' : ''), lede: '藥師照會、醫療端接受與多重用藥處方優化（品管中心月報表；比率為各月值的四分位距平均）。', kpis: kpis, insights: ins, blocks: [bc, T1.card, T2.card, mat, scaleCard, T3 && T3.card] });
 }
 /*AX-END*/
 
