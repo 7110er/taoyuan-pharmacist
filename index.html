@@ -1035,7 +1035,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '3.3.0';
+var APP_VERSION = '3.3.1';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -2299,13 +2299,15 @@ function loadDashboard(first) {
   api('dashboard', { id: id, year: first ? '' : $('yearSel').value, month: first ? '' : $('monthSel').value, filters: S.filt, subject: S.subject })
     .then(function (j) {
       if (req !== S.dashReq) return;
-      S.dash = j.data; S.subject = j.data.subject || '';
-      var subs = axFilterSubjects(j.data.name || dashName(id), j.data.subjects); j.data.subjects = subs;
-      if (subs.length && !subs.some(function (x) { return x.pid === S.subject; })) { if (!S._subjRetry) { S._subjRetry = true; S.subject = subs[0].pid; loadDashboard(first); return; } S.subject = subs[0].pid; }
-      S._subjRetry = false;
-      fillPeriods(j.data.years, j.data.charts.some(function (c) { return c.hasTime; }), first);
-      fillSubjects(subs);
-      renderDashboard();
+      return axRosterFilter(j.data.name || dashName(id), axFilterSubjects(j.data.name || dashName(id), j.data.subjects)).then(function (subs) {
+        if (req !== S.dashReq) return;
+        S.dash = j.data; S.subject = j.data.subject || ''; j.data.subjects = subs;
+        if (subs.length && !subs.some(function (x) { return x.pid === S.subject; })) { if (!S._subjRetry) { S._subjRetry = true; S.subject = subs[0].pid; loadDashboard(first); return; } S.subject = subs[0].pid; }
+        S._subjRetry = false;
+        fillPeriods(j.data.years, j.data.charts.some(function (c) { return c.hasTime; }), first);
+        fillSubjects(subs);
+        renderDashboard();
+      });
     }).catch(function (e) { dashError(e, function () { loadDashboard(first); }); });
 }
 function fillPeriods(years, hasTime, first) {
@@ -2323,7 +2325,7 @@ function axSubjRole(x) {
   if (/教師|INSTRUCTOR/i.test(l)) return 'INSTRUCTOR';
   if (/（\s*學員\s*）|（\s*PGY|TRAINEE/i.test(l)) return 'TRAINEE';
   if (/（\s*學生\s*）|（\s*UGY|STUDENT/i.test(l)) return 'STUDENT';
-  if (/^\s*(我本人|本人|我)\b/.test(l) && S.user) { var r = String(S.user.active_role || ''); return /INSTRUCTOR/.test(r) ? 'INSTRUCTOR' : r; }
+  if (/^\s*(我本人|本人)/.test(l) && S.user) { var r = String(S.user.active_role || ''); return /INSTRUCTOR/.test(r) ? 'INSTRUCTOR' : r; }
   return '';
 }
 function axFilterSubjects(name, list) {
@@ -2331,6 +2333,33 @@ function axFilterSubjects(name, list) {
   if (!want || !list || list.length < 2) return list || [];
   var out = list.filter(function (x) { var r = axSubjRole(x); return !r || r === want; });
   return out.length ? out : list;
+}
+/* 名冊交叉核對（v3.3.1）：後端對「混合資料集」（如晨會簡報同時有 PGY 與 UGY，未設身分別）以資料集固定母體標示角色，
+ * 會把 UGY 學生標成「學員」。前端以實際名冊再核對一次：PGY 名冊＝學員CBME＋學員CbD；UGY 名冊＝UGY-360 學生成效。
+ * PGY 頁移除「只出現在 UGY 名冊」的人；UGY 頁移除「只出現在 PGY 名冊」的人。名冊讀不到時不過濾（fail-open 只影響顯示，授權仍由後端判定）。 */
+function axRosterName(label) { return axName(String(label || '').replace(/（[^（）]*）\s*$/, '').replace(/^\s*實習生\s*/, '')); }
+function axRosters() {
+  if (S._rosters) return Promise.resolve(S._rosters);
+  var ld = function (k) { return axLoad(k).catch(function () { return null; }); };
+  return Promise.all([ld(AX.KEYS.cbme), ld(AX.KEYS.cbd), axPrep('stu').catch(function () { return null; })]).then(function (r) {
+    var pgy = {}, ugy = {}, okP = false, okU = false;
+    [r[0], r[1]].forEach(function (src) { if (!src || !src.rows || !src.rows.length) return; var i = axCol(src.cols, /^學員姓名$/); if (i < 0) return; okP = true; src.rows.forEach(function (x) { var n = axName(x[i]); if (n) pgy[n] = 1; }); });
+    if (r[2] && r[2].recs && r[2].recs.length) { okU = true; r[2].recs.forEach(function (x) { var n = axName(x.subj); if (n) ugy[n] = 1; }); }
+    return (S._rosters = { pgy: pgy, ugy: ugy, ok: okP && okU });
+  });
+}
+function axRosterFilter(name, list) {
+  var want = /PGY|學員/.test(name) ? 'TRAINEE' : /UGY|學生/.test(name) ? 'STUDENT' : '';
+  if (!want || !list || list.length < 2) return Promise.resolve(list || []);
+  return axRosters().then(function (R) {
+    if (!R.ok) return list;
+    var out = list.filter(function (x) {
+      if (x.self || /^\s*(我本人|本人)/.test(x.label || '')) { var ar = String((S.user && S.user.active_role) || ''); return !/INSTRUCTOR|ADMIN/.test(ar) || ar === want; } // 教師身分在 PGY／UGY 頁不列「我本人」
+      var n = axRosterName(x.label), inP = !!R.pgy[n], inU = !!R.ugy[n];
+      return want === 'TRAINEE' ? (inP || !inU) : (inU || !inP);
+    });
+    return out.length ? out : list;
+  }, function () { return list; });
 }
 function fillSubjects(list) {
   var s = $('subjSel'); s.innerHTML = '';
