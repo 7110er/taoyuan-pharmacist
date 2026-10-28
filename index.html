@@ -792,6 +792,11 @@ table.grid td{max-width:320px}
 .ax-fact small{font-size:.72rem;color:var(--ink-3)}
 .ax-fact b{font-size:.95rem;color:var(--ink);font-variant-numeric:tabular-nums}
 .ax-foot{margin-top:10px}
+.ax-stages{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px;align-items:stretch}
+.ax-stage{flex:1 1 120px;border:1px solid var(--rule-2);border-radius:var(--r-md);padding:6px 10px;display:grid;gap:2px;font-size:.74rem;background:var(--wash-2)}
+.ax-stage b{font-size:.8rem}.ax-stage small{color:var(--ink-3)}
+.ax-stage.done{border-color:var(--ok);background:var(--ok-soft)}.ax-stage.obs{border-color:#C99A3A;background:#FFF4DE}.ax-stage.sched{border-color:var(--teal)}.ax-stage.late{border-color:#B3261E;background:#FDECEA}.ax-stage.late small{color:#B3261E;font-weight:700}.ax-stage.miss{border-style:dashed}.ax-stage.miss small{color:#8A5D0E}.ax-stage.todo{opacity:.75}
+.ax-stages>small{flex-basis:100%}
 .ax-strength{display:grid;gap:6px}.ax-strength .ax-bl{display:flex;flex-wrap:wrap;gap:6px}
 .ax-b.pos{background:var(--ok-soft);color:var(--ok)}
 .ax-plant2 td.ok{color:var(--ok);font-weight:700}.ax-plant2 td.low{color:#8A5D0E;font-weight:700}.ax-plant2 td.st.ok{color:var(--ok)}.ax-plant2 td.st.warn{color:#B3261E;font-weight:700}.ax-plant2 td.st.low{color:#8A5D0E}.ax-plant2 td.st.na{color:var(--ink-3)}
@@ -1042,7 +1047,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '3.4.0';
+var APP_VERSION = '3.5.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -3663,6 +3668,8 @@ function axApplyLayout(box, host, name) {
   host.remove();
 }
 var AX_NOPERM = {
+  'PGY 學員個人成績': '目前角色對「學員CBME／學員CbD」資料集只能讀取本人資料（資料集矩陣 DATASET_ACCESS＝SELF），因此無法為其他對象計算專業成長、EPA 評量規劃與質性回饋整併；下方後台圖表依同一矩陣判定。若您是此學員的教學指派指導者，請管理者將該資料集對您的角色改為 ASSIGNED（依教學指派開放）後再部署。',
+  'UGY 學生個人成績': '目前角色對「分析_學生成效／學生分數」資料集只能讀取本人資料，無法為其他對象計算學習成長；請管理者確認資料集矩陣與教學指派。',
   '教師個人成績': '教師評核分析資料（分析_教師成效）目前讀不到。後台已開放此資料，但網站使用的 Apps Script 部署版本尚未更新；管理者完成「部署 → 管理部署作業 → 新版本」後即可顯示。下方原有的等第表與質性回饋不受影響。',
   '教師教學成效': '教師評核分析資料（分析_教師成效）目前讀不到。管理者完成 Apps Script「新版本」部署後即可顯示四維比較與教師亮點。'
 };
@@ -4171,8 +4178,30 @@ function axPgyGrowthBlock(host, who, P, cbdN, cbdFb) {
 }
 
 /* ---------- UGY：成長區塊（他評剖面＋自評與他評差異） ---------- */
-/* UGY-360 八題對應臺灣藥師學習里程碑的核心能力領域（PC 病人照護／ICS 人際溝通／PROF 專業素養／CPD 持續專業發展）；院內展示用對應，不是正式判定 */
-var AX_UGY_DOMAIN = { 1: 'PROF 專業素養', 2: 'ICS 人際溝通與團隊合作', 3: 'ICS 人際溝通與團隊合作', 4: 'CPD 持續專業發展', 5: 'PC 病人照護', 6: 'PC 病人照護', 7: 'PC 病人照護', 8: 'PC 病人照護' };
+/* UGY-360 八題 ＝ 《醫院藥學實習辦法》（1100729 修訂版）肆、藥學實習之評估／附件一「醫院藥學實習評估表」的八個評估項目：
+ * 壹、專業素養：(一)專業態度的表現 (二)有效的溝通 (三)成為團隊中積極的成員 (四)經營個人及專業的成長
+ * 貳、技術單元：(一)調劑 (二)藥品管理觀念的認知與了解 (三)臨床藥事服務 (四)藥品諮詢
+ * 辦法評分為五等（極優／優／良／尚可／不佳）且「並非逐條評分，以綜合表現評分」；院內 UGY-360 採 1–6 分，兩者非同一量尺。 */
+var AX_UGY_DOMAIN = { 1: '壹、專業素養（辦法附件一）', 2: '壹、專業素養（辦法附件一）', 3: '壹、專業素養（辦法附件一）', 4: '壹、專業素養（辦法附件一）', 5: '貳、技術單元（辦法附件一）', 6: '貳、技術單元（辦法附件一）', 7: '貳、技術單元（辦法附件一）', 8: '貳、技術單元（辦法附件一）' };
+/* 實習辦法貳、實習課程「基本項目」時程（640 小時／16 週）與院內教學單位的對應；對應為院內草案，待課程指導藥師核定 */
+var AX_UGY_BASIC = [
+  { k: '門急診調劑', h: 160, re: /門診|急診|發藥/ },
+  { k: '住院調劑', h: 160, re: /住院|特殊調劑|UD|單一劑量/ },
+  { k: '臨床藥事服務', h: 120, re: /臨床|連貫照護|藥師門診|ADR|藥物不良反應|HPC|長照|IPE|跨領域/ },
+  { k: '藥品諮詢', h: 80, re: /諮詢/ },
+  { k: '藥品管理（含於調劑）', h: 0, re: /藥庫|管理|行政/ }
+];
+var AX_UGY_ELECT = [{ k: '全靜脈營養調配', re: /TPN|靜脈營養/ }, { k: '化學治療藥品調劑', re: /化療|化學治療|TPN/ }, { k: '中藥門診', re: /中藥|中西藥/ }];
+function axUgyBasicTile(units) {
+  var box = axEl('div', 'ax-plan'), t = axEl('table', 'ax-ttab ax-plant'); t.innerHTML = '<tr><th>基本項目（辦法）</th><th>規定時數</th><th>對應教學單位（有評核紀錄者）</th></tr>';
+  var used = {};
+  AX_UGY_BASIC.forEach(function (b) { var hit = units.filter(function (u) { return b.re.test(u); }); hit.forEach(function (u) { used[u] = 1; }); var tr = document.createElement('tr'); tr.innerHTML = '<th>' + esc(b.k) + '</th><td>' + (b.h ? b.h + ' 小時' : '含於調劑') + '</td><td class="' + (hit.length ? 'ok' : 'low') + '">' + (hit.length ? esc(hit.join('、')) : '尚無對應單位的評核紀錄') + '</td>'; t.appendChild(tr); });
+  var el = units.filter(function (u) { return !used[u] && AX_UGY_ELECT.some(function (e) { return e.re.test(u); }); }), other = units.filter(function (u) { return !used[u] && el.indexOf(u) < 0; });
+  if (el.length || other.length) { var tr2 = document.createElement('tr'); tr2.innerHTML = '<th>選修／其他</th><td>—</td><td>' + esc(el.concat(other).join('、')) + '</td>'; t.appendChild(tr2); }
+  box.appendChild(t);
+  box.appendChild(axEl('small', 'ax-muted', '依《醫院藥學實習辦法》貳、實習課程：全部 640 小時（16 週），基本項目門急診調劑 160、住院調劑 160、臨床藥事服務 120、藥品諮詢 80 小時，藥品管理含於調劑；選修：全靜脈營養調配、化學治療藥品調劑、中藥門診。本表只對照「有 UGY-360 評核紀錄的單位」，後台沒有實習時數資料，無法核對時數；單位對應為院內草案。'));
+  return box;
+}
 function axUgyGrowthBlock(host, who, MA, quotes) {
   var all = MA.recs.filter(function (x) { return axName(x.subj) === who; }); if (!all.length) return;
   var oth = all.filter(function (x) { return !/自評/.test(x.view); }), self = all.filter(function (x) { return /自評/.test(x.view); });
@@ -4188,7 +4217,7 @@ function axUgyGrowthBlock(host, who, MA, quotes) {
   var nxt = stat.filter(function (x) { return x.m !== null && x.n >= 3; }).map(function (x) { return { x: x, sc: (om - x.m) * 10 + (x.d !== null && x.d >= .5 ? 5 : 0) }; }).filter(function (y) { return y.sc > 0; }).sort(function (a, b) { return b.sc - a.sc; }).slice(0, 2);
   var sec = axEl('section', 'chart ax-card ax-growth'); sec.dataset.ax = 'growth'; host.appendChild(sec);
   axGrowthHead(sec, '我的學習成長（UGY）', who + '｜他評 ' + axRows(oth) + ' 份｜輪訓單位 ' + units.length + ' 個',
-    '<b>他評</b>＝教師與同儕評核（1–6 分）；<b>自評</b>單獨呈現，用來對照自己的判斷，不計入他評。<br><b>自評與他評差異</b>：同一題自評與他評平均相差 0.5 分以上，標示「自評較高／較低」；這是反思素材，不是扣分。<br><b>優勢</b>：他評平均高於本人整體平均 0.1 分以上、且至少 3 份的題目。<br><b>下一步發展重點</b>：相對較弱、或自評明顯高於他評的題目，供與教師討論後寫入 ILP。<br>能力領域依臺灣藥師學習里程碑的核心能力領域對應（PC 病人照護、ICS 人際溝通與團隊合作、PROF 專業素養、CPD 持續專業發展）；UGY-360 只有 8 題，對應屬院內展示分類，不是正式能力判定。', true);
+    '<b>評估架構</b>：UGY-360 的 8 題即《醫院藥學實習辦法》（1100729 修訂版）附件一「醫院藥學實習評估表」的八個評估項目——壹、專業素養（專業態度的表現、有效的溝通、成為團隊中積極的成員、經營個人及專業的成長）、貳、技術單元（調劑、藥品管理觀念的認知與了解、臨床藥事服務、藥品諮詢）。辦法規定「並非逐條評分，以綜合表現評分」，評分為五等；院內採 1–6 分，與辦法的五等不是同一量尺，本頁不換算。<br><b>他評</b>＝教師與同儕評核（1–6 分）；<b>自評</b>單獨呈現，用來對照自己的判斷，不計入他評。<br><b>自評與他評差異</b>：同一題自評與他評平均相差 0.5 分以上，標示「自評較高／較低」；這是反思素材，不是扣分。<br><b>優勢</b>：他評平均高於本人整體平均 0.1 分以上、且至少 3 份的題目。<br><b>下一步發展重點</b>：相對較弱、或自評明顯高於他評的題目，供與教師討論後寫入 ILP。<br><b>正式成績</b>：辦法第捌條（合約第十條）規定實習期滿由醫院填寫成績送交學校；本頁「個人實習總分」為院內總結性成績，由後台提供。', true);
   var g = axEl('div', 'ax-gtiles'); sec.appendChild(g);
   g.appendChild(axTile('目前位置｜他評整體', om !== null ? '<b>' + axFmt(om, 2) + '</b><small> ／6</small>' : '—', '他評 ' + axRows(oth) + ' 份｜' + units.length + ' 個輪訓單位'));
   g.appendChild(axTile('自評與他評差異', self.length ? '<span class="ax-tr same">一致 ' + cal.ok + '</span><span class="ax-tr up">自評較高 ' + cal.hi + '</span><span class="ax-tr down">自評較低 ' + cal.lo + '</span>' : '<small>尚無自評</small>', self.length ? '題數；差距 ≥0.5 分才標示' : '完成自評後可對照自己的判斷'));
@@ -4201,6 +4230,7 @@ function axUgyGrowthBlock(host, who, MA, quotes) {
   else nx.appendChild(axEl('p', 'ax-muted', '各題表現接近，可與教師共同選擇興趣或進階學習目標。'));
   nx.appendChild(axIlpLink('student', '寫入 ILP'));
   g.appendChild(axTile('下一步發展重點（ILP 候選）', null, '與教師討論後再定案；每個輪訓單位聚焦 1–2 項', 'wide next', nx));
+  g.appendChild(axTile('實習基本項目涵蓋（醫院藥學實習辦法）', null, '依辦法貳、實習課程；只對照有評核紀錄的單位，時數無資料', 'full', axUgyBasicTile(units)));
   // 能力剖面：題目 × 輪訓單位
   var w = axEl('div', 'ax-map'); sec.appendChild(w);
   var t = axEl('table', 'ax-maptab'), thd = document.createElement('thead'), tr0 = document.createElement('tr');
@@ -4216,7 +4246,7 @@ function axUgyGrowthBlock(host, who, MA, quotes) {
     var std = document.createElement('td'); if (x.sm === null) std.className = 'ax-na'; else { std.className = 'ax-self'; std.appendChild(axEl('b', '', axFmt(x.sm, 1))); if (x.d !== null && Math.abs(x.d) >= .5) std.appendChild(axEl('small', x.d > 0 ? 'hi' : 'lo', x.d > 0 ? '自評較高' : '自評較低')); }
     tr.appendChild(std); tb.appendChild(tr);
   });
-  t.appendChild(tb); var sc = axEl('div', 'ax-scroll'); sc.appendChild(t); w.appendChild(axEl('div', 'ax-ftitle', '能力剖面（題目 × 輪訓單位；他評平均，1–6 分）')); w.appendChild(sc);
+  t.appendChild(tb); var sc = axEl('div', 'ax-scroll'); sc.appendChild(t); w.appendChild(axEl('div', 'ax-ftitle', '能力剖面（辦法附件一八項 × 輪訓單位；他評平均，1–6 分）')); w.appendChild(sc);
 }
 
 /* ---------- 教師：專業成長區塊 ---------- */
@@ -4528,29 +4558,34 @@ function axChartCount(d, re) {
 /* 公版 EPA 評量規劃（2023 台灣藥師 EPAs 第一版各項第 7 項）中可計數的要求；門檻為公版文字。
  * 紀錄連動（2026-10-28 教學負責人指定）：EPA 1、5 ← 藥事照會紀錄 PCNE-DRPs；EPA 3、7 ← 藥品諮詢紀錄。計數即時讀取本頁後台圖表。 */
 var AX_EPA_PLAN = {
-  'EPA-01': { cbd: 1, cbdText: '處方討論 CbD ≥1 例', rec: '疑義處方討論通報或用藥建議紀錄', recN: 5, recSrc: /^藥事照會紀錄/, recLab: '藥事照會紀錄 PCNE-DRPs', recPick: /門診/ },
+  'EPA-01': { cbd: 1, cbdText: '處方討論 CbD ≥1 例', rec: '疑義處方討論通報或用藥建議紀錄', recN: 5, recSrc: /^藥事照會紀錄/, recLab: '藥事照會紀錄 PCNE-DRPs', recPick: /門診/, pickLab: '專業活動' },
   'EPA-02': { rec: '', recN: 0 },
-  'EPA-03': { rec: '病人衛教紀錄', recN: 10, recSrc: /^藥品諮詢紀錄/, recLab: '藥品諮詢紀錄', recPick: /病人|家屬|民眾|個案/ },
-  'EPA-04': { cbd: 2, cbdText: 'ADR 評估討論 ≥2 例', rec: 'ADR 評估紀錄 ≥2 例（後台尚無對應紀錄）', recN: 0 },
-  'EPA-05': { cbd: 1, cbdText: '住院個案討論報告 ≥1 例', rec: '住院用藥評估或建議紀錄', recN: 10, recSrc: /^藥事照會紀錄/, recLab: '藥事照會紀錄 PCNE-DRPs', recPick: /住院|病房|病床/ },
-  'EPA-06': { cbdMonthly: 2, cbdText: '每月 CbD ≥2 次', rec: '≥2 種監測藥品的 TDM 紀錄（後台尚無對應紀錄）', recN: 0 },
-  'EPA-07': { rec: '醫療人員諮詢紀錄', recN: 5, recSrc: /^藥品諮詢紀錄/, recLab: '藥品諮詢紀錄', recPick: /醫師|護理|藥師|醫療|治療師|專科|營養師/ },
+  'EPA-03': { rec: '病人衛教紀錄', recN: 10, recSrc: /^藥品諮詢紀錄/, recLab: '藥品諮詢紀錄', recPick: /病人|家屬|民眾|個案/, pickLab: '諮詢來源對象' },
+  'EPA-04': { cbd: 2, cbdText: 'ADR 評估討論 ≥2 例', rec: '藥品不良反應評估紀錄', recN: 2, recSrc: /^藥事照會紀錄/, recLab: '藥事照會紀錄 PCNE-DRPs', recPick: /不良反應|ADR/i, onlyPick: true, pickLab: '專業活動' },
+  'EPA-05': { cbd: 1, cbdText: '住院個案討論報告 ≥1 例', rec: '住院用藥評估或建議紀錄', recN: 10, recSrc: /^藥事照會紀錄/, recLab: '藥事照會紀錄 PCNE-DRPs', recPick: /住院|病房|病床/, pickLab: '專業活動' },
+  'EPA-06': { cbdMonthly: 2, cbdText: '每月 CbD ≥2 次', rec: '不同監測藥物品項的 TDM 評估與建議紀錄（公版以「品項數」計，此處為筆數，品項數需人工核對）', recN: 2, recSrc: /^藥事照會紀錄/, recLab: '藥事照會紀錄 PCNE-DRPs', recPick: /藥物治療監測|療劑監測|TDM/i, onlyPick: true, pickLab: '專業活動', recManual: '不同監測藥物品項數與每月 CbD ≥2 次需人工核對' },
+  'EPA-07': { rec: '醫療人員諮詢紀錄', recN: 5, recSrc: /^藥品諮詢紀錄/, recLab: '藥品諮詢紀錄', recPick: /醫師|護理|藥師|醫療|治療師|專科|營養師/, pickLab: '諮詢來源對象' },
   'EPA-08': { rec: '', recN: 0 }
 };
 /* 後台圖表逐組計數：回傳 {ok, total, groups:{label:n}}；status 非 OK 時 ok=false（fail-closed，不顯示 0） */
-function axChartGroups(d, re) {
-  var c = ((d && d.charts) || []).filter(function (x) { return re.test(x.title || ''); })[0]; if (!c) return null;
-  if (c.status !== 'OK') return { ok: false, status: c.status };
-  var g = {}, tot = 0;
-  if (c.type === '看板') { (c.cards || []).forEach(function (k) { g[k.g] = (g[k.g] || 0) + 1; tot++; }); }
-  else (c.cells || []).forEach(function (x) { if (x[11] || x[3]) return; var n = x[4] || 0; g[x[2]] = (g[x[2]] || 0) + n; tot += n; });
-  return { ok: true, total: tot, groups: g, title: c.title, groupLabel: c.groupLabel || '' };
+function axChartGroups(d, re, pick) {
+  var cs = ((d && d.charts) || []).filter(function (x) { return re.test(x.title || ''); }); if (!cs.length) return null;
+  function one(c) {
+    if (c.status !== 'OK') return { ok: false, status: c.status, title: c.title };
+    var g = {}, tot = 0;
+    if (c.type === '看板') { (c.cards || []).forEach(function (k) { g[k.g] = (g[k.g] || 0) + 1; tot++; }); }
+    else (c.cells || []).forEach(function (x) { if (x[11] || x[3]) return; var n = x[4] || 0; g[x[2]] = (g[x[2]] || 0) + n; tot += n; });
+    return { ok: true, total: tot, groups: g, title: c.title, groupLabel: c.groupLabel || '', nCharts: cs.length };
+  }
+  var all = cs.map(one);
+  if (pick) { var hit = all.filter(function (r) { return r.ok && Object.keys(r.groups).some(function (k) { return pick.test(k); }); })[0]; if (hit) return hit; }
+  return all.filter(function (r) { return r.ok; })[0] || all[0];
 }
 function axEpaPlanCard(host, G, P, cbdBySrc, d) {
   var sec = axEl('section', 'chart ax-card ax-plancard'); sec.dataset.ax = 'epaplan'; host.appendChild(sec);
   var y = $('yearSel').value, m = $('monthSel').value, per = (y ? y + ' 年' : '全部年度') + (m ? ' ' + Number(m) + ' 月' : '');
   axGrowthHead(sec, '公版 EPA 評量規劃與證據累積', '依 2023 公版各 EPA 評量規劃｜紀錄期間：' + per + '（隨上方年度／月份篩選）',
-    '<b>用途</b>：對照公版各 EPA「評量規劃」可計數的要求，看證據是否足以送 CCC 判定；不是正式能力判定。<br><b>CbD</b>：學員CbD 依「病例來源」對應 EPA（例：「門診處方評估」→ EPA 1）。<br><b>紀錄</b>：依教學負責人指定連動——EPA 1、EPA 5 ← 藥事照會紀錄 PCNE-DRPs；EPA 3、EPA 7 ← 藥品諮詢紀錄。後台圖表若有「門診／住院」或「病人／醫療人員」分組，系統只計對應分組；沒有分組時以全部筆數計並標示「未區分」。<br><b>未含</b>：職場直接觀察（DOPS／ad-hoc EPA）每月 ≥2–3 次——後台目前沒有 PGY 的直接觀察次數資料。<br>門檻為公版文字；紀錄筆數為即時讀取本頁後台圖表，切換年度／月份會改變。', false);
+    '<b>用途</b>：對照公版各 EPA「評量規劃」可計數的要求，看證據是否足以送 CCC 判定；不是正式能力判定。<br><b>CbD</b>：學員CbD 依「病例來源」對應 EPA（例：「門診處方評估」→ EPA 1）。<br><b>紀錄</b>：依教學負責人指定連動——EPA 1、EPA 5 ← 藥事照會紀錄 PCNE-DRPs；EPA 3、EPA 7 ← 藥品諮詢紀錄。藥事照會來源的「專業活動」欄（門診處方評估／住院病人用藥評估／藥品不良反應評估／藥物治療監測）可分別對應 EPA 1／5／4／6；藥品諮詢來源的「諮詢來源對象」欄（病人／家屬、護理師、醫師）可對應 EPA 3／7。後台圖表若依這兩欄分組，本表只計對應分組；目前後台圖表分別依「原因面向」「問題類型」分組，EPA 1／5 與 3／7 只能以全部筆數計並標示「未區分」，EPA 4／6 不計數。<br><b>未含</b>：職場直接觀察（DOPS／ad-hoc EPA）每月 ≥2–3 次——後台目前沒有 PGY 的直接觀察次數資料。<br>門檻為公版文字；紀錄筆數為即時讀取本頁後台圖表，切換年度／月份會改變。', false);
   var tab = axEl('table', 'ax-gtab ax-plant2'); tab.innerHTML = '<thead><tr><th>EPA（公版 L4 時機）</th><th>目前（CCC）</th><th>CbD（公版要求）</th><th>紀錄（公版要求）</th><th>證據狀態</th></tr></thead>';
   var tb = document.createElement('tbody'), last = G.last, mo = last.mo || 0;
   AX_EPA_REG.filter(function (e) { return !e.inhouse; }).forEach(function (e) {
@@ -4562,13 +4597,17 @@ function axEpaPlanCard(host, G, P, cbdBySrc, d) {
     var cbdOk = pl.cbd !== undefined ? nC >= pl.cbd : null, manual = !!pl.cbdMonthly;
     var recTxt = '—', recOk = null, recNote = '';
     if (pl.recSrc) {
-      var R = axChartGroups(d, pl.recSrc);
+      var R = axChartGroups(d, pl.recSrc, pl.recPick);
       if (!R) recTxt = '本頁無「' + pl.recLab + '」圖表';
       else if (!R.ok) recTxt = pl.recLab + '：' + (EMPTY_TEXT[R.status] || R.status);
       else {
-        var keys2 = Object.keys(R.groups), pick = keys2.filter(function (g2) { return pl.recPick && pl.recPick.test(g2); }), n2 = pick.length ? pick.reduce(function (a, g2) { return a + R.groups[g2]; }, 0) : R.total;
-        recNote = pick.length ? '（' + pick.join('、') + '）' : '（' + pl.recLab + ' 全部，未區分' + (/^EPA-0[15]/.test(e.id) ? '門診／住院' : '病人／醫療人員') + '）';
-        recTxt = n2 + '／' + pl.recN + ' 例 ' + pl.rec + recNote; recOk = n2 >= pl.recN;
+        var keys2 = Object.keys(R.groups), pick = keys2.filter(function (g2) { return pl.recPick && pl.recPick.test(g2); });
+        if (!pick.length && pl.onlyPick) { recTxt = pl.rec + '：後台「' + pl.recLab + '」圖表未依「' + pl.pickLab + '」分組，無法計數（管理者可在儀表板設定新增分組圖表）'; recOk = null; }
+        else {
+          var n2 = pick.length ? pick.reduce(function (a, g2) { return a + R.groups[g2]; }, 0) : R.total;
+          recNote = pick.length ? '（' + pl.pickLab + '：' + pick.join('、') + '）' : '（' + pl.recLab + ' 全部，未區分' + (/^EPA-0[15]/.test(e.id) ? '門診／住院' : '病人／醫療人員') + '，後台圖表未依「' + pl.pickLab + '」分組）';
+          recTxt = n2 + '／' + pl.recN + ' 例 ' + pl.rec + recNote; recOk = n2 >= pl.recN;
+        }
       }
     } else if (pl.rec) recTxt = pl.rec;
     var due = mo >= e.l4, st = '', cls = '';
@@ -4577,6 +4616,7 @@ function axEpaPlanCard(host, G, P, cbdBySrc, d) {
     else if (oks.every(Boolean)) { st = '證據量已達公版要求'; cls = 'ok'; }
     else if (lc && lc.C[k].v >= 4 - AX_EPS) { st = '已判定 L4；公版證據量未達，請核對紀錄是否完整'; cls = 'low'; }
     else { st = (due ? '已到 L4 時機，' : '') + '證據量未達'; cls = due ? 'warn' : 'low'; }
+    if (pl.recManual && recOk === true && cls === 'ok') { st = '紀錄筆數已達；' + pl.recManual; cls = 'low'; }
     var tr = document.createElement('tr');
     tr.appendChild(axEl('th', '', 'EPA ' + e.no + ' ' + e.name + '（' + e.l4 + ' 個月）'));
     tr.appendChild(axEl('td', '', cur));
@@ -4673,12 +4713,35 @@ function axPgyGrowth(P, who) {
 var AX_STATE_LEGEND = '<span><i class="ax-st up">▲</i>進展</span><span><i class="ax-st same">●</i>維持</span><span><i class="ax-st down">▼</i>同來源低於前期</span><span><i class="ax-st nc">≈</i>來源不同不比較</span><span><i class="ax-st first">○</i>首次評量</span><span><i class="ax-st none">…</i>證據不足</span><span><i class="ax-metbox"></i>CCC 正式判定達公版目標</span><span><i class="ax-metbox draft"></i>達院內草案（參照）</span>';
 AX_ST.nc = ['≈', '前後期判定來源不同（教師觀察／CCC），不比較', 'nc'];
 function axPgyGrowthBlock(host, who, P, cbdN, cbdFb, extra) {
-  var G = axPgyGrowth(P, who); if (!G) return;
+  var G = axPgyGrowth(P, who), m = axRowsFor(P, who);
+  if (!G) { var sec0 = axEl('section', 'chart ax-card ax-growth'); sec0.dataset.ax = 'growth'; host.appendChild(sec0); sec0.appendChild(axEl('h3', 'ax-title', '我的專業成長（CBME）')); sec0.appendChild(axEl('div', 'state', m.rows.length ? '「' + axIdKey(who) + '」在學員CBME 有 ' + m.rows.length + ' 列（' + m.rows.map(function (r) { return r.stage; }).join('、') + '），但尚無任何等級；CCC 判定完成後即顯示。' : '「' + axIdKey(who) + '」在學員CBME 尚無資料。')); return; }
   var sec = axEl('section', 'chart ax-card ax-growth'); sec.dataset.ax = 'growth'; host.appendChild(sec);
   if (G.ambiguous) { axGrowthHead(sec, '我的專業成長（CBME）', who, '同名資料無法安全區分，系統停止計算。', false); sec.appendChild(axEl('div', 'state', '「' + axName(who) + '」在學員CBME 中對應到多位學員（' + G.ambiguous.join('、') + '），為避免誤配，暫停顯示。請在對象選單使用含學員代碼的名稱。')); return; }
   var last = G.last;
-  axGrowthHead(sec, '我的專業成長（CBME）', axIdKey(who) + '｜最近期程 ' + last.stage + '｜判定來源：' + last.src + (last.date ? '｜CCC 日期 ' + axFmtDate(last.date) : ''),
+  // 期程進度（v3.5）：每個公版期程的狀態——已判定（CCC）／僅教師觀察／已排程未評（有 CCC 日期無等級）／未排程；預定日期由起訓年月推估
+  var allR = m.rows.slice().sort(function (a, b) { return (a.mo || 0) - (b.mo || 0); }), noLv = allR.filter(function (r) { return !r.any && (r.date || r.fb.length); });
+  axGrowthHead(sec, '我的專業成長（CBME）', axIdKey(who) + '｜最近有等級的期程 ' + last.stage + '｜判定來源：' + last.src + (last.date ? '｜CCC 日期 ' + axFmtDate(last.date) : '') + (noLv.length ? '｜另有 ' + noLv.map(function (r) { return r.stage; }).join('、') + ' 已建檔但尚無等級' : ''),
     '<b>閱讀方式</b>：本區只和你自己過去的表現比較；同期程分布屬第二層，按右上「同期參照」才顯示。<br><b>正式階段判定</b>：本期「公版明定」應達項目（里程碑於 PGY24M 全部 L4；各 EPA 依公版 L4 時程）逐項需有 <b>CCC 正式判定</b>且達標才計入；只有教師觀察者列為「待 CCC」。公版未訂的中間期程目標屬院內草案，只作發展性參照，不計正式。<br>' + axTargetTableHtml() + '<br><b>里程碑 L4 ≠ EPA L4</b>：里程碑 L4＝該次核心能力達完訓目標；EPA L4＝該任務可獨立執行的信賴層級；兩者都不是法定執業授權。<br><b>成長軌跡</b>：同一能力、前後期同一判定來源（CCC 對 CCC、教師觀察對教師觀察）才比較；來源不同標「≈」。<br><b>EPA 維持期限</b>：公版第 8 項——EPA 1、2、3、5、7 一年、EPA 4、6、8 二年未執行應重新評量；本系統以 CCC 判定日期近似最近執行日期。<br><b>下一步發展重點</b>：依「低於公版目標（院內危害登錄者標病人安全）→ 公版項目待 CCC → 同來源較前期下降 → 低於院內草案」排序，僅供共同討論，不是自動指派。', true);
+  var strip = axEl('div', 'ax-stages'); sec.appendChild(strip);
+  (function () {
+    var t0 = null; allR.forEach(function (r) { if (r.date && r.mo !== null) { var t = r.date.getFullYear() * 12 + r.date.getMonth() - r.mo; if (t0 === null || t < t0) t0 = t; } });
+    var now = new Date(), nowI = now.getFullYear() * 12 + now.getMonth();
+    [['PGY0', 0], ['PGY3M', 3], ['PGY6M', 6], ['PGY12M', 12], ['PGY18M', 18], ['PGY24M', 24]].forEach(function (st) {
+      var r = allR.filter(function (x) { return String(x.stage).replace(/\s/g, '').toUpperCase() === st[0]; })[0];
+      var nC = r ? Object.keys(r.C).length : 0, nT = r ? Object.keys(r.T).length : 0, cls, txt, sub = '';
+      var expI = t0 !== null ? t0 + st[1] : null, expTxt = expI !== null ? (Math.floor(expI / 12) - 1911) + '/' + (expI % 12 + 1) : '';
+      if (r && nC) { cls = 'done'; txt = 'CCC 判定 ' + nC + ' 項'; sub = r.date ? axFmtDate(r.date) : ''; }
+      else if (r && nT) { cls = 'obs'; txt = '僅教師觀察 ' + nT + ' 項'; sub = '待 CCC'; }
+      else if (r && (r.date || r.fb.length)) { cls = r.date && r.date.getTime() < now.getTime() ? 'late' : 'sched'; txt = r.date ? 'CCC 日期 ' + axFmtDate(r.date) : '已建檔'; sub = r.date && r.date.getTime() < now.getTime() ? '已過日期，尚無等級' : '尚無等級'; }
+      else if (st[0] === 'PGY0') { cls = 'todo'; txt = '無紀錄'; sub = '到職基線（院內，非公版期程）'; }
+      else if (expI !== null && expI < nowI) { cls = 'miss'; txt = '無紀錄'; sub = '預計 ' + expTxt + ' 已過'; }
+      else { cls = 'todo'; txt = '未到期'; sub = expTxt ? '預計 ' + expTxt : ''; }
+      var d = axEl('div', 'ax-stage ' + cls); d.appendChild(axEl('b', '', st[0])); d.appendChild(axEl('span', '', txt)); if (sub) d.appendChild(axEl('small', '', sub)); d.title = st[0] + '｜' + txt + (sub ? '｜' + sub : '') + (expTxt ? '｜預定（起訓＋' + st[1] + ' 個月）約 ' + expTxt : '｜起訓年月無法推估');
+      strip.appendChild(d);
+    });
+    var lg = axEl('small', 'ax-muted', '期程進度：預定時間＝推估起訓年月＋期程月數（起訓年月由 CCC 日期反推，屬推論）；「已過日期尚無等級」與「無紀錄」為 CCC 待辦。PGY0 為院內到職基線，不列入公版期程。');
+    strip.appendChild(lg);
+  })();
   var g = axEl('div', 'ax-gtiles'); sec.appendChild(g);
   var bar = axEl('div', 'ax-kpi-bar'); var bi = axEl('i'); bi.style.width = (G.req.length ? Math.round(G.met / G.req.length * 100) : 0) + '%'; bar.appendChild(bi);
   g.appendChild(axTile('正式階段判定（公版應達）', G.req.length ? '<b>' + G.met + '</b><small>／' + G.req.length + ' 項達標</small>' : '<small>本期公版未訂應達項目</small>',
@@ -5665,3 +5728,4 @@ function axStudentIndicators(host, M) {
 </script>
 </body>
 </html>
+
