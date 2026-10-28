@@ -1003,7 +1003,7 @@ table.grid td{max-width:320px}
  * 只需修改下面一行：貼上 Apps Script 部署後的「網頁應用程式網址」。
  * ===================================================================== */
 var CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbx7nSUfYl3R9Czc9HE1awxS2k3ODT5cgg-KRj4ATZehqx0YY0l2DyyiUn_tlNMOKtYdog/exec'
+  API_URL: 'https://script.google.com/macros/s/AKfycbxPPE-LAXmbEcsVTt5E5yJOS0VzBZgUEhcS9-wVijqE3ucL85-6NeGJUquv_RwTktAI6w/exec'
 };
 /* ===================================================================== */
 
@@ -1035,7 +1035,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '3.3.1';
+var APP_VERSION = '3.3.2';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -2325,7 +2325,7 @@ function axSubjRole(x) {
   if (/教師|INSTRUCTOR/i.test(l)) return 'INSTRUCTOR';
   if (/（\s*學員\s*）|（\s*PGY|TRAINEE/i.test(l)) return 'TRAINEE';
   if (/（\s*學生\s*）|（\s*UGY|STUDENT/i.test(l)) return 'STUDENT';
-  if (/^\s*(我本人|本人)/.test(l) && S.user) { var r = String(S.user.active_role || ''); return /INSTRUCTOR/.test(r) ? 'INSTRUCTOR' : r; }
+  if (/^\s*(我本人|本人)/.test(l)) return ''; // 本人一律保留：身分轉變者（學生→學員→教師）仍須能查閱自己過去的學習資料（v3.3.2）
   return '';
 }
 function axFilterSubjects(name, list) {
@@ -2354,7 +2354,7 @@ function axRosterFilter(name, list) {
   return axRosters().then(function (R) {
     if (!R.ok) return list;
     var out = list.filter(function (x) {
-      if (x.self || /^\s*(我本人|本人)/.test(x.label || '')) { var ar = String((S.user && S.user.active_role) || ''); return !/INSTRUCTOR|ADMIN/.test(ar) || ar === want; } // 教師身分在 PGY／UGY 頁不列「我本人」
+      if (x.self || /^\s*(我本人|本人)/.test(x.label || '')) { var ar = String((S.user && S.user.active_role) || ''); if (!/INSTRUCTOR|ADMIN/.test(ar) || ar === want) return true; var me = axRosterName(String(x.label || '').replace(/^\s*(我本人|本人)\s*[（(]\s*/, '').replace(/[）)]\s*$/, '')) || axName((S.user && S.user.display_name) || ''); return want === 'TRAINEE' ? !!R.pgy[me] : !!R.ugy[me]; } // 教師本人：曾為該身分（名冊有名字）才保留
       var n = axRosterName(x.label), inP = !!R.pgy[n], inU = !!R.ugy[n];
       return want === 'TRAINEE' ? (inP || !inU) : (inU || !inP);
     });
