@@ -1207,7 +1207,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '3.8.2';
+var APP_VERSION = '3.8.3';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -6514,12 +6514,12 @@ var PC = {
 var PC_A = [
   ['A1.1', /完全執行|fully implemented/i, '接受且完全執行'],
   ['A1.2', /部[分份]執行|partially implemented/i, '接受，部分執行'],
-  ['A1.3', /接受但未執行|accepted but not implemented/i, '接受但未執行'],
-  ['A1.4', /接受.{0,4}不清楚.{0,4}執行|執行.{0,2}不明|implementation unknown/i, '接受，執行情形不明'],
+  ['A1.3', /接受但未執行|^(?!未).{0,2}接受.{0,10}(並未|未)執行|accepted but not implemented/i, '接受但未執行'],
+  ['A1.4', /^(?!未).{0,2}接受.{0,10}不清楚是否執行|接受.{0,4}不清楚.{0,4}執行|執行.{0,2}不明|implementation unknown/i, '接受，執行情形不明'],
   ['A2.1', /不可行|not feasible/i, '不接受：不可行'],
   ['A2.2', /不贊同|不同意|no agreement/i, '不接受：不贊同'],
   ['A2.3', /其[它他]原因|other reason/i, '不接受：其他原因'],
-  ['A2.4', /不清楚原因.{0,2}未接受|未接受.{0,4}原因不明|unknown reason/i, '不接受：原因不明'],
+  ['A2.4', /不清楚原因.{0,2}未接受|未接受.{0,10}(原因不明|不清楚原因)|unknown reason/i, '不接受：原因不明'],
   ['A3.1', /不清楚是否.{0,2}接受|接受與否不明|acceptance unknown/i, '已提出，接受與否不明'],
   ['A3.2', /未提出|not proposed/i, '未提出介入建議']
 ];
@@ -7436,7 +7436,7 @@ function csKudosCfg(C, err) {
 function csKpiCard(host, C, F, st, re) {
   var R = gxWinRows(C, F), tot = R.reduce(function (s, r) { return s + r.n; }, 0);
   var sec = pcCard(host, 'csKpi', '諮詢服務｜本期總覽', pcPeriod(F) + '（依諮詢日期）｜' + tot + ' 件',
-    '<b>資料</b>：教學資源「諮詢問題」→「儀表板用_諮詢」彙總，不含問題敘述與回覆內容。<br><b>時間</b>：紀錄自 2010 年起，2025 年第 1–3 季集中，其餘各季零星，推論多數紀錄來自訓練期間作業而非全部藥品諮詢【推論】，因此不做每月管制圖，改以季別呈現。<br><b>數字</b>：統計期間合併值，括號為 95% 信賴區間。');
+    '<b>資料</b>：教學資源「諮詢問題」→「儀表板用_諮詢」彙總，不含問題敘述與回覆內容。<br><b>時間</b>：紀錄自 2010 年起（民國年日期已自動換算），各季件數差異大，部分期間可能只登錄訓練作業【推論】，因此不做每月管制圖，改以季別呈現。<br><b>數字</b>：統計期間合併值，括號為 95% 信賴區間。');
   var tb = axEl('div', 'cc-toolbar'); tb.appendChild(pcSel('統計期間', [[0, '全期'], [24, '近 24 個月'], [12, '近 12 個月'], [6, '近 6 個月']], st.win, function (v) { st.win = +v; re('win'); })); sec.appendChild(tb);
   function S(fn) { return R.reduce(function (s, r) { return s + (fn(r.c) ? r.n : 0); }, 0); }
   var lagN = S(function (c) { return c['登錄延遲'] !== '無法判讀'; }), K = [
@@ -7507,7 +7507,10 @@ function axCsGroup(host, d) {
   var pc = axPcGroup, cc = axCcGroup;
   axPcGroup = function (host, d) { return pc(host, d).then(function () { var M = PC.M; if (!M) return; return kdMount(host, kdPcCfg(M)); }); };
   axCcGroup = function (host, d) {
-    var p = kdLoadCube(KD_CC_T, /連貫照護|整合病房/, ['人員', '問題類別', '後續追蹤']).then(function (C) { return { C: C }; }, function (e) { return { err: e.message }; });
+    var p = kdLoadCube(KD_CC_T, /連貫照護|整合病房/, ['人員', '問題類別', '後續追蹤']).then(function (C) {
+      var pk = pcFindKey(); if (!pk) return { C: C };
+      return axLoad(pk).then(function (src) { var ci = src.cols.indexOf('維度'), cc = src.cols.indexOf('類別'), map = {}; src.rows.forEach(function (r) { if (r[ci] !== '人員') return; var m = /^([A-Za-z]{0,2}\d+)\s+(.+)$/.exec(String(r[cc] || '').trim()); if (m) map[m[1].toUpperCase()] = m[1].toUpperCase() + ' ' + m[2]; }); C.rows.forEach(function (r) { var k = String(r.c['人員'] || '').toUpperCase(); if (map[k]) r.c['人員'] = map[k]; }); return { C: C }; }, function () { return { C: C }; });
+    }, function (e) { return { err: e.message }; });
     return cc(host, d).then(function () { return p; }).then(function (r) { return kdMount(host, kdCcCfg(r.C, r.err)); });
   };
   AX_PANELS['藥事照會介入成效'] = axPcGroup; AX_PANELS['連貫照護整合成效'] = axCcGroup; AX_PANELS['整合病房減藥成效'] = axCcGroup;
