@@ -1207,7 +1207,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '3.8.0';
+var APP_VERSION = '3.8.1';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -6176,7 +6176,25 @@ function ccChart(host, R, opt) {
 }
 
 /* ---------- 卡片 1：本期總覽 ---------- */
-function ccSecHead(sec, title, sub, note) { axGrowthHead(sec, title, sub, note, false); }
+function ccSecHead(sec, title, sub, note) { axGrowthHead(sec, title, sub, note, false); axFocusBtn(sec, title); }
+/* 分析卡放大檢視（v3.8.1）：與後台圖表相同的放大行為；卡片重繪時保留放大狀態 */
+function axFocusBtn(sec, title) {
+  var head = sec.querySelector('.ax-head'); if (!head || head.querySelector('[data-focus]')) return;
+  var fb = document.createElement('button'); fb.type = 'button'; fb.className = 'iconbtn ax-focus'; fb.setAttribute('aria-label', '放大檢視「' + title + '」'); fb.setAttribute('aria-pressed', 'false'); fb.dataset.focus = '1'; fb.title = '放大檢視';
+  fb.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>';
+  fb.addEventListener('click', function () {
+    var card = fb.closest('.chart'); if (!card) return;
+    if (card.classList.contains('focused')) { unfocusChart(); return; }
+    unfocusChart();
+    var sc = document.createElement('div'); sc.className = 'focus-scrim'; sc.addEventListener('click', unfocusChart); document.body.appendChild(sc);
+    card.classList.add('focused'); fb.setAttribute('aria-pressed', 'true'); document.body.style.overflow = 'hidden';
+  });
+  var info = head.querySelector('.ax-info'); head.insertBefore(fb, info || null);
+}
+function axSwapCard(old, neu) {
+  if (old.classList && old.classList.contains('focused') && neu.classList) { neu.classList.add('focused'); var b = neu.querySelector('[data-focus]'); if (b) b.setAttribute('aria-pressed', 'true'); }
+  old.parentNode.replaceChild(neu, old);
+}
 function ccChip(st) { var c = axEl('span', 'cc-chip ' + st.cls, st.txt); if (st.note) c.title = st.note; return c; }
 function ccBaseSel(onChange) {
   var w = axEl('label', 'cc-sel'); w.appendChild(axEl('span', '', '管制界限基線'));
@@ -6206,7 +6224,7 @@ function ccKpiCard(host, M, end, FL, rerender) {
     t.appendChild(axEl('span', 'cc-kpi-v', last ? ccFmt(ind, last.v) : '—'));
     var meta = axEl('span', 'cc-kpi-m', last ? ccYmShort(last.ym) + (last.n && ind.type === 'p' ? '｜' + last.x + '／' + last.n : '') + (R.L ? '｜CL ' + ccFmt(ind, R.L.cl) : '') : '');
     t.appendChild(meta); t.appendChild(ccChart(t, R, { mini: true, w: 220, h: 40 })); t.appendChild(ccChip(R.st));
-    t.addEventListener('click', function () { CC.st.grp = ind.grp; CC.st.focus = ind.id; rerender('spc'); });
+    t.addEventListener('click', function () { unfocusChart(); CC.st.grp = ind.grp; CC.st.focus = ind.id; rerender('spc'); });
     t.setAttribute('aria-label', ind.name + '，' + (last ? ccFmt(ind, last.v) : '無資料') + '，' + R.st.txt);
     grid.appendChild(t);
   });
@@ -6460,7 +6478,7 @@ function axCcGroup(host, d) {
       var old = cards[k]; if (!old || !old.parentNode) return;
       var tmp = axEl('div', ''); tmp.style.cssText = 'grid-column:1/-1;width:' + old.offsetWidth + 'px;position:absolute;visibility:hidden;left:0';
       old.parentNode.insertBefore(tmp, old); var neu = B[k](tmp); tmp.remove();
-      if (neu) { old.parentNode.replaceChild(neu, old); cards[k] = neu; }
+      if (neu) { axSwapCard(old, neu); cards[k] = neu; }
     }
     function rerender(kind) {
       var y = window.pageYOffset || 0;
@@ -6739,7 +6757,7 @@ function pcKpiCard(host, M, F, re) {
     t.appendChild(ccChart(t, R, { mini: true, w: 220, h: 40 })); t.appendChild(ccChip(R.st));
     t.title = ind.name + '｜最近 ' + (last ? ccYmLab(last.ym) + '：' + (last.v === null ? '無資料' : ccFmt(ind, last.v)) : '無資料');
     t.setAttribute('aria-label', ind.name + '，' + t.querySelector('.cc-kpi-v').textContent + '，' + R.st.txt);
-    t.addEventListener('click', function () { PC.st.grp = ind.grp; PC.st.focus = ind.id; re('spc'); });
+    t.addEventListener('click', function () { unfocusChart(); PC.st.grp = ind.grp; PC.st.focus = ind.id; re('spc'); });
     grid.appendChild(t);
   });
   var leg = axEl('div', 'cc-legend'); leg.innerHTML = '<span><i class="cc-dot good"></i>特殊原因｜改善</span><span><i class="cc-dot bad"></i>特殊原因｜惡化</span><span><i class="cc-dot neu"></i>特殊原因｜無好壞方向</span><span><i class="cc-dot stable"></i>共同原因變異</span><span><i class="cc-dot na"></i>資料缺漏／基線不足</span>'; sec.appendChild(leg);
@@ -7047,7 +7065,7 @@ function axPcGroup(host, d) {
       var old = cards[k]; if (!old || !old.parentNode) return;
       var tmp = axEl('div', ''); tmp.style.cssText = 'grid-column:1/-1;width:' + old.offsetWidth + 'px;position:absolute;visibility:hidden;left:0';
       old.parentNode.insertBefore(tmp, old); var neu = B[k](tmp); tmp.remove();
-      if (neu) { old.parentNode.replaceChild(neu, old); cards[k] = neu; }
+      if (neu) { axSwapCard(old, neu); cards[k] = neu; }
     }
     function rerender(kind) {
       var y = window.pageYOffset || 0;
@@ -7181,7 +7199,7 @@ function kdCard(host, cfg) {
 /* 卡片重繪：保留位置 */
 function kdMount(host, cfg) {
   var holder = { el: null };
-  cfg.redo = function () { var old = holder.el; if (!old || !old.parentNode) return; var tmp = axEl('div', ''); old.parentNode.insertBefore(tmp, old); var y = window.pageYOffset || 0; Promise.resolve(kdCard(tmp, cfg)).then(function (neu) { var el = tmp.firstChild; if (el) { old.parentNode.replaceChild(el, old); holder.el = el; } tmp.remove(); window.scrollTo(0, y); }); };
+  cfg.redo = function () { var old = holder.el; if (!old || !old.parentNode) return; var tmp = axEl('div', ''); old.parentNode.insertBefore(tmp, old); var y = window.pageYOffset || 0; Promise.resolve(kdCard(tmp, cfg)).then(function (neu) { var el = tmp.firstChild; if (el) { axSwapCard(old, el); holder.el = el; } tmp.remove(); window.scrollTo(0, y); }); };
   var tmp0 = axEl('div', ''); host.appendChild(tmp0);
   return Promise.resolve(kdCard(tmp0, cfg)).then(function () { holder.el = tmp0.firstChild; host.replaceChild(holder.el, tmp0); return holder.el; });
 }
@@ -7243,7 +7261,7 @@ function gxKpiCard(host, id, title, sub, note, inds, kpis, C, F, st, re) {
     t.appendChild(axEl('span', 'cc-kpi-m', ind.type === 'u' ? '合計 ' + P.x + '｜' + F.win.length + ' 個月' : P.x + '／' + P.n + (P.n ? '（' + ccPct(P.ci[0], 0) + '–' + ccPct(P.ci[1], 0) + '）' : '')));
     t.appendChild(ccChart(t, R, { mini: true, w: 220, h: 40 })); t.appendChild(ccChip(R.st));
     t.setAttribute('aria-label', ind.name + '，' + t.querySelector('.cc-kpi-v').textContent + '，' + R.st.txt);
-    t.addEventListener('click', function () { st.grp = ind.grp; st.focus = ind.id; re('spc'); });
+    t.addEventListener('click', function () { unfocusChart(); st.grp = ind.grp; st.focus = ind.id; re('spc'); });
     grid.appendChild(t);
   });
   var leg = axEl('div', 'cc-legend'); leg.innerHTML = '<span><i class="cc-dot good"></i>特殊原因｜改善</span><span><i class="cc-dot bad"></i>特殊原因｜惡化</span><span><i class="cc-dot neu"></i>特殊原因｜無好壞方向</span><span><i class="cc-dot stable"></i>共同原因變異</span><span><i class="cc-dot na"></i>資料缺漏／基線不足</span>'; sec.appendChild(leg);
@@ -7274,7 +7292,7 @@ function gxSpcCard(host, id, pre, inds, grps, C, F, st, re) {
 }
 function gxGroup(host, B, order, kinds) {
   var cards = {};
-  function redo(k) { var old = cards[k]; if (!old || !old.parentNode) return; var tmp = axEl('div', ''); tmp.style.cssText = 'grid-column:1/-1;width:' + old.offsetWidth + 'px;position:absolute;visibility:hidden;left:0'; old.parentNode.insertBefore(tmp, old); var neu = B[k](tmp); tmp.remove(); if (neu && neu.nodeType) { old.parentNode.replaceChild(neu, old); cards[k] = neu; } }
+  function redo(k) { var old = cards[k]; if (!old || !old.parentNode) return; var tmp = axEl('div', ''); tmp.style.cssText = 'grid-column:1/-1;width:' + old.offsetWidth + 'px;position:absolute;visibility:hidden;left:0'; old.parentNode.insertBefore(tmp, old); var neu = B[k](tmp); tmp.remove(); if (neu && neu.nodeType) { axSwapCard(old, neu); cards[k] = neu; } }
   function re(kind) { var y = window.pageYOffset || 0; (kinds[kind] || []).forEach(redo); if (kind !== 'spc') window.scrollTo(0, y); }
   order.forEach(function (k) { cards[k] = B[k](host, re); });
   return re;
