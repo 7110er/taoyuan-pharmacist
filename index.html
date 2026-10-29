@@ -1207,7 +1207,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '3.8.1';
+var APP_VERSION = '3.8.2';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -3831,7 +3831,7 @@ function axApplyLayout(box, host, name) {
   (L.order || []).forEach(function (o) { kids.forEach(function (k) { if (out.indexOf(k) < 0 && layoutMatch(k, o)) out.push(k); }); });
   kids.forEach(function (k) { if (out.indexOf(k) < 0) out.push(k); });
   // 後台原始圖表收合（v3.2）：與分析區塊重複或判定來源不同的後台圖表，收在頁尾的摺疊區，仍可展開查看
-  var C = L.collapse || [], fold = [];
+  var C = host.dataset.nofold ? [] : (L.collapse || []), fold = [];
   out = out.filter(function (k) { var hit = k.dataset && k.dataset.title && !k.dataset.ax && C.some(function (re) { return re.test(k.dataset.title); }); if (hit) fold.push(k); return !hit; });
   out.forEach(function (k) { box.appendChild(k); });
   if (fold.length) { var dt = document.createElement('details'); dt.className = 'ax-fold'; var sm = document.createElement('summary'); sm.textContent = (L.collapseTitle || '後台原始圖表') + '（' + fold.length + ' 張）'; dt.appendChild(sm); var inner = axEl('div', 'ax-foldbody'); fold.forEach(function (k) { inner.appendChild(k); }); dt.appendChild(inner); box.appendChild(dt); }
@@ -7413,7 +7413,7 @@ function axEdGroup(host, d) {
       };
       gxGroup(host, B, ['kpi', 'spc', 'depth', 'mix', 'sat', 'dq'], { limits: ['kpi', 'spc'], spc: ['spc'], win: ['kpi', 'depth', 'mix', 'sat'] });
     });
-  }, function (e) { return kdMount(host, edKudosCfg(null, e.message)).then(function () { host.appendChild(axEl('div', 'chart ax-card state', '衛教諮詢分析資料讀不到（' + e.message + '）。後台原始圖表收在頁尾，可展開查看；管理者開放「衛教諮詢彙總」分頁後即顯示照護深度、滿意度判讀與資料品質。')); }); });
+  }, function (e) { host.dataset.nofold = '1'; return kdMount(host, edKudosCfg(null, e.message)).then(function () { host.appendChild(axEl('div', 'chart ax-card state', '衛教諮詢分析資料讀不到（' + e.message + '）。下方先顯示後台原始圖表；管理者開放「衛教諮詢彙總」分頁後即顯示照護深度、滿意度判讀與資料品質。')); }); });
 }
 
 /* ---------- 諮詢服務（藥品諮詢） ---------- */
@@ -7499,7 +7499,7 @@ function axCsGroup(host, d) {
       var B = { kpi: function (h, re) { return csKpiCard(h, C, F(), st, re); }, mix: function (h, re) { return csMixCard(h, C, F(), st, re); }, dq: function (h) { return csDqCard(h, C, F()); } };
       gxGroup(host, B, ['kpi', 'mix', 'dq'], { win: ['kpi', 'mix'] });
     });
-  }, function (e) { return kdMount(host, csKudosCfg(null, e.message)).then(function () { host.appendChild(axEl('div', 'chart ax-card state', '諮詢分析資料讀不到（' + e.message + '）。後台原始圖表收在頁尾，可展開查看。')); }); });
+  }, function (e) { host.dataset.nofold = '1'; return kdMount(host, csKudosCfg(null, e.message)).then(function () { host.appendChild(axEl('div', 'chart ax-card state', '諮詢分析資料讀不到（' + e.message + '）。下方先顯示後台原始圖表。')); }); });
 }
 
 /* ---------- 掛載：四個臨床成效儀表板 ---------- */
