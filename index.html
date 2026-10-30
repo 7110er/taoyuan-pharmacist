@@ -1021,6 +1021,62 @@ table.grid td{max-width:320px}
 .kd-a0{background:#1F7A8C}.kd-a1{background:#7FC0C9}.kd-a2{background:#3F98A6}.kd-a3{background:#E2A15B}.kd-a4{background:#B9C4C8}.kd-a5{background:#E3E8EA}
 .kd-dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
 @media (max-width:640px){.kd-chain4{grid-template-columns:repeat(2,minmax(0,1fr))}.kd-chain4 .pc-step::after{display:none}.kd-row{grid-template-columns:1fr}.kd-lab{padding-top:0}}
+/* ---------- PGY 個人化訓練課程（v3.9.0） ---------- */
+.tile.plan-tile{cursor:pointer;border-left-color:var(--teal-deep);transition:box-shadow .15s var(--ease),transform .15s var(--ease)}
+.tile.plan-tile:hover,.tile.plan-tile:focus-visible{box-shadow:0 6px 18px rgba(10,63,75,.14);transform:translateY(-1px);outline:2px solid var(--teal);outline-offset:1px}
+.pl-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.pl-b{font-size:.66rem;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--wash);color:var(--teal-deep);white-space:nowrap}
+.pl-b.warn{background:#FFF4DE;color:#8A5D0E}.pl-b.safe{background:var(--peach-wash);color:var(--peach)}
+.pl-dlg{width:min(920px,100%)}
+.pl-body{display:grid;gap:10px}
+.pl-note{margin:0;font-size:.8rem;line-height:1.5;padding:8px 10px;border-radius:var(--r-md);background:var(--wash-2);border-left:3px solid var(--teal)}
+.pl-note.warn{background:#FFF8EC;border-left-color:#C99A3A;color:#5C3D06}
+.pl-tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--rule-2);padding-bottom:2px;scrollbar-width:thin}
+.pl-tab{flex:0 0 auto;border:0;background:transparent;font:inherit;font-size:.84rem;padding:8px 12px;border-radius:8px 8px 0 0;color:var(--ink-2);cursor:pointer;min-height:40px}
+.pl-tab[aria-selected=true]{background:var(--wash);color:var(--teal-deep);font-weight:700;box-shadow:inset 0 -3px 0 var(--teal-deep)}
+.pl-tab:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
+.pl-pane{display:grid;gap:8px;min-width:0}
+.pl-h{margin:4px 0 0;font-size:.92rem}
+.pl-sum{margin:0;font-size:.8rem;color:var(--ink-2)}
+.pl-list{display:grid;gap:8px}
+.pl-row{border:1px solid var(--rule);border-left:4px solid var(--rule);border-radius:var(--r-md);padding:8px 10px;display:grid;gap:4px;background:var(--sheet);min-width:0}
+.pl-row.done{border-left-color:var(--ok)}.pl-row.exc{border-left-color:#B3261E}.pl-row.late{border-left-color:#C99A3A}.pl-row.wait{border-left-color:#8FB7BF}.pl-row.now{border-left-color:var(--teal-deep)}
+.pl-row.extra{background:#FFFBF2}
+.pl-rt{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.72rem;color:var(--ink-3)}
+.pl-code{font-family:var(--mono,monospace);font-size:.72rem;color:var(--ink-3)}
+.pl-tier{font-size:.66rem;padding:1px 7px;border-radius:999px;border:1px solid var(--rule);color:var(--ink-2)}
+.pl-tier.risk{border-color:#F0B9A6;color:var(--peach)}.pl-tier.extra{border-color:#E6C98A;color:#8A5D0E}
+.pl-st{margin-left:auto;font-size:.68rem;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--wash);color:var(--teal-deep)}
+.pl-st.done{background:var(--ok-soft);color:var(--ok)}.pl-st.exc{background:#FBE9E7;color:#B3261E}.pl-st.late{background:#FFF4DE;color:#8A5D0E}.pl-st.wait{background:#EEF4F5;color:#36646D}
+.pl-title{font-size:.86rem;line-height:1.4;word-break:break-word}
+.pl-meta{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:.72rem;color:var(--ink-2)}
+.pl-flag{font-size:.72rem;color:#8A5D0E;background:#FFF8EC;border-radius:6px;padding:2px 8px}
+.pl-why{font-size:.72rem;color:var(--ink-3)}
+.pl-det{border:1px solid var(--rule-2);border-radius:var(--r-md);padding:6px 10px;background:var(--wash-2)}
+.pl-det>summary{cursor:pointer;font-size:.8rem;font-weight:600;color:var(--teal-deep);padding:2px 0}
+.pl-det[open]{display:grid;gap:6px}
+.pl-det p{margin:0;font-size:.76rem;line-height:1.5}.pl-det p b{color:var(--ink-2)}
+.pl-month.cur>summary{color:var(--seal)}
+.pl-act{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pl-act .linkbtn{font-size:.76rem}
+.pl-act select,.pl-act input{width:auto;flex:1 1 160px}
+.pl-form{border:1px dashed var(--rule);border-radius:var(--r-md);padding:8px 10px;background:var(--sheet)}
+.pl-form select,.pl-form input{font:inherit;font-size:.84rem;border:1px solid var(--rule);border-radius:var(--r-md);padding:6px 8px;width:100%;box-sizing:border-box}
+.pl-form .btn,.pl-fb .btn,.pl-act .btn{min-height:36px;border-radius:999px;padding:0 14px;background:var(--teal-deep);color:#fff;border-color:var(--teal-deep);font-weight:700}
+.pl-msg{font-size:.76rem;color:var(--ink-2)}
+.pl-gt{display:grid;gap:2px;font-size:.76rem}
+.pl-gr{display:grid;grid-template-columns:1.1fr .8fr .8fr 1.2fr 2fr;gap:6px;padding:4px 6px;border-radius:6px;background:var(--sheet)}
+.pl-gr.head{background:transparent;font-weight:700;color:var(--ink-3)}.pl-gr.low{background:#FBE9E7}.pl-gr.un{background:#FFF8EC}
+.pl-gr span{min-width:0;word-break:break-word}
+.pl-step{font-size:.72rem;color:#8A5D0E;padding:0 6px}
+.pl-kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:8px}
+.pl-kv div{background:var(--wash-2);border-radius:var(--r-md);padding:8px 10px;display:grid;gap:2px}.pl-kv b{font-size:.7rem;color:var(--ink-3);font-weight:600}.pl-kv span{font-size:.9rem;font-weight:700}
+.pl-li{font-size:.76rem;padding:4px 0;border-bottom:1px dotted var(--rule-2);word-break:break-word}.pl-li.off{color:var(--ink-3);text-decoration:line-through}
+.pl-diff{font-size:.74rem;background:var(--sheet);border:1px solid var(--rule-2);border-radius:6px;padding:6px 8px;margin-top:4px}.pl-diff .add{color:var(--ok)}.pl-diff .del{color:#B3261E}
+.pl-ft .btn{min-height:38px}
+.pl-print{display:none}
+@media (max-width:640px){.pl-gr{grid-template-columns:1fr 1fr 1fr;}.pl-gr span:nth-child(4),.pl-gr span:nth-child(5){grid-column:span 3}.pl-st{margin-left:0}}
+@media print{body.pl-printing>*:not(.pl-print){display:none!important}body.pl-printing .pl-print{display:block;font-size:10pt;color:#000}.pl-print h2{font-size:13pt}.pl-print h3{font-size:10.5pt;margin:8pt 0 2pt;break-after:avoid}.pl-print ul{margin:0 0 4pt 14pt;padding:0}.pl-print li{margin:0;break-inside:avoid}}
 </style>
 </head>
 <body>
@@ -1207,7 +1263,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '3.8.3';
+var APP_VERSION = '3.9.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -1215,7 +1271,25 @@ var S = {
 };
 
 /* ---------- 後端呼叫 ---------- */
+/* 後台每筆個人資料讀取都要寫入稽核鏈（單一文件鎖）；同時送出太多查詢時會搶不到鎖而回 AUDIT_UNAVAILABLE。
+   前台限制資料查詢同時最多 3 筆，遇 AUDIT_UNAVAILABLE 間隔 3–7 秒自動重試 2 次（只讀，不重複寫入資料） */
+var API_Q = { max: 3, n: 0, wait: [] };
 function api(action, payload) {
+  if (action !== 'sheet' && action !== 'dashboard' && !(action === 'plan' && payload && /^(get|lib|diff)$/.test(payload.op))) return apiRaw(action, payload);
+  var tries = 0;
+  function slot() { return new Promise(function (res) { if (API_Q.n < API_Q.max) { API_Q.n++; res(); } else API_Q.wait.push(res); }); }
+  function free() { var nx = API_Q.wait.shift(); if (nx) nx(); else API_Q.n--; }
+  function run() {
+    return slot().then(function () {
+      return apiRaw(action, payload).then(function (j) { free(); return j; }, function (e) { free(); throw e; });
+    }).catch(function (e) {
+      if (e && e.code === 'AUDIT_UNAVAILABLE' && tries++ < 2) return new Promise(function (res) { setTimeout(res, 3000 + Math.random() * 4000); }).then(run);
+      throw e;
+    });
+  }
+  return run();
+}
+function apiRaw(action, payload) {
   var body = Object.assign({ action: action }, payload || {});
   if (S.session && action !== 'login' && action !== 'config') body.session = S.session;
   var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
@@ -1484,6 +1558,9 @@ var EMPTY_TEXT = {
   NOT_APPLICABLE: '此指標目前不適用。',
   DATA_ERROR: '資料設定有誤，請通知管理者。'
 };
+/* 後台權限設定發布後，快照與圖表需分批重建（每批約 3 分鐘）；期間回傳 NOT_READY 或 DATA_ERROR＋「重建中」，屬暫時狀態 */
+var REBUILD_TEXT = '資料重建中：權限設定更新後，後台分批重建資料（通常 5–15 分鐘），本頁會自動重試。';
+function isRebuild(c) { return !!c && ((c.status === 'DATA_ERROR' && /重建中/.test(String(c.reason || ''))) || c.code === 'NOT_READY'); }
 var REASON_TEXT = {
   PRIV_SMALL_CELL: '人數少於最低門檻。', PRIV_COMPLEMENTARY_SUPPRESSION: '為避免由其他數字相減推算個人，一併隱藏。',
   PRIV_N_UNKNOWN: '來源資料未提供人數，無法確認已達最低門檻。', PRIV_ASSESSOR_SMALL: '評核者人數不足，為保護評核者匿名暫不顯示。'
@@ -2623,8 +2700,10 @@ function renderDashboard() {
     kp.appendChild(t);
   });
   var nSupp = d.charts.filter(function (c) { return c.status === 'SUPPRESSED_PRIVACY'; }).length;
-  var nErr = d.charts.filter(function (c) { return c.status === 'DATA_ERROR'; }).length;
-  setChips([chip('clock', '資料更新 ' + (d.updatedAt || '—')), chip('lock', '人數不足自動隱藏'), nSupp ? chip('lock', nSupp + ' 張圖因樣本數不足未顯示') : null, nErr ? chip('alert', nErr + ' 張圖設定待修正', true) : null]);
+  var nRb = d.charts.filter(isRebuild).length;
+  var nErr = d.charts.filter(function (c) { return c.status === 'DATA_ERROR' && !isRebuild(c); }).length;
+  setChips([chip('clock', '資料更新 ' + (d.updatedAt || '—')), chip('lock', '人數不足自動隱藏'), nSupp ? chip('lock', nSupp + ' 張圖因樣本數不足未顯示') : null, nRb ? chip('clock', nRb + ' 張圖資料重建中，自動重試', true) : null, nErr ? chip('alert', nErr + ' 張圖設定待修正', true) : null]);
+  if (nRb) axRebuildRetry();
   var ok = d.charts.filter(function (c) { return c.status === 'OK'; }).length;
   if (!d.charts.length) ok = 0;
   var maxN = null, maxSubj = null;
@@ -2638,6 +2717,7 @@ function renderDashboard() {
   if (maxN !== null && !axPersonal && !kp.querySelector('.tile:not(.meta)')) kp.appendChild(metaTile('紀錄筆數', maxN.toLocaleString('zh-TW'), '本頁紀錄最多之圖表'));
   if (maxSubj !== null && !axPersonal) kp.appendChild(metaTile('受評人數', maxSubj.toLocaleString('zh-TW'), '本頁人數最多之群體圖表（不同人）'));
   if (personal && subjLabel) kp.appendChild(metaTile('檢視對象', subjLabel, '', true));
+  if (typeof PLAN_ON !== 'undefined' && PLAN_ON && personal && d.subject && planIsPage(d)) kp.appendChild(planTile(d.subject, subjLabel));
   d.charts.forEach(function (c) { if (!(c.type === '數字卡' && c.status === 'OK')) box.appendChild(chartCard(c)); });
   try { enhanceDashboard(d, box); } catch (e) { if (window.console) console.error(e); }
 }
@@ -2744,11 +2824,12 @@ function renderOverview(catKey) {
   if (!wrap.children.length) { box.innerHTML = '<div class="panel state">' + EMPTY_TEXT.NO_PERMISSION + '</div>'; return; }
   box.appendChild(wrap);
   var gen = ++S.dashReq;
+  var ovRetry = function () { if (S.ovTimer || (S.ovTries = (S.ovTries || 0) + 1) > 20) return; S.ovTimer = setTimeout(function () { S.ovTimer = null; if (gen === S.dashReq) renderOverview(catKey); }, 60000); };
   var next = function () {
     var q = queue.shift(); if (!q || gen !== S.dashReq) return;
     var hit = S.ovCache[q.id];
-    var p = hit ? Promise.resolve(hit) : api('dashboard', { id: q.id, year: '', month: '', filters: {}, subject: '' }).then(function (j) { S.ovCache[q.id] = j.data; return j.data; });
-    p.then(function (d) { if (gen === S.dashReq) fillBoardCard(q.body, Object.assign({}, d, { charts: visibleCharts(d, q.name) })); }, function (e) { if (gen === S.dashReq) q.body.innerHTML = '<div class="bc-hero"><span class="ld">' + esc(e.code === 'NO_PERMISSION' ? EMPTY_TEXT.NO_PERMISSION : '載入失敗：' + e.message) + '</span></div>'; })
+    var p = hit ? Promise.resolve(hit) : api('dashboard', { id: q.id, year: '', month: '', filters: {}, subject: '' }).then(function (j) { if (!(j.data.charts || []).some(isRebuild)) S.ovCache[q.id] = j.data; return j.data; });
+    p.then(function (d) { if (gen === S.dashReq) { fillBoardCard(q.body, Object.assign({}, d, { charts: visibleCharts(d, q.name) })); if ((d.charts || []).some(isRebuild)) ovRetry(); } }, function (e) { if (gen === S.dashReq) { q.body.innerHTML = '<div class="bc-hero"><span class="ld">' + esc(e.code === 'NO_PERMISSION' ? EMPTY_TEXT.NO_PERMISSION : isRebuild(e) ? '資料重建中，稍後再看' : '載入失敗：' + e.message) + '</span></div>'; if (isRebuild(e)) ovRetry(); } })
       .then(next);
   };
   next(); next(); next();
@@ -2769,7 +2850,8 @@ function boardKpis(d) {
 function fillBoardCard(body, d) {
   body.innerHTML = '';
   var cnt = { OK: 0, SUPP: 0, OTHER: 0 };
-  d.charts.forEach(function (c) { if (c.status === 'OK') cnt.OK++; else if (c.status === 'SUPPRESSED_PRIVACY') cnt.SUPP++; else cnt.OTHER++; });
+  var nRb = 0;
+  d.charts.forEach(function (c) { if (isRebuild(c)) nRb++; if (c.status === 'OK') cnt.OK++; else if (c.status === 'SUPPRESSED_PRIVACY') cnt.SUPP++; else cnt.OTHER++; });
   var maxN = null; d.charts.forEach(function (c) { var n = c.meta && c.meta.assessment_n; if (typeof n === 'number' && (maxN === null || n > maxN)) maxN = n; });
   var ks = boardKpis(d);
   if (maxN !== null) ks.push({ label: '紀錄筆數', value: maxN.toLocaleString('zh-TW') });
@@ -2777,7 +2859,7 @@ function fillBoardCard(body, d) {
   if (ks.length) {
     var st = document.createElement('strong'); st.textContent = ks[0].value; hero.appendChild(st);
     var lb = document.createElement('span'); lb.textContent = ks[0].label; hero.appendChild(lb);
-  } else { var no = document.createElement('span'); no.className = 'ld'; no.textContent = d.charts.length ? '無可彙總的數字' : EMPTY_TEXT.NO_DATA; hero.appendChild(no); }
+  } else { var no = document.createElement('span'); no.className = 'ld'; no.textContent = nRb ? '資料重建中，稍後再看' : d.charts.length ? '無可彙總的數字' : EMPTY_TEXT.NO_DATA; hero.appendChild(no); }
   body.appendChild(hero);
   if (ks.length > 1) {
     var sub = document.createElement('dl'); sub.className = 'bc-sub';
@@ -2790,7 +2872,7 @@ function fillBoardCard(body, d) {
   [[cnt.OK, 'var(--teal)'], [cnt.SUPP, 'var(--rule)'], [cnt.OTHER, 'var(--warn)']].forEach(function (x) { if (!x[0]) return; var i = document.createElement('i'); i.style.flex = String(x[0]); i.style.background = x[1]; bar.appendChild(i); });
   foot.appendChild(bar);
   var txt = document.createElement('small');
-  txt.textContent = cnt.OK + '／' + d.charts.length + ' 張圖表可顯示';
+  txt.textContent = cnt.OK + '／' + d.charts.length + ' 張圖表可顯示' + (nRb ? '（' + nRb + ' 張重建中）' : '');
   foot.title = '可顯示 ' + cnt.OK + '｜樣本數不足 ' + cnt.SUPP + '｜無資料或待設定 ' + cnt.OTHER;
   foot.appendChild(txt);
   body.appendChild(foot);
@@ -2853,7 +2935,7 @@ function chartCard(c) {
     body.innerHTML = '';
     if (c.status !== 'OK') {
       var st = document.createElement('div'); st.className = 'state' + (c.status === 'SUPPRESSED_PRIVACY' ? ' supp-state' : '');
-      st.textContent = (EMPTY_TEXT[c.status] || c.status) + (REASON_TEXT[c.reason] ? ' ' + REASON_TEXT[c.reason] : '');
+      st.textContent = isRebuild(c) ? REBUILD_TEXT : (EMPTY_TEXT[c.status] || c.status) + (REASON_TEXT[c.reason] ? ' ' + REASON_TEXT[c.reason] : '');
       body.appendChild(st); return;
     }
     try {
@@ -3557,6 +3639,14 @@ function axEl(tag, cls, text) { var e = document.createElement(tag); if (cls) e.
 
 /* ---------- 資料載入（同一次瀏覽只抓一次） ---------- */
 function axKey(k) { return AX.KEYS[k] && !/^AX_/.test(AX.KEYS[k]) ? AX.KEYS[k] : (AX.resolved && AX.resolved[k]) || ''; }
+/* 重建期間每 60 秒重新載入目前儀表板（最多 20 次；換頁即停止） */
+function axRebuildRetry(still) {
+  if (S.rbTimer) return;
+  if (S.rbId !== S.dashId) { S.rbId = S.dashId; S.rbTries = 0; }
+  S.rbTries = (S.rbTries || 0) + 1; if (S.rbTries > 20) return;
+  var id = S.dashId, gen = S.dashReq; // 換頁或使用者重新查詢（dashReq 改變）即不重載
+  S.rbTimer = setTimeout(function () { S.rbTimer = null; if (S.dashId !== id || S.dashReq !== gen || (still && !still())) return; S.ovCache = {}; AX.cache = {}; loadDashboard(false); }, 60000);
+}
 function axLoad(key) {
   if (!key) return Promise.reject({ code: 'NO_KEY', message: '分析分頁尚未登錄' });
   if (AX.cache[key]) return Promise.resolve(AX.cache[key]);
@@ -3819,7 +3909,8 @@ function enhanceDashboard(d, box) {
   var gen = S.dashReq;
   Promise.resolve().then(function () { return fn(host, d); }).then(function () { ld.remove(); if (gen === S.dashReq) { axApplyLayout(box, host, name); if (catOfId(S.dashId) === 'personal') axPeerApply(); } }, function (e) {
     if (gen !== S.dashReq) return; ld.classList.remove('ax-loading'); ld.className = 'chart ax-card';
-    ld.innerHTML = ''; ld.appendChild(axEl('div', 'state', e && e.code === 'NO_PERMISSION' ? (AX_NOPERM[name] || '目前角色無法讀取此分析資料。') : '分析資料暫時無法載入：' + ((e && e.message) || e)));
+    ld.innerHTML = ''; ld.appendChild(axEl('div', 'state', e && e.code === 'NO_PERMISSION' ? (AX_NOPERM[name] || '目前角色無法讀取此分析資料。') : isRebuild(e) ? REBUILD_TEXT : '分析資料暫時無法載入：' + ((e && e.message) || e)));
+    if (isRebuild(e)) axRebuildRetry();
     axApplyLayout(box, host, name);
   });
 }
@@ -6629,7 +6720,7 @@ function pcLoad(d) {
   var key = pcFindKey();
   function basic(why) { var b = pcFromCharts(d); if (!b.R.length) throw { code: 'NO_DATA', message: why + '；本頁後台圖表亦無可計算資料' }; var M = pcIndex(b.R); M.mode = 'basic'; M.why = why; M.used = b.used; return M; }
   if (!key) return Promise.resolve(basic('尚未開放「藥事照會 PCNE 彙總」分頁'));
-  return axLoad(key).then(function (src) { var M = pcIndex(pcParseAgg(src)); M.mode = 'full'; return M; }, function (e) { return basic(e && e.code === 'NO_PERMISSION' ? '目前角色無法讀取「藥事照會 PCNE 彙總」' : '「藥事照會 PCNE 彙總」暫時無法載入'); })
+  return axLoad(key).then(function (src) { var M = pcIndex(pcParseAgg(src)); M.mode = 'full'; return M; }, function (e) { if (isRebuild(e)) axRebuildRetry(); return basic(e && e.code === 'NO_PERMISSION' ? '目前角色無法讀取「藥事照會 PCNE 彙總」' : isRebuild(e) ? REBUILD_TEXT : '「藥事照會 PCNE 彙總」暫時無法載入'); })
     .catch(function (e) { if (e && e.code === 'NO_DATA') throw e; return basic((e && e.message) || '彙總分頁格式不符'); });
 }
 
@@ -6738,7 +6829,7 @@ function pcTable(head, rows, cls) {
 }
 function pcTr(cells, cls) { var tr = document.createElement('tr'); if (cls) tr.className = cls; cells.forEach(function (c, i) { if (c && c.nodeType) { var td = axEl(i ? 'td' : 'th', ''); td.appendChild(c); tr.appendChild(td); } else tr.appendChild(axEl(i ? 'td' : 'th', '', c)); }); return tr; }
 function pcBarLab(text, frac, sub) { var w = axEl('span', 'pc-bl'); w.appendChild(axEl('span', '', text)); if (sub) w.appendChild(axEl('small', '', sub)); var b = axEl('i', 'cc-pbar'); b.style.width = Math.max(0, Math.min(1, frac)) * 100 + '%'; w.appendChild(b); return w; }
-function pcBasicNote(sec, M, what) { if (M.mode !== 'basic') return; var p = axEl('p', 'pc-basic'); p.textContent = '降級模式：' + what + '需「藥事照會 PCNE 彙總」分頁（' + M.why + '）。'; sec.appendChild(p); }
+function pcBasicNote(sec, M, what) { if (M.mode !== 'basic') return; var p = axEl('p', 'pc-basic'); p.textContent = M.why === REBUILD_TEXT ? '暫用後台圖表：' + REBUILD_TEXT : '降級模式：' + what + '需「藥事照會 PCNE 彙總」分頁（' + M.why + '）。'; sec.appendChild(p); }
 
 /* ---------- 卡片 1：本期總覽 ---------- */
 function pcKpiCard(host, M, F, re) {
@@ -7125,7 +7216,7 @@ function kdLoadCube(titles, srcRe, need) {
     if (!rows.length) throw { message: '「' + titles[0] + '」目前沒有資料列' };
     var by = {}; rows.forEach(function (r) { (by[r.ym] = by[r.ym] || []).push(r); });
     return { rows: rows, yms: yms, by: by, cols: c };
-  }, function (e) { throw { code: e && e.code, message: e && e.code === 'NO_PERMISSION' ? '目前角色無法讀取「' + titles[0] + '」' : '「' + titles[0] + '」暫時無法載入' }; });
+  }, function (e) { throw { code: e && e.code, message: e && e.code === 'NO_PERMISSION' ? '目前角色無法讀取「' + titles[0] + '」' : isRebuild(e) ? REBUILD_TEXT : '「' + titles[0] + '」暫時無法載入' }; });
 }
 
 /* ---------- 判定引擎 ---------- */
@@ -7208,7 +7299,7 @@ function kdMount(host, cfg) {
 function kdPcUnits(M, dim, fn) { var out = []; Object.keys(M.idx).forEach(function (ym) { var d = M.idx[ym][dim]; if (!d) return; Object.keys(d).forEach(function (c) { var p = c.split('｜'), u = fn(p[0], p.slice(1).join('｜'), d[c]); if (u) { u.ym = ym; u.who = p[0]; out.push(u); } }); }); return out; }
 function kdPcCfg(M) {
   var cfg = { id: 'pcKudos', note: '<b>資料</b>：「藥事照會 PCNE 彙總」的照會者（我的姓名）維度；PGY 學員登錄的照會一併納入。' };
-  if (M.mode !== 'full' || !M.dims['人員']) { cfg.err = '深度照護亮點需「藥事照會 PCNE 彙總」分頁（含人員維度，v3.8.0 公式）。' + (M.why ? '目前：' + M.why + '。' : ''); cfg.facets = []; return cfg; }
+  if (M.mode !== 'full' || !M.dims['人員']) { cfg.err = M.why === REBUILD_TEXT ? REBUILD_TEXT : '深度照護亮點需「藥事照會 PCNE 彙總」分頁（含人員維度，v3.8.0 公式）。' + (M.why ? '目前：' + M.why + '。' : ''); cfg.facets = []; return cfg; }
   cfg.facets = [
     { id: 'impl', name: '建議落實到醫囑', crit: '接受且完全執行（PCNE A1.1）比率不低於團隊，期間 ≥3 件', minDen: 3, minNum: 2, why: '分母為已知接受結果的建議', units: kdPcUnits(M, '人員', function (w, c, s) { return { x: s.A['A1.1'] || 0, n: s.G.A1 + s.G.A2 }; }) },
     { id: 'ref', name: '實證依據', crit: '照會載明參考文獻或臨床指引的比率不低於團隊，期間 ≥3 件', minDen: 3, minNum: 2, units: kdPcUnits(M, '人員×參考', function (w, c, s) { return { x: c === '有' ? s.n : 0, n: s.n }; }) },
@@ -7225,7 +7316,7 @@ var KD_CC_T = ['連貫照護人員彙總', '儀表板用_人員'];
 function kdCubeUnits(C, fn) { var out = []; C.rows.forEach(function (r) { var u = fn(r.c, r.n); if (u) { u.ym = r.ym; u.who = r.c['人員']; out.push(u); } }); return out; }
 function kdCcCfg(C, err) {
   var cfg = { id: 'ccKudos', note: '<b>資料</b>：整合病房「照會統整」經「儀表板用_人員」分頁彙總（照會者代碼以控制台同仁名冊對應姓名，對應不到者不參與）。整合病房藥師人數少，亮點以「達到條件」解讀，不作人與人比較。' };
-  if (err) { cfg.err = '深度照護亮點需「連貫照護人員彙總」分頁：' + err + '。'; cfg.facets = []; return cfg; }
+  if (err) { cfg.err = err === REBUILD_TEXT ? REBUILD_TEXT : '深度照護亮點需「連貫照護人員彙總」分頁：' + err + '。'; cfg.facets = []; return cfg; }
   cfg.facets = [
     { id: 'fu', name: '出院後追蹤', crit: '照會有後續追蹤紀錄的比率不低於團隊，期間 ≥5 件', minDen: 5, minNum: 2, units: kdCubeUnits(C, function (c, n) { return { x: c['後續追蹤'] === '有' ? n : 0, n: n }; }) },
     { id: 'mc', name: '多重原因評估', crit: '記錄第二原因的比率不低於團隊，期間 ≥5 件', minDen: 5, minNum: 2, units: kdCubeUnits(C, function (c, n) { return { x: c['多重原因'] === '有' ? n : 0, n: n }; }) },
@@ -7317,7 +7408,7 @@ var ED_IND = [
 var ED_GRPS = [['core', '照護深度'], ['sat', '病人回饋'], ['dq', '紀錄品質']];
 function edKudosCfg(C, err) {
   var cfg = { id: 'edKudos', note: '<b>資料</b>：「衛教諮詢_簡版」→「儀表板用_衛教」彙總；以員工編號對應同仁姓名，只計藥師角色。<b>不以件數或滿意度評選</b>：件數取決於窗口排班，滿意度有預設值問題。' };
-  if (err) { cfg.err = '深度照護亮點需「衛教諮詢彙總」分頁：' + err + '。'; cfg.facets = []; return cfg; }
+  if (err) { cfg.err = err === REBUILD_TEXT ? REBUILD_TEXT : '深度照護亮點需「衛教諮詢彙總」分頁：' + err + '。'; cfg.facets = []; return cfg; }
   function U(fn) { return kdCubeUnits(C, function (c, n) { return edPh(c) ? fn(c, n) : null; }); }
   cfg.facets = [
     { id: 'find', name: '主動發現問題', crit: '紀錄「發現問題」的比率不低於團隊，期間 ≥20 筆', minDen: 20, minNum: 2, units: U(function (c, n) { return { x: c['發現問題'] ? n : 0, n: n }; }) },
@@ -7413,7 +7504,7 @@ function axEdGroup(host, d) {
       };
       gxGroup(host, B, ['kpi', 'spc', 'depth', 'mix', 'sat', 'dq'], { limits: ['kpi', 'spc'], spc: ['spc'], win: ['kpi', 'depth', 'mix', 'sat'] });
     });
-  }, function (e) { host.dataset.nofold = '1'; return kdMount(host, edKudosCfg(null, e.message)).then(function () { host.appendChild(axEl('div', 'chart ax-card state', '衛教諮詢分析資料讀不到（' + e.message + '）。下方先顯示後台原始圖表；管理者開放「衛教諮詢彙總」分頁後即顯示照護深度、滿意度判讀與資料品質。')); }); });
+  }, function (e) { host.dataset.nofold = '1'; var rb = isRebuild(e); if (rb) axRebuildRetry(); return kdMount(host, edKudosCfg(null, e.message)).then(function () { host.appendChild(axEl('div', 'chart ax-card state', rb ? REBUILD_TEXT + '下方先顯示後台原始圖表。' : '衛教諮詢分析資料讀不到（' + e.message + '）。下方先顯示後台原始圖表；管理者開放「衛教諮詢彙總」分頁後即顯示照護深度、滿意度判讀與資料品質。')); }); });
 }
 
 /* ---------- 諮詢服務（藥品諮詢） ---------- */
@@ -7422,7 +7513,7 @@ function csPro(c) { return /醫師|護理|專科/.test(c['諮詢對象']); }
 function csQ(ym) { return ym.slice(0, 4) + 'Q' + Math.ceil(+ym.slice(5, 7) / 3); }
 function csKudosCfg(C, err) {
   var cfg = { id: 'csKudos', note: '<b>資料</b>：教學資源「諮詢問題」→「儀表板用_諮詢」彙總；藥師姓名去除括號序號後歸併。諮詢件數少，建議切換「半年」或「年」檢視。' };
-  if (err) { cfg.err = '深度照護亮點需「藥品諮詢彙總」分頁：' + err + '。'; cfg.facets = []; return cfg; }
+  if (err) { cfg.err = err === REBUILD_TEXT ? REBUILD_TEXT : '深度照護亮點需「藥品諮詢彙總」分頁：' + err + '。'; cfg.facets = []; return cfg; }
   cfg.facets = [
     { id: 'ev', name: '實證回覆', crit: '回覆引用文獻或指引的比率不低於團隊，期間 ≥3 件', minDen: 3, minNum: 2, units: kdCubeUnits(C, function (c, n) { return { x: c['引用來源'] !== '（未引用）' ? n : 0, n: n }; }) },
     { id: 'multi', name: '多重來源查證', crit: '回覆引用兩種以上資料來源的比率不低於團隊，期間 ≥3 件', minDen: 3, minNum: 1, units: kdCubeUnits(C, function (c, n) { return { x: /、/.test(c['引用來源']) ? n : 0, n: n }; }) },
@@ -7499,7 +7590,7 @@ function axCsGroup(host, d) {
       var B = { kpi: function (h, re) { return csKpiCard(h, C, F(), st, re); }, mix: function (h, re) { return csMixCard(h, C, F(), st, re); }, dq: function (h) { return csDqCard(h, C, F()); } };
       gxGroup(host, B, ['kpi', 'mix', 'dq'], { win: ['kpi', 'mix'] });
     });
-  }, function (e) { host.dataset.nofold = '1'; return kdMount(host, csKudosCfg(null, e.message)).then(function () { host.appendChild(axEl('div', 'chart ax-card state', '諮詢分析資料讀不到（' + e.message + '）。下方先顯示後台原始圖表。')); }); });
+  }, function (e) { host.dataset.nofold = '1'; var rb = isRebuild(e); if (rb) axRebuildRetry(); return kdMount(host, csKudosCfg(null, e.message)).then(function () { host.appendChild(axEl('div', 'chart ax-card state', rb ? REBUILD_TEXT + '下方先顯示後台原始圖表。' : '諮詢分析資料讀不到（' + e.message + '）。下方先顯示後台原始圖表。')); }); });
 }
 
 /* ---------- 掛載：四個臨床成效儀表板 ---------- */
@@ -7509,8 +7600,8 @@ function axCsGroup(host, d) {
   axCcGroup = function (host, d) {
     var p = kdLoadCube(KD_CC_T, /連貫照護|整合病房/, ['人員', '問題類別', '後續追蹤']).then(function (C) {
       var pk = pcFindKey(); if (!pk) return { C: C };
-      return axLoad(pk).then(function (src) { var ci = src.cols.indexOf('維度'), cc = src.cols.indexOf('類別'), map = {}; src.rows.forEach(function (r) { if (r[ci] !== '人員') return; var m = /^([A-Za-z]{0,2}\d+)\s+(.+)$/.exec(String(r[cc] || '').trim()); if (m) map[m[1].toUpperCase()] = m[1].toUpperCase() + ' ' + m[2]; }); C.rows.forEach(function (r) { var k = String(r.c['人員'] || '').toUpperCase(); if (map[k]) r.c['人員'] = map[k]; }); return { C: C }; }, function () { return { C: C }; });
-    }, function (e) { return { err: e.message }; });
+      return axLoad(pk).then(function (src) { var ci = src.cols.indexOf('維度'), cc = src.cols.indexOf('類別'), map = {}; src.rows.forEach(function (r) { if (r[ci] !== '人員') return; var m = /^([A-Za-z]{0,2}\d+)\s+(.+)$/.exec(String(r[cc] || '').trim()); if (m) map[m[1].toUpperCase()] = m[1].toUpperCase() + ' ' + m[2]; }); C.rows.forEach(function (r) { var k = String(r.c['人員'] || '').toUpperCase(); if (map[k]) r.c['人員'] = map[k]; else if (/^[A-Z]{1,2}\d+$/.test(k)) r.c['人員'] = k + ' 代碼' + k + '（未對應姓名）'; }); return { C: C }; }, function () { return { C: C }; });
+    }, function (e) { if (isRebuild(e)) axRebuildRetry(); return { err: e.message }; });
     return cc(host, d).then(function () { return p; }).then(function (r) { return kdMount(host, kdCcCfg(r.C, r.err)); });
   };
   AX_PANELS['藥事照會介入成效'] = axPcGroup; AX_PANELS['連貫照護整合成效'] = axCcGroup; AX_PANELS['整合病房減藥成效'] = axCcGroup;
@@ -7519,6 +7610,353 @@ function axCsGroup(host, d) {
 
 /*AX-END*/
 
+/* ====================================================================
+ * PGY 個人化訓練課程安排（方案 B）前端｜v3.9.0
+ * 前端只顯示後台快照，不自行計算課表；權限、版本、例外、覆寫一律由後台判定。
+ * ==================================================================== */
+var PLAN_ON = true; // 功能旗標：false 時卡片不出現，其他儀表板不受影響（回滾步驟 1）
+S.plan = { cache: {}, lib: null, libHash: '', open: null };
+function planIsPage(d) { return /PGY\s*學員個人成績/.test(dashName(S.dashId) || (d && d.name) || ''); }
+function planNonce() { return 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function planApi(op, pid, extra) {
+  var p = Object.assign({ op: op, subject: pid }, extra || {});
+  return api('plan', p);
+}
+function planStore(pid, data) { try { sessionStorage.setItem('plan:' + pid, JSON.stringify({ at: Date.now(), d: data })); } catch (e) { /* 無痕模式 */ } }
+function planRecall(pid) { try { var j = JSON.parse(sessionStorage.getItem('plan:' + pid) || 'null'); return j && j.d ? j : null; } catch (e) { return null; } }
+function planFetch(pid, force) {
+  var c = S.plan.cache[pid];
+  if (c && !force && Date.now() - c.at < 120000) return Promise.resolve(c);
+  return planApi('get', pid).then(function (j) {
+    var o = { at: Date.now(), d: j, stale: false }; S.plan.cache[pid] = o; planStore(pid, j); return o;
+  }, function (e) {
+    if (e && (e.code === 'PLAN_OFF' || e.code === 'NO_PERMISSION' || e.code === 'INVALID_QUERY')) throw e;
+    var r = planRecall(pid); if (r) { var o = { at: r.at, d: r.d, stale: true, err: e }; S.plan.cache[pid] = o; return o; }
+    throw e;
+  });
+}
+function planLib() {
+  if (S.plan.lib) return Promise.resolve(S.plan.lib);
+  return planApi('lib').then(function (j) {
+    var m = {}; (j.topics || []).forEach(function (t) { m[t[0]] = { code: t[0], title: t[1], laneName: t[2], type: t[3], tier: t[4], comps: t[5], epas: t[6], milestones: t[7], level: t[8], tool: t[9], pass: t[10], critical: t[11], exposure: t[12], risk: t[13], qual: t[14], supervision: t[15], venue: t[16], hours: t[17], objective: t[18], method: t[19], teacher: t[20], sop: t[21], sopVer: t[22], sopDate: t[23], verdict: t[24], verdictNote: t[25], threshold: t[26] }; });
+    S.plan.lib = { map: m, hash: j.hash, version: j.version, status: j.versionStatus, approved: j.approved, reason: j.reason, passUndefined: j.passUndefined }; return S.plan.lib;
+  });
+}
+var PLAN_TYPE = { K: '知識', R: '閱讀', P: '專題', C: '病例討論', S: '模擬', W: '職場實作', A: '階段評量' };
+function planStatusCls(s) { return /^完成/.test(s) ? 'done' : /^例外/.test(s) ? 'exc' : /逾期/.test(s) ? 'late' : /待結案/.test(s) ? 'wait' : s === '進行中' ? 'now' : 'plan'; }
+function planBadgeCls(b) { return /預覽|逾期|衝突|資料問題|未確認/.test(b) ? 'warn' : /病安|限制/.test(b) ? 'safe' : 'ok'; }
+
+/* ---------- KPI 列卡片 ---------- */
+function planTile(pid, label) {
+  var t = axEl('section', 'tile plan-tile'); t.setAttribute('role', 'button'); t.tabIndex = 0; t.setAttribute('aria-label', '個人化訓練課程安排：開啟');
+  t.appendChild(axEl('h3', '', '個人化 訓練課程安排'));
+  var v = axEl('div', 'tv sm', '載入中…'); t.appendChild(v);
+  var n = axEl('small', 'note', ''); t.appendChild(n);
+  var bd = axEl('div', 'pl-badges'); t.appendChild(bd);
+  var open = function () { planOpen(pid, label); };
+  t.addEventListener('click', open); t.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+  planFetch(pid).then(function (o) {
+    var j = o.d;
+    if (j.none) { v.textContent = '尚未建立'; n.textContent = j.message; return; }
+    var p = j.plan || {};
+    if (p.status !== 'OK') { v.textContent = p.status === 'NO_START' ? '尚未建立' : '暫停產生'; n.textContent = (p.reasons || []).join('；'); return; }
+    var cur = p.current, pm = cur >= 1 && cur <= 24 ? p.perMonth[cur - 1] : null;
+    v.textContent = cur === 0 ? '尚未起訓' : cur >= 25 ? '已結訓（24／24 月）' : '第 ' + cur + '／24 月' + (p.months[cur - 1].kind === '階段評量月' ? '・階段評量月' : '');
+    var last = (j.versions || [])[0];
+    n.textContent = (pm ? '本月 ' + pm.n + (pm.extra ? '＋' + pm.extra : '') + ' 項、約 ' + pm.hours + ' 小時' : '') + (last ? '｜上次重排：' + String(last.trigger || '').split('；')[0].slice(0, 40) + '（' + String(last.at).slice(0, 10) + '）' : '') + (o.stale ? '｜可能不是最新' : '');
+    (p.badges || []).forEach(function (b) { bd.appendChild(axEl('span', 'pl-b ' + planBadgeCls(b), b)); });
+    if (j.me && (j.me.writer || j.me.all) && j.myTodo) bd.appendChild(axEl('span', 'pl-b warn', '待辦 ' + j.myTodo));
+  }).catch(function (e) {
+    if (e && e.code === 'PLAN_OFF') { t.remove(); return; }
+    v.textContent = '暫時無法載入'; n.textContent = (e && e.message) || '';
+  });
+  return t;
+}
+
+/* ---------- 懸浮視窗 ---------- */
+function planOpen(pid, label, tab) {
+  var prevFocus = document.activeElement;
+  var ov = axEl('div', 'ilp-ov pl-ov'); var dlg = axEl('div', 'ilp-dlg wide pl-dlg'); dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true'); dlg.setAttribute('aria-labelledby', 'plDlgT');
+  ov.appendChild(dlg); document.body.appendChild(ov); document.body.style.overflow = 'hidden';
+  function close() { ov.remove(); document.body.style.overflow = ''; document.removeEventListener('keydown', esc); S.plan.open = null; if (prevFocus && prevFocus.focus) prevFocus.focus(); }
+  function esc(e) { if (e.key === 'Escape') { var inner = dlg.querySelector('.pl-form'); if (inner) { inner.remove(); return; } close(); } }
+  ov.addEventListener('click', function (e) { if (e.target === ov) close(); }); document.addEventListener('keydown', esc);
+  var hd = axEl('div', 'ilp-hd'); var ht = axEl('div'); var h3 = axEl('h3', '', '個人化訓練課程安排｜' + (label || '')); h3.id = 'plDlgT'; ht.appendChild(h3); var sub = axEl('small', '', '載入中…'); ht.appendChild(sub); hd.appendChild(ht);
+  var x = axEl('button', 'ilp-x', '×'); x.type = 'button'; x.setAttribute('aria-label', '關閉'); x.addEventListener('click', close); hd.appendChild(x); dlg.appendChild(hd);
+  var body = axEl('div', 'ilp-body pl-body'); dlg.appendChild(body); body.appendChild(axEl('div', 'state', '載入課程…'));
+  S.plan.open = { pid: pid, label: label, tab: tab || 'now', redraw: null };
+  function load(force) {
+    return Promise.all([planFetch(pid, force), planLib().catch(function () { return null; })]).then(function (r) { draw(r[0], r[1]); }).catch(function (e) {
+      body.innerHTML = ''; body.appendChild(axEl('div', 'state', (e && e.message) || '暫時無法載入課程'));
+    });
+  }
+  S.plan.open.reload = function () { return load(true); };
+  function draw(o, lib) {
+    var j = o.d, p = j.plan || {}; body.innerHTML = '';
+    if (j.none || p.status !== 'OK') { sub.textContent = ''; body.appendChild(axEl('div', 'state', j.none ? j.message : (p.reasons || []).join('；') || '尚無課程')); return; }
+    var ver = j.version || {};
+    sub.textContent = (p.mode === '正式' ? '正式（自動生效）' : '預覽（未正式生效）') + '｜版本 ' + (ver.id || '—') + '｜更新 ' + (ver.at || '') + '｜主題庫 ' + (ver.lib || '') + '｜目標表 ' + (ver.target || '');
+    if (o.stale) body.appendChild(planNote('warn', '後台目前未回應：以下為 ' + new Date(o.at).toLocaleString('zh-TW') + ' 載入的課表，可能不是最新；登錄與調整功能暫停。'));
+    if (p.mode !== '正式') body.appendChild(planNote('warn', '預覽：' + (p.reasons || []).join('；') + '。預覽課表供規劃參考，不作為正式課表或授權依據。'));
+    var bd = axEl('div', 'pl-badges'); (p.badges || []).forEach(function (b) { bd.appendChild(axEl('span', 'pl-b ' + planBadgeCls(b), b)); }); body.appendChild(bd);
+    var tabs = [['now', '本月課程'], ['gap', '我的能力缺口'], ['ccc', 'CCC 準備'], ['all', '二年完整課表']];
+    if (j.me.writer || j.me.all) tabs.push(['todo', '待辦' + (j.todos.filter(function (t) { return t.status === '未處理'; }).length ? '（' + j.todos.filter(function (t) { return t.status === '未處理'; }).length + '）' : '')]);
+    tabs.push(['fb', j.me.self ? '回饋與異議' : '學員回饋']);
+    var tl = axEl('div', 'pl-tabs'); tl.setAttribute('role', 'tablist'); body.appendChild(tl);
+    var pane = axEl('div', 'pl-pane'); pane.setAttribute('role', 'tabpanel'); body.appendChild(pane);
+    var ctx = { pid: pid, j: j, p: p, lib: lib, stale: o.stale, can: !o.stale && (j.me.writer), reload: function () { return load(true); } };
+    tabs.forEach(function (tb) {
+      var b = axEl('button', 'pl-tab', tb[1]); b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', tb[0] === S.plan.open.tab ? 'true' : 'false');
+      b.addEventListener('click', function () { S.plan.open.tab = tb[0]; Array.prototype.forEach.call(tl.children, function (c) { c.setAttribute('aria-selected', c === b ? 'true' : 'false'); }); show(tb[0]); });
+      tl.appendChild(b);
+    });
+    function show(k) { pane.innerHTML = ''; ({ now: planViewNow, gap: planViewGap, ccc: planViewCcc, all: planViewAll, todo: planViewTodo, fb: planViewFb })[k](pane, ctx); }
+    show(S.plan.open.tab);
+    var ft = axEl('div', 'ilp-ft pl-ft');
+    ft.appendChild(axEl('small', '', '完成數為「CCC 結案」之推定，不代表能力達標；能力只看 CCC 等級，臨床授權只看主管登錄。網站不是 HIS 或排班系統。'));
+    var csv = axEl('button', 'btn', '匯出 CSV'); csv.type = 'button'; csv.addEventListener('click', function () { planCsv(ctx); }); ft.appendChild(csv);
+    var pr = axEl('button', 'btn', '列印 24 個月'); pr.type = 'button'; pr.addEventListener('click', function () { planPrint(ctx); }); ft.appendChild(pr);
+    body.appendChild(ft);
+    var first = tl.querySelector('[aria-selected=true]'); if (first) first.focus();
+  }
+  load(false);
+}
+function planNote(kind, text) { var d = axEl('p', 'pl-note ' + kind, text); return d; }
+function planSlotRow(s, ctx, opt) {
+  var lib = ctx.lib ? ctx.lib.map[s.base] : null, r = axEl('div', 'pl-row ' + planStatusCls(s.status) + (s.extra ? ' extra' : ''));
+  var top = axEl('div', 'pl-rt');
+  top.appendChild(axEl('span', 'pl-code', s.code));
+  top.appendChild(axEl('span', 'pl-tier', s.tierShown || s.tier));
+  if (s.risk === '高' || s.risk === '極高') top.appendChild(axEl('span', 'pl-tier risk', '病安 ' + s.risk));
+  if (s.extra) top.appendChild(axEl('span', 'pl-tier extra', '名額外補排'));
+  top.appendChild(axEl('span', 'pl-st ' + planStatusCls(s.status), s.status));
+  r.appendChild(top);
+  r.appendChild(axEl('div', 'pl-title', s.title));
+  var meta = axEl('div', 'pl-meta');
+  meta.appendChild(axEl('span', '', (PLAN_TYPE[s.type] || s.type || '') + (s.hours ? '・約 ' + s.hours + ' 小時' : '')));
+  if (s.due) meta.appendChild(axEl('span', '', (s.tier === '必修評量' ? '評量截止（CCC）' : '教學完成截止') + ' ' + s.due));
+  if (s.source) meta.appendChild(axEl('span', '', '來源：' + s.source));
+  if (s.supervision) meta.appendChild(axEl('span', '', '監督：' + s.supervision));
+  r.appendChild(meta);
+  (s.flags || []).forEach(function (f) { r.appendChild(axEl('div', 'pl-flag', f)); });
+  if (s.reason) r.appendChild(axEl('div', 'pl-why', '理由：' + s.reason));
+  if (lib) {
+    var det = axEl('details', 'pl-det'); det.appendChild(axEl('summary', '', '學習目標、教學方法與評量'));
+    [['學習目標', lib.objective], ['教學方法', lib.method], ['負責教師', lib.teacher], ['評量工具', lib.tool], ['通過標準', lib.pass + (s.tier === '必修評量' && /納入\s*CCC/.test(lib.pass) ? '（尚未定義可判定的通過規準，僅記錄完成）' : '')], ['關鍵錯誤', lib.critical], ['次核心能力／EPA', [lib.comps, lib.epas].filter(function (x) { return x && x !== '—'; }).join('；')], ['SOP', lib.sop + (lib.sopVer ? ' 第 ' + lib.sopVer + ' 版' : '') + (lib.sopDate ? '（' + lib.sopDate + '）' : '')], ['教學負責人審查', lib.verdict + (lib.verdictNote ? '：' + lib.verdictNote : '')]].forEach(function (kv) {
+      if (!kv[1]) return; var p = axEl('p', ''); p.appendChild(axEl('b', '', kv[0] + '　')); p.appendChild(document.createTextNode(kv[1])); det.appendChild(p);
+    });
+    r.appendChild(det);
+  }
+  if (ctx.can && opt) {
+    var act = axEl('div', 'pl-act');
+    var cur = ctx.p.current, ex = (ctx.j.exceptions || []).filter(function (e) { return e.month === s.month && e.code === s.code && e.type !== '撤銷'; }).filter(function (e) { return !(ctx.j.exceptions || []).some(function (z) { return z.type === '撤銷' && z.target === e.id; }); })[0];
+    if (s.month <= cur && !ex && !/^例外/.test(s.status)) { var b = axEl('button', 'linkbtn', '標為例外'); b.type = 'button'; b.addEventListener('click', function () { planExcForm(r, s, ctx); }); act.appendChild(b); }
+    if (ex) { var u = axEl('button', 'linkbtn', '撤銷例外'); u.type = 'button'; u.addEventListener('click', function () { planRevoke(ex, ctx); }); act.appendChild(u); }
+    if (s.month > cur && cur < 25 && s.tier !== '必修評量') { var m = axEl('button', 'linkbtn', '替換／移動'); m.type = 'button'; m.addEventListener('click', function () { planOvForm(r, s, ctx); }); act.appendChild(m); }
+    if (act.children.length) r.appendChild(act);
+  }
+  return r;
+}
+function planViewNow(pane, ctx) {
+  var p = ctx.p, cur = p.current;
+  if (cur === 0) { pane.appendChild(planNote('info', '尚未起訓（起訓日 ' + (ctx.j.learner.start || '未填') + '）。以下為第 1 月課程。')); cur = 1; }
+  if (cur >= 25) { pane.appendChild(planNote('info', '已完成 24 個月訓練期程；結訓後的例外補登只修正紀錄，不再重排。')); cur = 24; }
+  var mo = p.months[cur - 1], pm = p.perMonth[cur - 1];
+  pane.appendChild(axEl('h4', 'pl-h', '第 ' + cur + ' 月（' + mo.start + '～' + mo.end + '）・' + mo.stage + '・' + mo.kind));
+  pane.appendChild(axEl('p', 'pl-sum', '本月 ' + pm.n + (pm.extra ? '＋' + pm.extra : '') + ' 項、估計 ' + pm.hours + ' 小時' + (pm.over ? '（負荷超過上限）' : '')));
+  var list = axEl('div', 'pl-list'); p.slots.filter(function (s) { return s.month === cur; }).forEach(function (s) { list.appendChild(planSlotRow(s, ctx, true)); }); pane.appendChild(list);
+  var wait = p.slots.filter(function (s) { return s.month < cur && /^待結案/.test(s.status); });
+  if (wait.length) {
+    var d = axEl('details', 'pl-det'); d.appendChild(axEl('summary', '', '先前月份待結案 ' + wait.length + ' 項（期程 CCC 結案後記為完成；未做完或未通過請標為例外）'));
+    wait.forEach(function (s) { d.appendChild(planSlotRow(s, ctx, true)); }); pane.appendChild(d);
+  }
+}
+function planViewGap(pane, ctx) {
+  var p = ctx.p, gaps = p.gaps || [], stages = (p.stages || []).filter(function (s) { return gaps.some(function (g) { return g.stage === s.stage; }); });
+  pane.appendChild(planNote('info', '只依 CCC 等級與目標等級表判讀；教師日常觀察不觸發重排。未判項目標示「未判」，不以 0 計。證據量（DOPS、CbD 等）資料源尚未接通，一律顯示「未計」。'));
+  if (!stages.length) { pane.appendChild(axEl('div', 'state', '尚無 CCC 裁決；課表依共同基準進行。')); return; }
+  stages.slice().reverse().forEach(function (st, i) {
+    var sec = axEl('details', 'pl-det pl-stage'); if (i === 0) sec.open = true;
+    sec.appendChild(axEl('summary', '', st.stage + '・CCC ' + (st.cccDate || '') + '・' + st.state));
+    var tb = axEl('div', 'pl-gt');
+    var hd = axEl('div', 'pl-gr head'); ['項目', 'CCC', '目標', '判讀', '排入'].forEach(function (h) { hd.appendChild(axEl('span', '', h)); }); tb.appendChild(hd);
+    gaps.filter(function (g) { return g.stage === st.stage; }).forEach(function (g) {
+      var n = (p.needs || []).filter(function (x) { return x.key === g.key && x.id.indexOf(st.stage + '|') === 0; })[0];
+      var row = axEl('div', 'pl-gr ' + (g.status === '低於目標' ? 'low' : g.status === '未判' ? 'un' : ''));
+      [g.key, g.levelLabel, g.targetLabel, g.status, n ? (n.code ? n.code + '（第 ' + n.month + ' 月）' : '') + (n.state && n.state !== '已排入' ? ' ' + n.state : '') : (g.need || '—')].forEach(function (v) { row.appendChild(axEl('span', '', v)); });
+      tb.appendChild(row);
+      if (g.steps && g.steps.some(function (x) { return x.gap.length; })) g.steps.forEach(function (x) { if (x.gap.length) tb.appendChild(axEl('div', 'pl-step', '　任務步驟 ' + x.step + '「' + x.text + '」：' + x.gap.join('、') + ' 未達目標')); });
+    });
+    sec.appendChild(tb); pane.appendChild(sec);
+  });
+  pane.appendChild(axEl('p', 'pl-sum', '證據量：未計（DOPS／CbD／疑義處方紀錄資料源未接通，不判定充分或不足）'));
+}
+function planViewCcc(pane, ctx) {
+  var p = ctx.p, nx = (p.stages || []).filter(function (s) { return !s.closed; })[0];
+  if (nx) {
+    var box = axEl('div', 'pl-kv');
+    [['下次 CCC', nx.stage + '（預定 ' + (nx.cccDate || nx.predicted) + '）'], ['教學完成截止', nx.teachDue], ['證據擷取截止（CCC−7 天）', nx.evidenceDue], ['期程狀態', nx.state]].forEach(function (kv) { var d = axEl('div', ''); d.appendChild(axEl('b', '', kv[0])); d.appendChild(axEl('span', '', kv[1])); box.appendChild(d); });
+    pane.appendChild(box);
+  } else pane.appendChild(planNote('info', '五個期程均已結案。'));
+  var tb = axEl('div', 'pl-gt'); var hd = axEl('div', 'pl-gr head'); ['期程', '預定日', 'CCC 日期', '狀態', '完成'].forEach(function (h) { hd.appendChild(axEl('span', '', h)); }); tb.appendChild(hd);
+  (p.stages || []).forEach(function (s) {
+    var done = p.slots.filter(function (x) { return x.counted && planStageOfMonth(x.month) === s.stage; }).length, all = p.slots.filter(function (x) { return planStageOfMonth(x.month) === s.stage; }).length;
+    var r = axEl('div', 'pl-gr ' + (s.overdue ? 'low' : '')); [s.stage, s.predicted, s.cccDate || '—', s.state, done + '／' + all].forEach(function (v) { r.appendChild(axEl('span', '', v)); }); tb.appendChild(r);
+  });
+  pane.appendChild(tb);
+  var src = (p.stats && p.stats.bySource) || {}; var keys = Object.keys(src);
+  pane.appendChild(axEl('p', 'pl-sum', '完成數依來源：' + (keys.length ? keys.map(function (k) { return k + ' ' + src[k]; }).join('、') : '尚無')));
+  var ex = (ctx.j.exceptions || []).filter(function (e) { return e.type !== '撤銷'; });
+  pane.appendChild(axEl('h4', 'pl-h', '例外登錄（' + ex.length + '）'));
+  if (!ex.length) pane.appendChild(axEl('p', 'pl-sum', '無。期程結案時，無例外的主題記為完成（CCC 結案）。'));
+  ex.forEach(function (e) { var rv = (ctx.j.exceptions || []).some(function (z) { return z.type === '撤銷' && z.target === e.id; }); pane.appendChild(axEl('div', 'pl-li' + (rv ? ' off' : ''), '第 ' + e.month + ' 月 ' + e.code + '｜' + e.type + '｜' + e.reason + (e.note ? '：' + e.note : '') + '｜' + e.by + ' ' + e.at + (rv ? '｜已撤銷' : ''))); });
+  pane.appendChild(planNote('info', '寬限 ' + ctx.j.grace + ' 天' + (ctx.j.graceDefault ? '（預設值，待計畫主持人核定）' : '') + '：CCC 日期後滿寬限天數仍只有部分等級者以「部分裁決」結案；預定日後滿寬限天數仍無等級者標「CCC 逾期未裁決」，原課表繼續。'));
+}
+function planStageOfMonth(m) { return m <= 3 ? 'PGY3M' : m <= 6 ? 'PGY6M' : m <= 12 ? 'PGY12M' : m <= 18 ? 'PGY18M' : 'PGY24M'; }
+function planViewAll(pane, ctx) {
+  var p = ctx.p;
+  p.months.forEach(function (mo) {
+    var pm = p.perMonth[mo.m - 1], ss = p.slots.filter(function (s) { return s.month === mo.m; });
+    var d = axEl('details', 'pl-det pl-month' + (mo.m === p.current ? ' cur' : '')); if (mo.m === p.current) d.open = true;
+    var done = ss.filter(function (s) { return s.counted; }).length, exc = ss.filter(function (s) { return /^例外/.test(s.status); }).length, mod = ss.filter(function (s) { return s.variant !== 'A'; }).length;
+    d.appendChild(axEl('summary', '', '第 ' + mo.m + ' 月・' + mo.start + '～' + mo.end + '・' + mo.kind + '・' + pm.n + (pm.extra ? '＋' + pm.extra : '') + ' 項・' + pm.hours + ' 小時' + (pm.over ? '・負荷超過' : '') + (done ? '・完成 ' + done : '') + (exc ? '・例外 ' + exc : '') + (mod ? '・個人化 ' + mod : '')));
+    d.addEventListener('toggle', function () { if (d.open && d.children.length === 1) ss.forEach(function (s) { d.appendChild(planSlotRow(s, ctx, true)); }); });
+    if (d.open) ss.forEach(function (s) { d.appendChild(planSlotRow(s, ctx, true)); });
+    pane.appendChild(d);
+  });
+  if ((p.released || []).length) { var rl = axEl('details', 'pl-det'); rl.appendChild(axEl('summary', '', '讓出名額的主題（' + p.released.length + '）')); p.released.forEach(function (x) { rl.appendChild(axEl('div', 'pl-li', '第 ' + x.month + ' 月 ' + x.code + ' ' + x.title + '｜' + x.why)); }); pane.appendChild(rl); }
+  var vh = axEl('details', 'pl-det'); vh.appendChild(axEl('summary', '', '版本歷程（' + (ctx.j.versions || []).length + '）'));
+  (ctx.j.versions || []).forEach(function (v) {
+    var row = axEl('div', 'pl-li'); row.appendChild(document.createTextNode(v.at + '｜' + v.mode + '｜' + v.id + '｜' + v.trigger + ' '));
+    if (v.prev) { var b = axEl('button', 'linkbtn', '與前一版比對'); b.type = 'button'; b.addEventListener('click', function () { planDiff(row, v.id, ctx); }); row.appendChild(b); }
+    vh.appendChild(row);
+  });
+  pane.appendChild(vh);
+}
+function planDiff(row, id, ctx) {
+  var box = axEl('div', 'pl-diff', '比對中…'); row.appendChild(box);
+  planApi('diff', ctx.pid, { version: id }).then(function (j) {
+    box.textContent = '';
+    box.appendChild(axEl('p', '', '觸發：' + j.trigger + '｜新增 ' + j.added.length + '、移除 ' + j.removed.length + '、狀態或監督變更 ' + j.changed.length));
+    j.added.slice(0, 40).forEach(function (s) { box.appendChild(axEl('div', 'add', '＋ 第 ' + s.month + ' 月 ' + s.code + ' ' + s.title)); });
+    j.removed.slice(0, 40).forEach(function (s) { box.appendChild(axEl('div', 'del', '－ 第 ' + s.month + ' 月 ' + s.code + ' ' + s.title)); });
+    j.changed.slice(0, 40).forEach(function (s) { box.appendChild(axEl('div', '', '△ 第 ' + s.month + ' 月 ' + s.code + '：' + s.from + ' → ' + s.to)); });
+  }).catch(function (e) { box.textContent = (e && e.message) || '比對失敗'; });
+}
+function planViewTodo(pane, ctx) {
+  var td = (ctx.j.todos || []).slice().sort(function (a, b) { return (a.status === '未處理' ? 0 : 1) - (b.status === '未處理' ? 0 : 1) || (a.at < b.at ? 1 : -1); });
+  pane.appendChild(planNote('info', '待辦未處理時，課表保留原主題、不刪課。建議 14 天內處理（院內草案）。'));
+  if (!td.length) { pane.appendChild(axEl('div', 'state', '目前沒有待辦。')); return; }
+  td.forEach(function (t) {
+    var r = axEl('div', 'pl-row ' + (t.status === '未處理' ? 'exc' : 'done'));
+    var top = axEl('div', 'pl-rt'); top.appendChild(axEl('span', 'pl-tier', t.type)); top.appendChild(axEl('span', 'pl-st ' + (t.status === '未處理' ? 'exc' : 'done'), t.status)); top.appendChild(axEl('span', 'pl-code', t.at)); r.appendChild(top);
+    r.appendChild(axEl('div', 'pl-title', t.text));
+    if (t.status !== '未處理') r.appendChild(axEl('div', 'pl-why', '處置：' + t.action + (t.note ? '（' + t.note + '）' : '') + '｜' + t.by + ' ' + t.doneAt));
+    else if (ctx.can) {
+      var acts = (ctx.j.options.todoActions || {})[t.type] || [];
+      var f = axEl('div', 'pl-act'); var sel = document.createElement('select'); sel.className = 'ilp-q'; sel.setAttribute('aria-label', '處置');
+      acts.forEach(function (a) { var o = document.createElement('option'); o.value = a; o.textContent = a; sel.appendChild(o); });
+      var note = document.createElement('input'); note.className = 'ilp-q'; note.placeholder = '備註（「不排」必填）'; note.setAttribute('aria-label', '備註');
+      var go = axEl('button', 'btn', '送出'); go.type = 'button';
+      var msg = axEl('span', 'pl-msg', '');
+      go.addEventListener('click', function () {
+        if (t.type === '學員需求或異議') { pane.parentNode.querySelector('.pl-tab:last-child').click(); return; }
+        if (sel.value === '指定其他主題讓出') { msg.textContent = '請到「二年完整課表」對要讓出的主題按「替換／移動」，完成後再回來標記處理。'; return; }
+        go.disabled = true; msg.textContent = '送出中…';
+        planApi('todo', ctx.pid, { todo: { id: t.id, action: sel.value, note: note.value } }).then(function () { msg.textContent = '已處理'; ctx.reload(); }).catch(function (e) { go.disabled = false; msg.textContent = (e && e.message) || '失敗'; });
+      });
+      f.appendChild(sel); f.appendChild(note); f.appendChild(go); f.appendChild(msg); r.appendChild(f);
+    }
+    pane.appendChild(r);
+  });
+}
+function planViewFb(pane, ctx) {
+  var j = ctx.j;
+  if (j.me.self && !ctx.stale) {
+    pane.appendChild(planNote('info', '「已閱讀」只表示看過課表，不等於已理解、已達標或已完成面談。需求或異議會送到指派導師待辦，原始評量紀錄不會被修改。'));
+    var f = axEl('div', 'ilp-form pl-fb');
+    var rd = axEl('button', 'btn', '我已閱讀本版課表'); rd.type = 'button';
+    var msg = axEl('span', 'pl-msg', '');
+    rd.addEventListener('click', function () { rd.disabled = true; planApi('feedback', ctx.pid, { feedback: { type: '已閱讀', nonce: planNonce() } }).then(function () { msg.textContent = '已記錄'; ctx.reload(); }).catch(function (e) { rd.disabled = false; msg.textContent = e.message; }); });
+    var sel = document.createElement('select'); sel.className = 'ilp-q'; ['需求', '異議'].forEach(function (a) { var o = document.createElement('option'); o.value = a; o.textContent = a; sel.appendChild(o); }); sel.setAttribute('aria-label', '類型');
+    var ta = document.createElement('textarea'); ta.rows = 3; ta.className = 'ilp-q'; ta.placeholder = '例：第 9 月補強與輪訓衝突，希望改到第 10 月'; ta.setAttribute('aria-label', '內容');
+    var send = axEl('button', 'btn', '送出'); send.type = 'button'; var nonce = planNonce();
+    send.addEventListener('click', function () { if (!ta.value.trim()) { msg.textContent = '請填寫內容'; return; } send.disabled = true; planApi('feedback', ctx.pid, { feedback: { type: sel.value, text: ta.value, nonce: nonce } }).then(function () { msg.textContent = '已送出'; ctx.reload(); }).catch(function (e) { send.disabled = false; msg.textContent = e.message; }); });
+    f.appendChild(rd); f.appendChild(sel); f.appendChild(ta); f.appendChild(send); f.appendChild(msg); pane.appendChild(f);
+  }
+  var list = (j.feedback || []).slice().reverse();
+  if (!list.length) pane.appendChild(axEl('div', 'state', '尚無回饋紀錄。'));
+  list.forEach(function (x) {
+    var r = axEl('div', 'pl-row ' + (x.type === '已閱讀' ? 'done' : x.reply ? 'done' : 'exc'));
+    r.appendChild(axEl('div', 'pl-rt', x.at + '｜' + x.type + (x.version ? '｜版本 ' + x.version : '')));
+    if (x.text) r.appendChild(axEl('div', 'pl-title', x.text));
+    if (x.reply) r.appendChild(axEl('div', 'pl-why', '回覆（' + x.replyBy + ' ' + x.replyAt + '）：' + x.reply));
+    else if (x.type !== '已閱讀' && ctx.can) {
+      var f = axEl('div', 'pl-act'); var ta = document.createElement('input'); ta.className = 'ilp-q'; ta.placeholder = '回覆內容'; ta.setAttribute('aria-label', '回覆內容');
+      var b = axEl('button', 'btn', '回覆'); b.type = 'button'; var m = axEl('span', 'pl-msg', '');
+      b.addEventListener('click', function () { if (!ta.value.trim()) return; b.disabled = true; planApi('feedback', ctx.pid, { feedback: { replyTo: x.id, text: ta.value } }).then(function () { ctx.reload(); }).catch(function (e) { b.disabled = false; m.textContent = e.message; }); });
+      f.appendChild(ta); f.appendChild(b); f.appendChild(m); r.appendChild(f);
+    }
+    pane.appendChild(r);
+  });
+}
+function planExcForm(row, s, ctx) {
+  var old = row.querySelector('.pl-form'); if (old) { old.remove(); return; }
+  var f = axEl('div', 'pl-form ilp-form'); var o = ctx.j.options;
+  var mk = function (lbl, opts) { var w = axEl('label', 'ilp-f'); w.appendChild(axEl('span', 'ilp-l', lbl)); var sel = document.createElement('select'); opts.forEach(function (a) { var op = document.createElement('option'); op.value = a; op.textContent = a; sel.appendChild(op); }); w.appendChild(sel); f.appendChild(w); return sel; };
+  var ty = mk('類型', o.excTypes), rs = mk('原因', o.excReasons);
+  var w = axEl('label', 'ilp-f'); w.appendChild(axEl('span', 'ilp-l', '備註（原因為「其他」時必填）')); var nt = document.createElement('input'); w.appendChild(nt); f.appendChild(w);
+  f.appendChild(axEl('small', '', '未完成→2 個教學月內補課；未通過→補強（病安主題排下一個教學月）；暫緩→條件解除後重排。結案後補登會修正完成數並產生新版課表。'));
+  var b = axEl('button', 'btn', '登錄例外'); b.type = 'submit'; var m = axEl('span', 'pl-msg', ''); var nonce = planNonce();
+  b.addEventListener('click', function () { b.disabled = true; m.textContent = '登錄並重算中…'; planApi('exception', ctx.pid, { exception: { month: s.month, code: s.code, type: ty.value, reason: rs.value, note: nt.value, nonce: nonce } }).then(function () { ctx.reload(); }).catch(function (e) { b.disabled = false; m.textContent = e.message; }); });
+  f.appendChild(b); f.appendChild(m); row.appendChild(f); ty.focus();
+}
+function planRevoke(ex, ctx) {
+  if (!window.confirm('撤銷例外「第 ' + ex.month + ' 月 ' + ex.code + ' ' + ex.type + '」？（不刪除原紀錄，另新增一筆撤銷事件）')) return;
+  planApi('exception', ctx.pid, { exception: { revoke: ex.id, reason: '撤銷', nonce: planNonce() } }).then(function () { ctx.reload(); }).catch(function (e) { window.alert(e.message); });
+}
+function planOvForm(row, s, ctx) {
+  var old = row.querySelector('.pl-form'); if (old) { old.remove(); return; }
+  var f = axEl('div', 'pl-form ilp-form'), p = ctx.p, lib = ctx.lib ? ctx.lib.map : {};
+  var w1 = axEl('label', 'ilp-f'); w1.appendChild(axEl('span', 'ilp-l', '方式')); var mode = document.createElement('select'); [['move', '移到其他月份（與該月一般或延伸主題互換）'], ['swap', '替換為其他主題']].forEach(function (a) { if (a[0] === 'swap' && /^必修/.test(s.tier)) return; var op = document.createElement('option'); op.value = a[0]; op.textContent = a[1]; mode.appendChild(op); }); w1.appendChild(mode); f.appendChild(w1);
+  var w2 = axEl('label', 'ilp-f'); w2.appendChild(axEl('span', 'ilp-l', '新月份')); var mon = document.createElement('select'); p.months.forEach(function (m) { if (m.m > p.current && m.kind === '教學月' && m.m !== s.month && (!/^必修保護/.test(s.tier) || planStageOfMonth(m.m) === planStageOfMonth(s.month))) { var op = document.createElement('option'); op.value = m.m; op.textContent = '第 ' + m.m + ' 月（' + m.start + '）'; mon.appendChild(op); } }); w2.appendChild(mon); f.appendChild(w2);
+  var w3 = axEl('label', 'ilp-f'); w3.appendChild(axEl('span', 'ilp-l', '新主題')); var top = document.createElement('select');
+  p.slots.filter(function (x) { return x.month > p.current && (x.tier === '一般' || x.tier === '延伸') && x.code !== s.code && lib[x.code]; }).forEach(function (x) { var op = document.createElement('option'); op.value = x.code; op.textContent = x.code + ' ' + x.title + '（第 ' + x.month + ' 月，互換）'; top.appendChild(op); });
+  w3.appendChild(top); f.appendChild(w3);
+  var sync = function () { w2.hidden = mode.value !== 'move'; w3.hidden = mode.value !== 'swap'; }; mode.addEventListener('change', sync); sync();
+  var w4 = axEl('label', 'ilp-f'); w4.appendChild(axEl('span', 'ilp-l', '理由（必填）')); var rs = document.createElement('input'); w4.appendChild(rs); f.appendChild(w4);
+  f.appendChild(axEl('small', '', '覆寫會保留在之後每次重排；不能移除必修評量或必修保護。兩位教師同時調整時，後送出者會收到「已更新為新版本」。'));
+  var b = axEl('button', 'btn', '送出調整'); b.type = 'submit'; var m = axEl('span', 'pl-msg', ''); var nonce = planNonce();
+  b.addEventListener('click', function () {
+    if (!rs.value.trim()) { m.textContent = '請填寫理由'; return; }
+    var ov = { month: s.month, from: s.code, reason: rs.value, baseVersion: ctx.j.version.id, nonce: nonce };
+    if (mode.value === 'move') ov.toMonth = +mon.value; else ov.to = top.value;
+    b.disabled = true; m.textContent = '送出並重算中…';
+    planApi('override', ctx.pid, { override: ov }).then(function () { ctx.reload(); }).catch(function (e) { b.disabled = false; m.textContent = e.message; });
+  });
+  f.appendChild(b); f.appendChild(m); row.appendChild(f); mode.focus();
+}
+function planCsv(ctx) {
+  planApi('export', ctx.pid, { format: 'csv' }).then(function () {
+    var head = ['課程月', '期間', '期程', '月別', '軌道', '主題代碼', '基準代碼', '主題', '分級', '變體', '狀態', '完成來源', '截止日', '監督要求', '標記', '理由', '名額外'];
+    var lines = [head];
+    ctx.p.slots.forEach(function (s) { var mo = ctx.p.months[s.month - 1]; lines.push([s.month, mo.start + '～' + mo.end, mo.stage, mo.kind, s.lane, s.code, s.base, s.title, s.tierShown || s.tier, s.variant, s.status, s.source, s.due, s.supervision, (s.flags || []).join('；'), s.reason, s.extra ? '是' : '']); });
+    var csv = '﻿' + lines.map(function (r) { return r.map(function (c) { c = String(c === null || c === undefined ? '' : c); return /[",\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(','); }).join('\r\n');
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = '訓練課程_' + (ctx.j.version.id || '') + '.csv'; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }).catch(function (e) { window.alert((e && e.message) || '無法匯出'); });
+}
+function planPrint(ctx) {
+  var box = axEl('div', 'pl-print'); var p = ctx.p;
+  box.appendChild(axEl('h2', '', '個人化訓練課程安排｜' + (ctx.j.learner.label || '') + '｜' + (p.mode === '正式' ? '正式' : '預覽（未正式生效）')));
+  box.appendChild(axEl('p', '', '版本 ' + ctx.j.version.id + '｜列印 ' + new Date().toLocaleString('zh-TW') + '｜主題庫 ' + ctx.j.version.lib + '｜完成為 CCC 結案之推定，不代表能力達標或臨床授權'));
+  p.months.forEach(function (mo) {
+    var pm = p.perMonth[mo.m - 1]; box.appendChild(axEl('h3', '', '第 ' + mo.m + ' 月 ' + mo.start + '～' + mo.end + '・' + mo.stage + '・' + mo.kind + '・' + pm.n + (pm.extra ? '＋' + pm.extra : '') + ' 項・' + pm.hours + ' 小時'));
+    var ul = axEl('ul', ''); p.slots.filter(function (s) { return s.month === mo.m; }).forEach(function (s) { ul.appendChild(axEl('li', '', s.code + '｜' + s.title + '｜' + (s.tierShown || s.tier) + '｜' + s.status + (s.supervision ? '｜監督：' + s.supervision : '') + ((s.flags || []).length ? '｜' + s.flags.join('；') : ''))); }); box.appendChild(ul);
+  });
+  document.body.appendChild(box); document.body.classList.add('pl-printing');
+  var done = function () { document.body.classList.remove('pl-printing'); box.remove(); window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done); window.print(); setTimeout(function () { if (document.body.contains(box)) done(); }, 60000);
+}
 </script>
 </body>
 </html>
