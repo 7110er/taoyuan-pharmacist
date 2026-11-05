@@ -1106,6 +1106,8 @@ table.grid td{max-width:320px}
 .dq-sum{white-space:pre-wrap}
 .dq-area{display:grid;gap:8px}
 .dq-opts{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.dq-opts>.btn{align-self:flex-start;flex:0 0 auto;height:auto}.dq-rbl{width:100%}
+.dq-saved{color:#1a7f37;font-weight:700;margin:0 0 6px}.dq-recst{font-size:.8rem;color:#5b6b75;margin:2px 0 6px}.dq-recst.ok{color:#1a7f37}.dq-recst.wait{color:#9a6700}.dq-recst.fail{color:#b42318}
 .dq-opts legend{font-size:.84rem;font-weight:700;margin-bottom:6px;width:100%}
 .dq-opt{display:flex;align-items:center;gap:4px;font-size:.82rem;border:1px solid var(--rule);border-radius:999px;padding:6px 12px;cursor:pointer;min-height:36px}
 .dq-opt:has(input:checked){border-color:var(--teal-deep);background:var(--wash);font-weight:700}
@@ -2642,6 +2644,8 @@ $('subjSel').addEventListener('change', function () { S.subject = this.value; lo
 function openDashboard(id) {
   unfocusChart();
   S.dashId = id; if ($('dashSel').querySelector('option[value="' + id + '"]')) $('dashSel').value = id; S.dash = null; S.filt = {}; S.subject = '';
+  /* v4.5.0：個人頁預設顯示本人（本人在對象清單內時） */
+  S._selfPend = id; S.selfIn = S.selfIn || {}; if (S.selfIn[id] && S.user && S.user.person_id) S.subject = S.user.person_id;
   $('yearSel').innerHTML = ''; $('monthSel').innerHTML = '';
   S.dashCat = catOfId(id);
   renderDashNav();
@@ -2677,6 +2681,8 @@ function loadDashboard(first) {
         S.dash = j.data; S.subject = j.data.subject || ''; j.data.subjects = subs;
         if (subs.length && !subs.some(function (x) { return x.pid === S.subject; })) { if (!S._subjRetry) { S._subjRetry = true; S.subject = subs[0].pid; loadDashboard(first); return; } S.subject = subs[0].pid; }
         S._subjRetry = false;
+        var me = S.user && S.user.person_id, meIn = !!me && subs.some(function (x) { return x.pid === me; });
+        if (S._selfPend === id) { S._selfPend = null; if (meIn && (j.data.charts || []).some(function (c) { return c.scope === '個人'; })) { S.selfIn[id] = true; if (S.subject !== me) { S.subject = me; loadDashboard(first); return; } } }
         fillPeriods(j.data.years, j.data.charts.some(function (c) { return c.hasTime; }), first);
         fillSubjects(subs);
         renderDashboard();
@@ -8127,6 +8133,66 @@ function statsCrumb() {
 S.dq = { today: null, map: null };
 var DQ_TYPE = { A: '找問題', B: '給建議', C: '猜結局', G: '折衷題' };
 function dqApi(op, extra) { return apiRaw('dailyq', Object.assign({ op: op }, extra || {})); }
+/* v4.5.0 方案 D（搭配 DailyQ v1.7）：題單附加密解析包 enc；送出先取鑰匙（unlock，不讀寫試算表）→ 本機解密立即回饋 → 背景寫入紀錄（失敗暫存本機、自動重試） */
+var DQ_RECTXT = { pending: '作答紀錄上傳中…', ok: '✓ 作答已記錄', wait: '網路忙碌：作答已暫存在這台裝置，稍後自動上傳', fail: '作答紀錄未能上傳（下次開啟每日一題會再試）' };
+function dqB64(s) { var b = atob(String(s).replace(/-/g, '+').replace(/_/g, '/')), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+function dqDec(enc, k) {
+  var sub = window.crypto && window.crypto.subtle; if (!sub || !window.TextEncoder) return Promise.reject(new Error('NO_CRYPTO'));
+  return sub.importKey('raw', dqB64(k), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']).then(function (key) {
+    var c = dqB64(enc), out = new Uint8Array(c.length), te = new TextEncoder(), jobs = [];
+    for (var b = 0; b * 32 < c.length; b++) jobs.push(sub.sign('HMAC', key, te.encode('dq' + b)));
+    return Promise.all(jobs).then(function (ks) { ks.forEach(function (buf, b) { var s = new Uint8Array(buf); for (var j = 0; j < 32 && b * 32 + j < c.length; j++) out[b * 32 + j] = c[b * 32 + j] ^ s[j]; }); return JSON.parse(new TextDecoder().decode(out)); });
+  });
+}
+/** 與後端 dqGrade_ 同規則（後端仍為正式判定） */
+function dqGradeLocal(P, a) {
+  var k = P.key || {}, t = P.type;
+  if (t === 'A') return a.choice === k.cMain ? '對' : '錯';
+  if (t === 'B') return (k.bSet || []).indexOf(a.choice) >= 0 ? '對' : (k.bSet || []).some(function (s) { return s.slice(0, 2) === String(a.choice).slice(0, 2); }) ? '部分' : '錯';
+  if (t === 'C') return a.choice === k.outcome ? '對' : '錯';
+  if (t === 'G') { if (a.outcome !== k.outcome) return '錯'; var w = (k.na || []).map(Number).sort().join(','), g2 = (a.items || []).map(Number).sort().join(','); return w === g2 && a.reason === k.reason ? '對' : '部分'; }
+  return '';
+}
+function dqPendLoad() { try { return JSON.parse(localStorage.getItem('dq_pend') || '[]'); } catch (e) { return []; } }
+function dqPendSave(L) { try { localStorage.setItem('dq_pend', JSON.stringify(L.slice(-40))); } catch (e) { /* 無本機儲存 */ } }
+function dqRecSet(it, st) { it._recState = st; if (it._recEl) { it._recEl.className = 'dq-recst ' + st; it._recEl.textContent = DQ_RECTXT[st] || ''; } }
+/** 背景寫入正式紀錄：0／3／8／20／45 秒重試；作答內容以伺服器快取中第一次作答為準 */
+function dqRecord(it, payload) {
+  var day = S.dq.today && S.dq.today.day, uid = payload.id + '|' + payload.type + '|' + day, L = dqPendLoad().filter(function (x) { return x.uid !== uid; });
+  L.push({ uid: uid, day: day, p: payload }); dqPendSave(L); dqRecSet(it, 'pending');
+  var waits = [0, 3000, 8000, 20000, 45000];
+  return new Promise(function (resolve) {
+    (function attempt(i) {
+      setTimeout(function () {
+        dqApi('answer', payload).then(function (j) {
+          dqPendSave(dqPendLoad().filter(function (x) { return x.uid !== uid; })); dqRecSet(it, 'ok');
+          if (it.done && j && j.correct && j.correct !== it.done.correct) { it.done.correct = j.correct; it.done.redline = !!j.redline; }
+          resolve(true);
+        }).catch(function (e) {
+          if (e && (e.code === 'INVALID_QUERY' || e.code === 'NO_PERMISSION')) { dqPendSave(dqPendLoad().filter(function (x) { return x.uid !== uid; })); dqRecSet(it, 'fail'); resolve(false); return; }
+          if (i + 1 < waits.length) { dqRecSet(it, 'wait'); attempt(i + 1); } else { dqRecSet(it, 'fail'); resolve(false); }
+        });
+      }, waits[i]);
+    })(0);
+  });
+}
+function dqAfterRec(it) { return it._rec || Promise.resolve(true); }
+/** 送出：有加密包→unlock＋本機解密；否則或失敗→舊流程 answer */
+function dqSubmit(it, payload) {
+  var legacy = function () { return dqApi('answer', payload); };
+  if (!it.enc || !(window.crypto && window.crypto.subtle)) return legacy();
+  return dqApi('unlock', payload).then(function (u) {
+    return dqDec(it.enc, u.k).then(function (P) {
+      var a = u.locked ? Object.assign({}, payload, u.locked) : payload, correct = dqGradeLocal(P, a);
+      var mine = P.type === 'G' ? a.outcome + (a.outcome === '只採納一部分' ? '｜未採納 ' + (a.items || []).join('、') + '｜' + a.reason : '') : a.choice;
+      it._rec = dqRecord(it, payload);
+      return { correct: correct, mine: mine + (u.locked ? '（以第一次作答為準）' : ''), redline: correct === '錯' && P.risk === '極高' && (P.type === 'A' || P.type === 'B'), reveal: P.reveal, local: true };
+    });
+  }).catch(function (e) { if (e && e.code === 'NO_PERMISSION') throw e; return legacy(); });
+}
+/** 開啟時補送本機暫存的作答（只送當天） */
+function dqFlushPend(day) { dqPendLoad().forEach(function (x) { if (x.day !== day) return; dqApi('answer', x.p).then(function () { dqPendSave(dqPendLoad().filter(function (y) { return y.uid !== x.uid; })); }).catch(function () { /* 下次再試 */ }); }); dqPendSave(dqPendLoad().filter(function (x) { return x.day === day; })); }
+function dqHdr() { var t = S.dq.today, el = document.querySelector('.dq-dlg .ilp-hd small'); if (!t || !el) return; el.textContent = el.textContent.replace(/今天 \d+／\d+ 題完成/, '今天 ' + t.items.filter(function (i) { return i.done && i.done.stage >= 5; }).length + '／' + t.items.length + ' 題完成'); }
 function dqCards(box) {
   var r = S.user && S.user.active_role;
   if (r === 'TRAINEE' || r === 'STUDENT') box.insertBefore(dqCard('疑義處方每日一題', '每天 3 題〔模擬〕案例：找問題、給建議、猜結局；本週主題輪替', function () { dqOpen(); }), box.firstChild);
@@ -8158,7 +8224,7 @@ function dqOpen() {
   if (typeof statsTrack === 'function') statsTrack('view', '網頁檔', 'P:dailyq', '疑義處方每日一題');
   function load() {
     Promise.all([dqApi('today'), dqApi('map').catch(function () { return null; })]).then(function (r) {
-      var t = r[0], m = r[1]; S.dq.today = t; S.dq.map = m; sh.body.innerHTML = '';
+      var t = r[0], m = r[1]; S.dq.today = t; S.dq.map = m; sh.body.innerHTML = ''; dqFlushPend(t.day);
       sh.sub.textContent = t.day + '｜今天 ' + t.items.filter(function (i) { return i.done && i.done.stage >= 5; }).length + '／' + t.items.length + ' 題完成' + (m ? '｜本月完成 ' + m.monthDays + '／' + m.monthElapsed + ' 天' : '') + (m && m.redline ? '｜安全天數 ' + m.redline.safeDays : '');
       if (t.theme) sh.body.appendChild(axEl('p', 'dq-theme', '本週主題：' + t.theme + '（每週輪替；標籤相符的題目優先出現）'));
       if (t.empty || !t.items.length) { sh.body.appendChild(axEl('div', 'state', t.empty ? '題庫尚在教師複核中，完成後就會出題。' : '今天沒有可出的新題目。')); }
@@ -8197,8 +8263,8 @@ function dqItem(it, n, reload) {
     go.addEventListener('click', function () {
       var a = get(); if (!a) { msg('請完成作答'); return; }
       go.disabled = true; msg('送出中…');
-      dqApi('answer', Object.assign({ id: it.id, type: it.type, secs: Math.round((Date.now() - t0) / 1000) }, a)).then(function (j) {
-        it.reveal = j.reveal; it.done = { stage: 4, correct: j.correct, mine: j.mine, redline: !!j.redline }; box.replaceWith(dqItem(it, n, reload));
+      dqSubmit(it, Object.assign({ id: it.id, type: it.type, secs: Math.round((Date.now() - t0) / 1000) }, a)).then(function (j) {
+        it.reveal = j.reveal; it.done = { stage: 4, correct: j.correct, mine: j.mine, redline: !!j.redline }; it._n = n; it._reload = reload; box.replaceWith(dqItem(it, n, reload));
       }).catch(function (e) { go.disabled = false; msg(e.message); });
     });
     return box;
@@ -8206,6 +8272,8 @@ function dqItem(it, n, reload) {
   var rv = it.reveal || {}, res = axEl('div', 'dq-reveal'), d = it.done || {};
   if (d.correct) res.appendChild(axEl('p', 'dq-verdict ' + (d.correct === '對' ? 'ok' : d.correct === '部分' ? 'part' : 'no'), d.correct === '對' ? '判斷一致' : d.correct === '部分' ? '方向一致，細節不同' : '和參考答案不同'));
   if (d.mine) res.appendChild(axEl('p', 'dq-mine', '您的作答：' + d.mine));
+  if (stage >= 5) res.insertBefore(axEl('p', 'dq-saved', '✓ 自評已儲存' + (d.hits ? '：要點命中 ' + String(d.hits).replace('/', '／') : d.self ? '：' + d.self : '')), res.firstChild);
+  if (it._recState) { it._recEl = axEl('p', 'dq-recst ' + it._recState, DQ_RECTXT[it._recState] || ''); res.appendChild(it._recEl); }
   if (d.redline) res.appendChild(axEl('p', 'dq-red', '安全紅線：這題是極高風險用藥，判斷與參考答案不一致會記入您的紅線紀錄（只有您與導師看得到次數，不看內容；不作考核）。請把下方「本題紅線」讀完再進下一題。'));
   var kv = function (k, v, cls) { if (!v) return; var p = axEl('p', cls || ''); p.appendChild(axEl('b', '', k + '　')); p.appendChild(document.createTextNode(v)); res.appendChild(p); };
   kv('參考答案', rv.answer, 'dq-point'); kv('解析', rv.explain); kv('PCNE', [rv.problem, rv.cause, rv.iTxt].filter(Boolean).join('｜'));
@@ -8231,12 +8299,13 @@ function dqItem(it, n, reload) {
       fs3.appendChild(rbl);
       var ok3 = axEl('button', 'btn', '完成自評'); ok3.type = 'button'; ok3.addEventListener('click', function () {
         var hits = Array.prototype.map.call(rbl.querySelectorAll('input:checked'), function (c) { return +c.value; }); ok3.disabled = true;
-        dqApi('reflect', { id: it.id, type: it.type, hits: hits }).then(function () { it.done.stage = 5; box.replaceWith(dqItem(it, n, reload)); }).catch(function (e) { ok3.disabled = false; msg(e.message); });
+        ok3.textContent = '儲存中…';
+        dqAfterRec(it).then(function () { return dqApi('reflect', { id: it.id, type: it.type, hits: hits }); }).then(function (j) { it.done.stage = 5; it.done.hits = (j && j.hits) || ''; box.replaceWith(dqItem(it, n, reload)); dqHdr(); }).catch(function (e) { ok3.disabled = false; ok3.textContent = '完成自評'; msg(e.message); });
       }); fs3.appendChild(ok3);
     } else {
       fs3.appendChild(axEl('legend', '', '對照解析，您這題：'));
       ['有抓到', '部分', '沒抓到'].forEach(function (s) { var b = axEl('button', 'btn ghost', s); b.type = 'button'; b.addEventListener('click', function () {
-        dqApi('reflect', { id: it.id, type: it.type, self: s }).then(function () { it.done.stage = 5; box.replaceWith(dqItem(it, n, reload)); }).catch(function (e) { msg(e.message); });
+        dqAfterRec(it).then(function () { return dqApi('reflect', { id: it.id, type: it.type, self: s }); }).then(function (j) { it.done.stage = 5; it.done.self = (j && j.self) || s; box.replaceWith(dqItem(it, n, reload)); dqHdr(); }).catch(function (e) { msg(e.message); });
       }); fs3.appendChild(b); });
     }
     area.appendChild(fs3);
@@ -9399,7 +9468,7 @@ function dqEvtSend(e, it, d) { try { dqApi('evt', { e: e, id: it ? it.id : '', t
       w.appendChild(b); w.appendChild(axEl('small', '', '今日已出 ' + t.items.length + ' 題、已作答 ' + done + ' 題；每日題數無上限，作答與自評皆記錄。'));
       b.addEventListener('click', function () {
         b.disabled = true; b.textContent = '出題中…';
-        dqApi('more').then(function (j) { S.dq.today = j; var last = j.items[j.items.length - 1]; body.insertBefore(dqItem(last, j.items.length, function () { dlg.querySelector('.ilp-x').click(); dqOpen(); }), w); b.disabled = false; b.textContent = '再來一題'; w.querySelector('small').textContent = '今日已出 ' + j.items.length + ' 題；每日題數無上限，作答與自評皆記錄。'; })
+        dqApi('more').then(function (j) { S.dq.today = j; var last = j.items[j.items.length - 1], el = dqItem(last, j.items.length, function () { dlg.querySelector('.ilp-x').click(); dqOpen(); }); body.insertBefore(el, w); try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (x) { el.scrollIntoView(); } dqHdr(); b.disabled = false; b.textContent = '再來一題'; w.querySelector('small').textContent = '今日已出 ' + j.items.length + ' 題；每日題數無上限，作答與自評皆記錄。'; })
           .catch(function (e) { b.disabled = false; b.textContent = '再來一題'; w.querySelector('small').textContent = (e && e.message) || '暫時無法加題'; });
       });
       var map = body.querySelector('.dq-map'); body.insertBefore(w, map || null);
@@ -9430,7 +9499,7 @@ function dqxTRows(byT) { return Object.keys(DQX_T).map(function (k) { var t = by
 
 /* ---------- 個人頁：每日一題（本人／指派對象） ---------- */
 function axDqPersonal(host, d) {
-  var lab = typeof axSubjLabel === 'function' ? axSubjLabel(d) : '', self = !d.subject || /^\s*(我本人|本人|我)\s*[（(]/.test(String(lab || '')) || (S.user && (d.subject === S.user.person_id || d.subject === S.user.pid)); /* v4.4.1：以 person_id 辨識本人 */
+  var lab = typeof axSubjLabel === 'function' ? axSubjLabel(d) : '', self = !d.subject || /^\s*(我本人|本人|我)\s*[（(]/.test(String(lab || '')) || (S.user && (d.subject === S.user.person_id || d.subject === S.user.pid)); /* v4.4.1：以 person_id 辨識本人；v4.5.0：方案 D 加密解析包、背景紀錄重試、自評確認、個人頁預設本人 */
   var sec = axEl('section', 'chart ax-card ax-gsec'); sec.dataset.ax = 'dqx'; host.appendChild(sec);
   axGrowthHead(sec, '每日一題（疑義處方練習）', self ? '本人累計｜練習性質，不作為考核或 CCC 依據' : '指派對象近一年彙總｜只顯示類型統計，不顯示逐題作答',
     '<b>資料</b>：後台「答題紀錄」與「每日一題互動紀錄」即時彙總。<br><b>正確</b>＝結構化判定一致；<b>要點命中</b>＝揭曉後自評勾選的評量要點 ÷ 全部要點；<b>紅線</b>＝極高風險題判斷不一致（只計次數）。<br>所有題目皆為〔模擬〕案例，且已經藥師核准方可出題。', false);
