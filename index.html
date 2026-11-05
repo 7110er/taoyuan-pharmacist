@@ -1369,7 +1369,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '4.3.1';
+var APP_VERSION = '4.3.2';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -8258,7 +8258,7 @@ function dqMentorOpen() {
   var sh = dqShell('每日一題・導師檢視');
   dqApi('mentor').then(function (j) {
     sh.body.innerHTML = ''; sh.sub.textContent = j.note;
-    if (j.bank) sh.body.appendChild(axEl('p', 'pl-sum', '題庫：可出題 ' + j.bank.ready + '／' + j.bank.total + '（待複核 ' + j.bank.pending + '）'));
+    if (j.bank) sh.body.appendChild(axEl('p', 'pl-sum', '題庫：實際出題 ' + j.bank.ready + '／' + j.bank.total + '（未出題 ' + j.bank.pending + '）' + (j.bank.approved !== undefined ? '｜藥師已核准 ' + j.bank.approved + ' 題' + (j.bank.approveOn ? '（需核准模式：未核准題不出題）' : '') : '')));
     if (!j.people.length) sh.body.appendChild(axEl('div', 'state', '沒有指派的 PGY 學員。'));
     j.people.forEach(function (p) {
       var r = axEl('div', 'pl-row ' + (p.weak.length ? 'late' : 'done'));
@@ -9362,6 +9362,7 @@ ax41Pcne = function (src, lab) {
 };
 var ax41EpaPlanCard43 = ax41EpaPlanCard;
 ax41EpaPlanCard = function (host, G, P, C, pc, d) {
+  if (S.ck) S.ck.epaPlan = []; /* v4.3.2：重繪時不重複累加（駕駛艙曾出現「EPA 1、EPA 1、EPA 1」） */
   var sec = ax41EpaPlanCard43(host, G, P, C, pc, d);
   if (sec && pc && pc.ok && pc.late) sec.appendChild(axEl('p', 'ax-muted', '補登提醒：本人照會紀錄中 ' + pc.late + ' 筆的填寫時間晚於照會日期 30 天以上；建議照會當週登錄，以利月別統計與回饋。'));
   return sec;
