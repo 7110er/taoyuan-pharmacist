@@ -1121,6 +1121,9 @@ table.grid td{max-width:320px}
 .dq-cell{border:1px solid var(--rule);border-radius:var(--r-md);padding:6px 8px;display:grid;gap:2px;font-size:.74rem}.dq-cell b{font-size:.78rem}
 .dq-cell.none{color:var(--ink-3)}.dq-cell.good{border-color:var(--ok);background:var(--ok-soft)}/*dq*/.dq-gitems{margin:.4em 0 .6em 1.1em;padding:0}.dq-gitems li{margin:.15em 0}.dq-gitems li.miss{color:#9a3412;font-weight:600}.dq-gitems li.hit{color:#166534}
 .dq-cell.weak{border-color:#C99A3A;background:#FFF8EC}
+/* v4.4 每日一題整合 */.dq-more{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}.dq-more small{color:var(--ink-3);font-size:.78rem}
+.dqx-weeks{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;align-items:end;height:90px;margin:6px 0 12px}.dqx-wk{display:flex;flex-direction:column;justify-content:flex-end;height:100%;text-align:center}.dqx-wk i{display:block;background:var(--teal);border-radius:3px 3px 0 0;min-height:2px}.dqx-wk small{font-size:.62rem;color:var(--ink-3);margin-top:2px}
+.dqx-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
 /* v4.3 */.ax-scroll .ax-gtab tbody th:first-child,.ax-scroll .ax-gtab thead th:first-child{position:sticky;left:0;z-index:1;background:var(--sheet)}
 .dq-chal{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;font-size:.8rem;margin:.4em 0}.dq-chalbar{height:8px;border-radius:999px;background:var(--rule-2);overflow:hidden}.dq-chalbar i{display:block;height:100%;background:var(--teal)}
 .dq-badge.st{color:#0A3F4B;background:#CFE4E8}
@@ -1369,7 +1372,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '4.3.2';
+var APP_VERSION = '4.4.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -9367,6 +9370,146 @@ ax41EpaPlanCard = function (host, G, P, C, pc, d) {
   if (sec && pc && pc.ok && pc.late) sec.appendChild(axEl('p', 'ax-muted', '補登提醒：本人照會紀錄中 ' + pc.late + ' 筆的填寫時間晚於照會日期 30 天以上；建議照會當週登錄，以利月別統計與回饋。'));
   return sec;
 };
+
+
+/* ===================== v4.4（2026-11-05）：每日一題全員化＋成效指標整合 =====================
+ *  1. 教師、學員（PGY）、學生（UGY）皆可作答；不受訓練期限制；每日 3 題後可無上限「再來一題」。
+ *  2. 所有互動寫入後台「每日一題互動紀錄」（開啟、加題、作答、自評、能力地圖、證據連結、統計查詢）。
+ *  3. 成效儀表板：個人頁（PGY／UGY／教師）加「每日一題（本人／指派對象）」卡；群體頁（CBME 成效＝PGY、學生學習成效＝UGY、
+ *     教師教學成效＝教師）加「每日一題成效（群體）」卡：參與、正確率、要點命中、極高風險誤答、作答時間、持續參與、週趨勢、
+ *     PCNE 類別、題目分析（過難／過易）、學員名單（僅學員與學生；教師只呈現彙總）。 */
+var DQ_PLAYER_ROLES = ['TRAINEE', 'STUDENT', 'ASSISTANT_INSTRUCTOR', 'CLINICAL_INSTRUCTOR', 'EDUCATION_GOVERNANCE'];
+function dqCards(box) {
+  var r = S.user && S.user.active_role; if (!r) return;
+  var teach = r !== 'TRAINEE' && r !== 'STUDENT';
+  if (teach) box.insertBefore(dqCard('每日一題・導師檢視', '指派對象近 30 天作答、弱點類型與群體成效', function () { dqMentorOpen(); }), box.firstChild);
+  if (DQ_PLAYER_ROLES.indexOf(r) >= 0) box.insertBefore(dqCard('疑義處方每日一題', '〔模擬〕案例：找問題、給建議、猜結局；每日 3 題，可無上限加練', function () { dqOpen(); }), box.firstChild);
+}
+function dqEvtSend(e, it, d) { try { dqApi('evt', { e: e, id: it ? it.id : '', type: it ? it.type : '', d: d || '' }).catch(function () { }); } catch (x) { /* 略 */ } }
+/* 再來一題：在每日一題視窗底部加按鈕（視窗由 dqOpen 建立；以 MutationObserver 在每次重繪後補上） */
+(function () {
+  var dqOpen0 = dqOpen;
+  dqOpen = function () {
+    dqOpen0();
+    var dlg = document.querySelector('.dq-dlg'); if (!dlg) return; var body = dlg.querySelector('.dq-body');
+    var add = function () {
+      if (!body || body.querySelector('.dq-more') || !S.dq.today || !S.dq.today.items) return;
+      var t = S.dq.today, done = t.items.filter(function (i) { return i.done && i.done.stage >= 4; }).length;
+      var w = axEl('div', 'dq-more'), b = axEl('button', 'btn', '再來一題'); b.type = 'button';
+      w.appendChild(b); w.appendChild(axEl('small', '', '今日已出 ' + t.items.length + ' 題、已作答 ' + done + ' 題；每日題數無上限，作答與自評皆記錄。'));
+      b.addEventListener('click', function () {
+        b.disabled = true; b.textContent = '出題中…';
+        dqApi('more').then(function (j) { S.dq.today = j; var last = j.items[j.items.length - 1]; body.insertBefore(dqItem(last, j.items.length, function () { dlg.querySelector('.ilp-x').click(); dqOpen(); }), w); b.disabled = false; b.textContent = '再來一題'; w.querySelector('small').textContent = '今日已出 ' + j.items.length + ' 題；每日題數無上限，作答與自評皆記錄。'; })
+          .catch(function (e) { b.disabled = false; b.textContent = '再來一題'; w.querySelector('small').textContent = (e && e.message) || '暫時無法加題'; });
+      });
+      var map = body.querySelector('.dq-map'); body.insertBefore(w, map || null);
+    };
+    if (body) new MutationObserver(add).observe(body, { childList: true });
+  };
+})();
+/* 證據連結點擊記錄 */
+document.addEventListener('click', function (e) {
+  var a = e.target && e.target.closest && e.target.closest('.dq-ev a'); if (!a) return;
+  var item = a.closest('.dq-item'), t = S.dq && S.dq.today, idx = item ? Array.prototype.indexOf.call(item.parentNode.querySelectorAll('.dq-item'), item) : -1;
+  dqEvtSend('link', t && t.items && t.items[idx] ? t.items[idx] : null, a.href);
+}, true);
+
+/* ---------- 共用：小型 KPI 磚與週趨勢 ---------- */
+function dqxTile(lab, val, foot, warn) { return axTile(lab, val, foot || '', warn ? 'warn' : ''); }
+function dqxPct(v) { return v === null || v === undefined ? '—' : '<b>' + v + '</b><small>%</small>'; }
+function dqxWeeks(weeks) {
+  var w = axEl('div', 'dqx-weeks'), mx = Math.max.apply(null, weeks.map(function (x) { return x.n; }).concat([1]));
+  weeks.forEach(function (x) { var c = axEl('div', 'dqx-wk'), bar = axEl('i'); bar.style.height = Math.round(100 * x.n / mx) + '%'; c.title = x.w + ' 起一週：作答 ' + x.n + ' 題、' + x.users + ' 人'; c.appendChild(bar); c.appendChild(axEl('small', '', x.w.slice(5))); w.appendChild(c); });
+  return w;
+}
+function dqxTable(head, rows) { var t = axEl('table', 'ax-gtab'); t.innerHTML = '<thead><tr>' + head.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead>'; var tb = document.createElement('tbody'); rows.forEach(function (r) { var tr = document.createElement('tr'); r.forEach(function (c, i) { tr.appendChild(axEl(i ? 'td' : 'th', i ? 'num' : '', c === null || c === undefined ? '—' : String(c))); }); tb.appendChild(tr); }); t.appendChild(tb); var s = axEl('div', 'ax-scroll'); s.appendChild(t); return s; }
+var DQX_C = { C1: '藥品選擇', C2: '劑型', C3: '劑量選擇', C4: '療程', C5: '調劑', C6: '藥品使用過程', C7: '病人相關', C8: '病人轉銜', C9: '其他', ICS2: '讀懂醫師' };
+function dqxCRows(byC) { return Object.keys(DQX_C).map(function (k) { var c = byC[k] || { n: 0, ok: 0 }; return [k + ' ' + DQX_C[k], c.n, c.n >= 5 ? Math.round(100 * c.ok / c.n) + '%' : c.n ? '（n＜5）' : '—']; }); }
+var DQX_T = { A: '找問題', B: '給建議', C: '猜結局', G: '折衷題' };
+function dqxTRows(byT) { return Object.keys(DQX_T).map(function (k) { var t = byT[k] || { n: 0, ok: 0, part: 0 }; return [k + ' ' + DQX_T[k], t.n, t.n ? Math.round(100 * t.ok / t.n) + '%' : '—', t.n ? Math.round(100 * t.part / t.n) + '%' : '—']; }); }
+
+/* ---------- 個人頁：每日一題（本人／指派對象） ---------- */
+function axDqPersonal(host, d) {
+  var lab = typeof axSubjLabel === 'function' ? axSubjLabel(d) : '', self = !d.subject || /^\s*(我本人|本人|我)\s*[（(]/.test(String(lab || '')) || (S.user && d.subject === S.user.pid);
+  var sec = axEl('section', 'chart ax-card ax-gsec'); sec.dataset.ax = 'dqx'; host.appendChild(sec);
+  axGrowthHead(sec, '每日一題（疑義處方練習）', self ? '本人累計｜練習性質，不作為考核或 CCC 依據' : '指派對象近一年彙總｜只顯示類型統計，不顯示逐題作答',
+    '<b>資料</b>：後台「答題紀錄」與「每日一題互動紀錄」即時彙總。<br><b>正確</b>＝結構化判定一致；<b>要點命中</b>＝揭曉後自評勾選的評量要點 ÷ 全部要點；<b>紅線</b>＝極高風險題判斷不一致（只計次數）。<br>所有題目皆為〔模擬〕案例，且已經藥師核准方可出題。', false);
+  var body = axEl('div'); sec.appendChild(body); body.appendChild(axEl('div', 'state', '載入中…'));
+  var p = self ? dqApi('map') : dqApi('stats', { subject: d.subject, days: 365 });
+  return p.then(function (m) {
+    body.innerHTML = ''; var g = axEl('div', 'ax-gtiles'); body.appendChild(g);
+    if (self) {
+      var me = m.me || { n: 0, ok: 0, days: 0 };
+      g.appendChild(dqxTile('累計作答', '<b>' + me.n + '</b><small> 題</small>', '作答天數 ' + me.days + ' 天'));
+      g.appendChild(dqxTile('正確率', me.n ? dqxPct(Math.round(100 * me.ok / me.n)) : '—', me.n ? me.ok + '／' + me.n : '尚未作答'));
+      g.appendChild(dqxTile('要點命中', m.rubric && m.rubric.total ? dqxPct(Math.round(100 * m.rubric.hit / m.rubric.total)) : '—', m.rubric && m.rubric.total ? m.rubric.hit + '／' + m.rubric.total + ' 要點' : '尚無自評'));
+      g.appendChild(dqxTile('連續天數', '<b>' + (m.streak || 0) + '</b><small> 天</small>', '最長 ' + (m.bestStreak || 0) + ' 天' + (m.streakMarks && m.streakMarks.length ? '｜里程碑 ' + m.streakMarks.join('、') + ' 天' : '')));
+      g.appendChild(dqxTile('安全天數', '<b>' + (m.redline ? m.redline.safeDays : 0) + '</b><small> 天</small>', '近 30 天紅線 ' + (m.redline ? m.redline.n30 : 0) + ' 次', m.redline && m.redline.n30 > 0));
+      if (m.themeWeek) g.appendChild(dqxTile('本週主題挑戰', '<b>' + m.themeWeek.done + '</b><small>／' + m.themeWeek.goal + '</small>', m.themeWeek.theme));
+      try { body.appendChild(dqMap(m)); } catch (e) { /* 略 */ }
+      var go = axEl('button', 'btn', '開始今日練習'); go.type = 'button'; go.addEventListener('click', function () { dqOpen(); }); body.appendChild(go);
+    } else {
+      var k = m.kpi || {};
+      g.appendChild(dqxTile('作答', '<b>' + (k.answers || 0) + '</b><small> 題</small>', '作答天數 ' + (k.activeDays || 0) + ' 天（近一年）'));
+      g.appendChild(dqxTile('正確率', dqxPct(k.acc), ''));
+      g.appendChild(dqxTile('要點命中', dqxPct(k.rubric), k.rubricN ? '自評要點 ' + k.rubricN + ' 個' : '尚無自評'));
+      g.appendChild(dqxTile('極高風險題誤答', dqxPct(k.redRate), k.hiN ? '極高風險題作答 ' + k.hiN + ' 題' : '尚無', k.redRate > 0));
+      g.appendChild(dqxTile('中位作答時間', k.medSecs ? '<b>' + Math.round(k.medSecs) + '</b><small> 秒</small>' : '—', ''));
+      body.appendChild(axEl('div', 'ax-ftitle', 'PCNE 原因類別（含讀懂醫師）'));
+      body.appendChild(dqxTable(['類別', '題數', '正確率'], dqxCRows(m.byC || {})));
+    }
+  }).catch(function (e) { if (e && e.code === 'DAILYQ_OFF') { sec.remove(); return; } body.innerHTML = ''; body.appendChild(axEl('div', 'state', (e && e.message) || '每日一題資料暫時無法載入')); });
+}
+
+/* ---------- 群體頁：每日一題成效 ---------- */
+var DQX_DAYS = 90;
+function axDqGroup(host, role, label) {
+  var sec = axEl('section', 'chart ax-card ax-gsec'); sec.dataset.ax = 'dqx'; host.appendChild(sec);
+  axGrowthHead(sec, '每日一題成效（' + label + '）', '形成性練習成效｜不作為考核或 CCC 依據｜來源：答題紀錄、互動紀錄（即時）',
+    '<b>參與</b>＝期間內至少作答 1 題的人數；<b>持續參與</b>＝期間內 ≥2 個不同週有作答。<br><b>正確率</b>＝結構化判定一致 ÷ 作答數；<b>要點命中</b>＝自評勾選要點 ÷ 全部要點；<b>極高風險題誤答</b>＝極高風險題判斷錯誤 ÷ 極高風險題作答。<br><b>題目分析</b>：作答 ≥5 次且正確率 ＜30%（可能過難或題意不清）或 ＞95%（可能過易），供題庫維護。<br>類別作答 ＜5 題不顯示正確率。教師群組只呈現彙總，不列個人。', false);
+  var bar = axEl('div', 'ax-bar'), body = axEl('div'); sec.appendChild(bar); sec.appendChild(body);
+  function draw() {
+    bar.innerHTML = ''; bar.appendChild(axSelect('期間', [{ v: '30', t: '近 30 天' }, { v: '90', t: '近 90 天' }, { v: '365', t: '近一年' }], String(DQX_DAYS), function (v) { DQX_DAYS = +v; draw(); }));
+    body.innerHTML = ''; body.appendChild(axEl('div', 'state', '載入中…'));
+    return dqApi('stats', { role: role, days: DQX_DAYS }).then(function (m) {
+      body.innerHTML = ''; var k = m.kpi || {}, g = axEl('div', 'ax-gtiles'); body.appendChild(g);
+      g.appendChild(dqxTile('參與人數', '<b>' + (k.users || 0) + '</b><small> 人</small>', '持續參與 ' + (k.retained || 0) + ' 人（≥2 週）'));
+      g.appendChild(dqxTile('作答數', '<b>' + (k.answers || 0) + '</b><small> 題</small>', '每人中位 ' + (k.perUserMed || 0) + ' 題｜作答人日 ' + (k.activeDays || 0)));
+      g.appendChild(dqxTile('正確率', dqxPct(k.acc), ''));
+      g.appendChild(dqxTile('要點命中', dqxPct(k.rubric), k.rubricN ? '自評要點 ' + k.rubricN + ' 個' : '尚無自評'));
+      g.appendChild(dqxTile('極高風險題誤答', dqxPct(k.redRate), k.hiN ? '極高風險題作答 ' + k.hiN + ' 題' : '尚無', k.redRate >= 20));
+      g.appendChild(dqxTile('中位作答時間', k.medSecs ? '<b>' + Math.round(k.medSecs) + '</b><small> 秒</small>' : '—', ''));
+      g.appendChild(dqxTile('可出題（已核准）', '<b>' + (m.bankReady || 0) + '</b><small> 題</small>', '未經藥師核准的題目不出題'));
+      body.appendChild(axEl('div', 'ax-ftitle', '近 12 週作答量（滑過看人數）')); body.appendChild(dqxWeeks(m.weeks || []));
+      var two = axEl('div', 'dqx-two'); body.appendChild(two);
+      var c1 = axEl('div'); c1.appendChild(axEl('div', 'ax-ftitle', 'PCNE 原因類別')); c1.appendChild(dqxTable(['類別', '題數', '正確率'], dqxCRows(m.byC || {}))); two.appendChild(c1);
+      var c2 = axEl('div'); c2.appendChild(axEl('div', 'ax-ftitle', '題型')); c2.appendChild(dqxTable(['題型', '題數', '正確', '部分'], dqxTRows(m.byType || {}))); two.appendChild(c2);
+      var fl = m.flagged || {}; if ((fl.hard || []).length || (fl.easy || []).length) {
+        body.appendChild(axEl('div', 'ax-ftitle', '題目分析（題庫維護）'));
+        body.appendChild(axChips((fl.hard || []).map(function (x) { return { t: '過難 ' + x.p + '%（n=' + x.n + '）' + x.key, tip: x.stem }; }).concat((fl.easy || []).map(function (x) { return { t: '過易 ' + x.p + '%（n=' + x.n + '）' + x.key, tip: x.stem }; })), 'warn'));
+      }
+      if ((m.people || []).length) {
+        body.appendChild(axEl('div', 'ax-ftitle', '個人參與（' + m.people.length + ' 人；依作答天數）'));
+        body.appendChild(dqxTable(['對象', '作答天數', '作答', '正確率', '要點命中', '紅線', '最近作答'], m.people.map(function (p) { return [p.label, p.days, p.n, p.acc === null ? '—' : p.acc + '%', p.rub === null ? '—' : p.rub + '%', p.red, p.last]; })));
+      }
+      body.appendChild(axEl('p', 'ax-muted', m.note || ''));
+    }).catch(function (e) { if (e && e.code === 'DAILYQ_OFF') { sec.remove(); return; } body.innerHTML = ''; body.appendChild(axEl('div', 'state', (e && e.message) || '每日一題成效暫時無法載入')); });
+  }
+  return draw();
+}
+/* ---------- 接到儀表板 ---------- */
+(function () {
+  var wrap = function (name, after) { var f = AX_PANELS[name]; if (!f) return; AX_PANELS[name] = function (host, d) { return Promise.resolve().then(function () { return f(host, d); }).then(function (v) { return Promise.resolve(after(host, d)).catch(function () { }).then(function () { return v; }); }, function (err) { return Promise.resolve(after(host, d)).catch(function () { }).then(function () { throw err; }); }); }; };
+  ['PGY 學員個人成績', 'UGY 學生個人成績', '教師個人成績', '教師教學評核（個人）'].forEach(function (n) { wrap(n, axDqPersonal); });
+  wrap('CBME 成效', function (h) { return axDqGroup(h, 'PGY', 'PGY 學員'); });
+  wrap('學生學習成效', function (h) { return axDqGroup(h, 'UGY', 'UGY 學生'); });
+  wrap('藥學生整體成效', function (h) { return axDqGroup(h, 'UGY', 'UGY 學生'); });
+  wrap('教師教學成效', function (h) { return axDqGroup(h, '教師', '臨床教師'); });
+  var ins = function (name, before) { var L = DASH_LAYOUT[name]; if (!L) return; L.order = (L.order || []).filter(function (x) { return x !== 'ax:dqx'; }); var i = L.order.indexOf(before); if (i < 0) L.order.push('ax:dqx'); else L.order.splice(i, 0, 'ax:dqx'); };
+  ins('PGY 學員個人成績', 'ax:pres'); ins('UGY 學生個人成績', 'ax:hl'); ins('教師個人成績', 'ax:hl');
+  ins('CBME 成效', 'ax:dq'); ins('學生學習成效', 'ax:board'); ins('教師教學成效', 'ax:board');
+  if (typeof CK_NAV === 'object') CK_NAV.dqx = '每日一題';
+})();
 
 </script>
 </body>
