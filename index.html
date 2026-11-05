@@ -1372,7 +1372,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '4.4.0';
+var APP_VERSION = '4.4.1';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -8172,7 +8172,7 @@ function dqOpen() {
 }
 function dqItem(it, n, reload) {
   var stage = it.done ? it.done.stage : 1, box = axEl('section', 'dq-item' + (stage >= 5 ? ' done' : '')), t0 = Date.now();
-  var hd = axEl('div', 'pl-rt'); hd.appendChild(axEl('span', 'pl-tier', '第 ' + n + ' 題・' + DQ_TYPE[it.type] + (it.level ? '・' + it.level : ''))); hd.appendChild(axEl('span', 'pl-code', it.why)); if (it.risk === '極高') hd.appendChild(axEl('span', 'dq-risk', '極高風險・答錯計紅線')); if (stage >= 5) hd.appendChild(axEl('span', 'pl-st done', '完成')); box.appendChild(hd);
+  var hd = axEl('div', 'pl-rt'); hd.appendChild(axEl('span', 'pl-tier', '第 ' + n + ' 題・' + DQ_TYPE[it.type] + (it.level ? '・' + it.level : ''))); hd.appendChild(axEl('span', 'pl-code', it.why)); if (it.risk === '極高') hd.appendChild(axEl('span', 'dq-risk', it.type === 'A' || it.type === 'B' ? '極高風險・答錯計紅線' : '極高風險')); if (stage >= 5) hd.appendChild(axEl('span', 'pl-st done', '完成')); box.appendChild(hd);
   var ctx = axEl('div', 'dq-case'); ctx.appendChild(axEl('p', 'dq-sum', it.stem)); box.appendChild(ctx);
   var area = axEl('div', 'dq-area'); box.appendChild(area);
   function msg(t) { var m = area.querySelector('.pl-msg'); if (!m) { m = axEl('p', 'pl-msg'); area.appendChild(m); } m.textContent = t; }
@@ -9430,7 +9430,7 @@ function dqxTRows(byT) { return Object.keys(DQX_T).map(function (k) { var t = by
 
 /* ---------- 個人頁：每日一題（本人／指派對象） ---------- */
 function axDqPersonal(host, d) {
-  var lab = typeof axSubjLabel === 'function' ? axSubjLabel(d) : '', self = !d.subject || /^\s*(我本人|本人|我)\s*[（(]/.test(String(lab || '')) || (S.user && d.subject === S.user.pid);
+  var lab = typeof axSubjLabel === 'function' ? axSubjLabel(d) : '', self = !d.subject || /^\s*(我本人|本人|我)\s*[（(]/.test(String(lab || '')) || (S.user && (d.subject === S.user.person_id || d.subject === S.user.pid)); /* v4.4.1：以 person_id 辨識本人 */
   var sec = axEl('section', 'chart ax-card ax-gsec'); sec.dataset.ax = 'dqx'; host.appendChild(sec);
   axGrowthHead(sec, '每日一題（疑義處方練習）', self ? '本人累計｜練習性質，不作為考核或 CCC 依據' : '指派對象近一年彙總｜只顯示類型統計，不顯示逐題作答',
     '<b>資料</b>：後台「答題紀錄」與「每日一題互動紀錄」即時彙總。<br><b>正確</b>＝結構化判定一致；<b>要點命中</b>＝揭曉後自評勾選的評量要點 ÷ 全部要點；<b>紅線</b>＝極高風險題判斷不一致（只計次數）。<br>所有題目皆為〔模擬〕案例，且已經藥師核准方可出題。', false);
