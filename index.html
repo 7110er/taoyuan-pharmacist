@@ -1077,6 +1077,112 @@ table.grid td{max-width:320px}
 .pl-print{display:none}
 @media (max-width:640px){.pl-gr{grid-template-columns:1fr 1fr 1fr;}.pl-gr span:nth-child(4),.pl-gr span:nth-child(5){grid-column:span 3}.pl-st{margin-left:0}}
 @media print{body.pl-printing>*:not(.pl-print){display:none!important}body.pl-printing .pl-print{display:block;font-size:10pt;color:#000}.pl-print h2{font-size:13pt}.pl-print h3{font-size:10.5pt;margin:8pt 0 2pt;break-after:avoid}.pl-print ul{margin:0 0 4pt 14pt;padding:0}.pl-print li{margin:0;break-inside:avoid}}
+
+/* v4.0 CBME 成效 */
+.ax-bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:4px 0 10px}
+.ax-range{position:relative;height:14px;min-width:160px;border-radius:999px;background:var(--rule-2)}
+.ax-range i{position:absolute;top:0;bottom:0;background:#8FB7BF;border-radius:999px}
+.ax-range b{position:absolute;top:-2px;width:3px;height:18px;margin-left:-1px;background:var(--teal-deep);border-radius:2px}
+.ax-dq{display:grid;gap:6px}
+.ax-dqrow{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:.8rem;padding:8px 10px;border:1px solid var(--rule-2);border-radius:var(--r-md);background:var(--wash-2)}
+.ax-dqrow b{font-size:.72rem;color:var(--warn);background:var(--warn-soft);border-radius:4px;padding:1px 6px;white-space:nowrap}
+.ax-gtab td.num.draft{font-style:normal}
+.ax-stack i.pf,.ax-sw2.pf{background:#B23A48}
+.ax-gtab.ax-nowrap th,.ax-gtab.ax-nowrap td{white-space:nowrap}
+
+/* v4.1 PGY 個人頁 */
+.ax-evfold{margin-top:10px}.ax-evfold>summary{font-size:.84rem;font-weight:600;color:var(--teal-deep);cursor:pointer}
+.ax-evfold .ax-foldbody{display:grid;gap:12px;margin-top:10px}
+.ax-presbody{display:grid;gap:12px}
+.site-logins{font-size:.72rem;color:var(--ink-3);white-space:nowrap;margin-left:10px;font-weight:400}
+#dashCrumb small.views{font-size:.72rem;color:var(--ink-3);margin-left:10px;padding:1px 8px;border:1px solid var(--rule-2);border-radius:999px;background:var(--wash-2)}
+@media (max-width:560px){.top .brand{flex-wrap:wrap;row-gap:0}.site-logins{font-size:.64rem;margin-left:0;flex-basis:100%;padding-left:34px}}
+.dq-dlg{width:min(760px,100%)}
+.dq-body{display:grid;gap:12px}
+.dq-item{border:1px solid var(--rule);border-left:4px solid var(--teal-deep);border-radius:var(--r-md);padding:10px 12px;display:grid;gap:8px;background:var(--sheet)}
+.dq-item.done{border-left-color:var(--ok)}
+.dq-case{background:var(--wash-2);border-radius:var(--r-md);padding:8px 10px;display:grid;gap:4px}
+.dq-case p,.dq-reveal p{margin:0;font-size:.84rem;line-height:1.55;word-break:break-word}.dq-case b,.dq-reveal b{color:var(--ink-2);font-weight:600}
+.dq-sum{white-space:pre-wrap}
+.dq-area{display:grid;gap:8px}
+.dq-opts{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.dq-opts legend{font-size:.84rem;font-weight:700;margin-bottom:6px;width:100%}
+.dq-opt{display:flex;align-items:center;gap:4px;font-size:.82rem;border:1px solid var(--rule);border-radius:999px;padding:6px 12px;cursor:pointer;min-height:36px}
+.dq-opt:has(input:checked){border-color:var(--teal-deep);background:var(--wash);font-weight:700}
+.dq-area .btn{min-height:40px;border-radius:999px;padding:0 16px;background:var(--teal-deep);color:#fff;border-color:var(--teal-deep);font-weight:700;justify-self:start}
+.dq-area .btn.ghost{background:var(--sheet);color:var(--teal-deep)}
+.dq-reveal{border-top:1px dashed var(--rule);padding-top:8px;display:grid;gap:4px}
+.dq-verdict{font-weight:700;font-size:.86rem}.dq-verdict.ok{color:var(--ok)}.dq-verdict.part{color:#8A5D0E}.dq-verdict.no{color:#B3261E}
+.dq-mine{color:var(--ink-3)}
+.dq-point{background:#FFF8EC;border-radius:6px;padding:6px 8px}
+.dq-reply{border-left:3px solid var(--teal);padding-left:8px}
+.dq-map{display:grid;gap:6px}
+.dq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:6px}
+.dq-cell{border:1px solid var(--rule);border-radius:var(--r-md);padding:6px 8px;display:grid;gap:2px;font-size:.74rem}.dq-cell b{font-size:.78rem}
+.dq-cell.none{color:var(--ink-3)}.dq-cell.good{border-color:var(--ok);background:var(--ok-soft)}/*dq*/.dq-gitems{margin:.4em 0 .6em 1.1em;padding:0}.dq-gitems li{margin:.15em 0}.dq-gitems li.miss{color:#9a3412;font-weight:600}.dq-gitems li.hit{color:#166534}
+.dq-cell.weak{border-color:#C99A3A;background:#FFF8EC}
+/* v4.3 */.ax-scroll .ax-gtab tbody th:first-child,.ax-scroll .ax-gtab thead th:first-child{position:sticky;left:0;z-index:1;background:var(--sheet)}
+.dq-chal{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;font-size:.8rem;margin:.4em 0}.dq-chalbar{height:8px;border-radius:999px;background:var(--rule-2);overflow:hidden}.dq-chalbar i{display:block;height:100%;background:var(--teal)}
+.dq-badge.st{color:#0A3F4B;background:#CFE4E8}
+/* dq v1.4 */.dq-risk{display:inline-block;font-size:.72rem;font-weight:700;color:#B3261E;border:1px solid #B3261E;border-radius:999px;padding:1px 8px;margin-left:6px}.dq-red{border-left:4px solid #B3261E;background:#FFF1F0;padding:6px 10px;border-radius:var(--r-md);font-size:.84rem}.dq-rbl label{display:flex;gap:8px;align-items:flex-start;padding:4px 0;font-size:.86rem}.dq-rbl input{margin-top:3px}.dq-ev{margin:.3em 0 .5em 1.1em;padding:0;font-size:.8rem}.dq-ev li{margin:.1em 0}.dq-ev a{word-break:break-all}.dq-badges{display:flex;flex-wrap:wrap;gap:6px;margin:.4em 0}.dq-badge{font-size:.74rem;font-weight:700;color:#0F5132;background:#D1E7DD;border-radius:999px;padding:2px 10px}.dq-theme{font-size:.8rem;color:var(--ink-2);margin:.2em 0 .6em}
+.dq-link{color:var(--teal-deep);text-decoration:underline;cursor:pointer}
+/* ---------- 學習駕駛艙（v3.12.0） ---------- */
+.ck{grid-column:1/-1;padding:16px 18px 18px;border:1px solid var(--rule);border-radius:var(--r-lg);background:linear-gradient(180deg,var(--sheet) 0,var(--sheet) 60%,var(--wash-2) 100%);display:grid;gap:14px}
+.ck-hd{display:flex;align-items:flex-start;gap:12px}
+.ck-title{margin:0;font-family:var(--display);font-size:1.18rem;letter-spacing:.02em}
+.ck-sub{margin:2px 0 0;font-size:.78rem;color:var(--ink-3)}
+.ck-stamp{margin-left:auto;font-size:.7rem;color:var(--ink-3);white-space:nowrap;padding:2px 8px;border:1px solid var(--rule-2);border-radius:999px}
+.ck-board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ck-col{display:flex;flex-direction:column;gap:8px;min-width:0;background:var(--wash-2);border-radius:var(--r-lg);padding:10px;border-top:3px solid var(--rule)}
+.ck-col.now{border-top-color:var(--seal)}.ck-col.next{border-top-color:#C99A3A}.ck-col.done{border-top-color:var(--ok)}
+.ck-colh{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:0 8px;padding:0 2px 4px}
+.ck-colh b{font-size:.88rem}.ck-colh small{grid-column:1/-1;font-size:.7rem;color:var(--ink-3)}
+.ck-cnt{font-family:var(--display);font-weight:700;font-size:.82rem;min-width:24px;text-align:center;padding:0 7px;border-radius:999px;background:var(--sheet);border:1px solid var(--rule)}
+.ck-list{display:grid;gap:8px}
+.ck-card{all:unset;box-sizing:border-box;display:grid;gap:4px;background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--teal);border-radius:var(--r-md);padding:9px 11px;box-shadow:0 1px 2px rgba(10,63,75,.05);transition:transform .16s var(--ease),box-shadow .16s var(--ease);min-width:0}
+button.ck-card{cursor:pointer}
+button.ck-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(10,63,75,.12)}
+button.ck-card:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.ck-card.warn{border-left-color:#C99A3A}.ck-card.safety{border-left-color:var(--peach)}
+.ck-col.done .ck-card{border-left-color:var(--ok)}
+.ck-ct{display:flex;align-items:center;gap:8px}
+.ck-tag{font-size:.66rem;font-weight:700;letter-spacing:.04em;color:var(--teal-deep);background:var(--wash);padding:1px 8px;border-radius:999px}
+.ck-card.warn .ck-tag{background:#FFF4DE;color:#8A5D0E}.ck-card.safety .ck-tag{background:var(--peach-wash);color:var(--peach)}
+.ck-big{margin-left:auto;font-family:var(--display);font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums;color:var(--ink)}
+.ck-t{font-size:.84rem;font-weight:600;line-height:1.4;color:var(--ink);word-break:break-word}
+.ck-m{font-size:.72rem;line-height:1.45;color:var(--ink-3);word-break:break-word}
+.ck-bar{height:4px;border-radius:999px;background:var(--wash);overflow:hidden;margin-top:2px}.ck-bar i{display:block;height:100%;background:var(--teal-deep);border-radius:inherit;transition:width .6s var(--ease)}
+.ck-col.done .ck-bar i{background:var(--ok)}
+.ck-go{justify-self:start;font-size:.72rem;font-weight:700;color:var(--teal-deep)}.ck-go::after{content:' →'}
+.ck-empty{font-size:.74rem;color:var(--ink-3);padding:10px;border:1px dashed var(--rule);border-radius:var(--r-md);text-align:center}
+.ck-nav{grid-column:1/-1;position:sticky;top:var(--ck-top,calc(var(--top-h) + 6px));z-index:12;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:6px;margin:-4px 0 0;border:1px solid var(--rule-2);border-radius:999px;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.ck-nav::-webkit-scrollbar{display:none}
+.ck-nb{flex:0 0 auto;border:0;background:transparent;font:inherit;font-size:.78rem;color:var(--ink-2);padding:6px 12px;border-radius:999px;cursor:pointer;min-height:32px}
+.ck-nb:hover{background:var(--wash-2)}.ck-nb.on{background:var(--teal-deep);color:#fff;font-weight:700}
+.ck-nb:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+.ck-flash{animation:ckflash 1.4s var(--ease)}
+@keyframes ckflash{0%{box-shadow:0 0 0 0 rgba(14,116,128,.0)}25%{box-shadow:0 0 0 4px rgba(14,116,128,.28)}100%{box-shadow:0 0 0 0 rgba(14,116,128,0)}}
+[data-ax]{scroll-margin-top:calc(var(--ck-top,var(--top-h)) + 58px)}
+@media (max-width:900px){.ck-board{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(260px,86%);overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:thin}.ck-col{scroll-snap-align:start}}
+.ck-more{all:unset;cursor:pointer;font-size:.74rem;font-weight:700;color:var(--teal-deep);text-align:center;padding:6px;border-radius:var(--r-md);border:1px dashed var(--rule)}.ck-more:focus-visible{outline:2px solid var(--teal)}
+@media (max-width:560px){.ck{padding:12px}.ck-hd{flex-wrap:wrap}.ck-stamp{margin-left:0}}
+@media (prefers-reduced-motion:reduce){.ck-card,.ck-bar i{transition:none}button.ck-card:hover{transform:none}.ck-flash{animation:none}}
+.bi-crumb small.views{flex:0 0 auto;margin-left:0}
+.tile.plan-tile{grid-column:span 2}
+@media (max-width:560px){.tile.plan-tile{grid-column:1/-1}}
+.uh-top{display:grid;grid-template-columns:minmax(220px,1fr) 2fr;gap:12px;margin:8px 0 10px}
+.uh-total{background:var(--wash-2);border-radius:var(--r-lg);padding:12px 14px;display:grid;gap:6px;align-content:start}
+.uh-total small{font-size:.74rem;color:var(--ink-3)}
+.uh-big b{font-family:var(--display);font-size:2rem;font-variant-numeric:tabular-nums}.uh-big span{font-size:.86rem;color:var(--ink-2);margin-left:4px}
+.uh-bar{height:8px;border-radius:999px;background:var(--wash);overflow:hidden}.uh-bar.sm{height:6px}.uh-bar i{display:block;height:100%;background:var(--teal-deep);border-radius:inherit;transition:width .6s var(--ease)}
+.uh-cats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.uh-cat{border:1px solid var(--rule);border-left:4px solid #C99A3A;border-radius:var(--r-md);padding:8px 10px;display:grid;gap:4px;background:var(--sheet)}
+.uh-cat.ok{border-left-color:var(--ok)}.uh-cat.ok .uh-bar i{background:var(--ok)}
+.uh-ch{display:flex;align-items:baseline;gap:8px}.uh-ch b{font-size:.84rem}.uh-ch span{margin-left:auto;font-family:var(--display);font-weight:700;font-variant-numeric:tabular-nums}
+.uh-cat small{font-size:.72rem;color:var(--ink-3)}
+.uh-tab th{white-space:nowrap}
+@media (max-width:700px){.uh-top{grid-template-columns:1fr}.uh-cats{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.uh-bar i{transition:none}}
 </style>
 </head>
 <body>
@@ -1263,7 +1369,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '3.9.0';
+var APP_VERSION = '4.3.1';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -1359,7 +1465,7 @@ function initGsi() {
 function onCredential(resp) {
   showLogin('驗證中…', 'info');
   api('login', { credential: resp && resp.credential }).then(function (j) {
-    S.session = j.session; S.user = j.bootstrap; saveSession();
+    S.session = j.session; S.user = j.bootstrap; saveSession(); S.justLoggedIn = true;
     var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     $('sealWrap').classList.add('stamped');
     showLogin('驗證完成，正在開啟…', 'info');
@@ -1502,6 +1608,7 @@ function startApp() {
     render();
     preloadAll();
     freshStart();
+    if (typeof statsLoad === 'function') { statsLoad(); if (S.justLoggedIn) { S.justLoggedIn = false; statsTrack('login'); } }
   }).catch(function (e) {
     if (e.code === 'AUTH_REQUIRED' || e.code === 'ACCESS_DENIED') return;
     if (e.code === 'SYSTEM_NOT_ACTIVATED') { stateView('', '系統正在上線檢查，暫不提供資料。您的帳號與角色已確認，啟用後即可使用。'); return; }
@@ -1921,12 +2028,12 @@ function buildScope() {
   Object.keys(groups).forEach(function (src) {
     var og = document.createElement('optgroup'); og.label = src;
     var o = document.createElement('option'); o.value = 'src:' + src; o.textContent = src + '（全部）'; og.appendChild(o);
-    groups[src].forEach(function (s) { var x = document.createElement('option'); x.value = 'sheet:' + s.key; x.textContent = '　' + s.title; og.appendChild(x); });
+    groups[src].forEach(function (s) { var x = document.createElement('option'); x.value = 'sheet:' + s.key; x.textContent = '　' + s.title + (typeof statsViews === 'function' && statsViews('S:' + s.key) !== null ? '（累積點閱 ' + statsFmt(statsViews('S:' + s.key)) + '）' : ''); og.appendChild(x); });
     sel.appendChild(og);
   });
   sel.value = S.scope;
 }
-$('scope').addEventListener('change', function () { S.scope = this.value; S.shown = 50; render(); });
+$('scope').addEventListener('change', function () { S.scope = this.value; S.shown = 50; render(); if (this.value.indexOf('sheet:') === 0 && typeof statsTrack === 'function') { var k = this.value.slice(6), sh = (S.catalog.sheets || []).filter(function (x) { return x.key === k; })[0]; statsTrack('view', '資料分頁', 'S:' + k, sh ? sh.title : k); } });
 
 var qTimer = null;
 $('q').addEventListener('input', function () {
@@ -1967,10 +2074,11 @@ function buildPages() {
     var b = document.createElement('button'); b.type = 'button'; b.className = 'page-card';
     var calc = p.type === '計算機' || p.type === '計算機模組';
     b.innerHTML = '<span class="ic' + (calc ? ' calc' : '') + '" aria-hidden="true">' + (calc ? ICONS.calc : ICONS.page) + '</span><span><small></small><b></b><p></p></span>';
-    b.querySelector('small').textContent = p.type; b.querySelector('b').textContent = p.name; b.querySelector('p').textContent = p.desc || '';
-    b.addEventListener('click', function () { openViewer(p.name, api('page', { id: p.id })); });
+    b.querySelector('small').textContent = p.type + (typeof statsViews === 'function' && statsViews('P:' + p.id) !== null ? '・累積點閱 ' + statsFmt(statsViews('P:' + p.id)) : ''); b.querySelector('b').textContent = p.name; b.querySelector('p').textContent = p.desc || '';
+    b.addEventListener('click', function () { if (typeof statsTrack === 'function') statsTrack('view', '網頁檔', 'P:' + p.id, p.name); openViewer(p.name, api('page', { id: p.id })); });
     box.appendChild(b);
   });
+  if (typeof dqCards === 'function' && S.user && S.user.active_role) { dqCards(box); $('tabPages').hidden = false; }
 }
 
 /* ---------- 搜尋與呈現 ---------- */
@@ -2158,6 +2266,7 @@ function openDrawer(i) {
   var wasOpen = !$('drawer').hidden;
   S.current = i;
   var h = S.view[i], d = S.data[h.key], row = d.rows[h.row];
+  if (typeof statsTrack === 'function') statsTrack('view', '資料分頁', 'S:' + h.key, d.meta.title);
   if (!wasOpen) lastFocus = document.activeElement;
   var title = $('drawerTitle'); title.innerHTML = '';
   var cr = document.createElement('span'); cr.className = 'crumb'; cr.appendChild(dot(d.meta.source)); cr.appendChild(document.createTextNode(d.meta.title + '（' + d.meta.source + '）'));
@@ -2357,7 +2466,7 @@ document.addEventListener('keydown', function (e) {
 });
 
 /* ---------- 分析與成績（統計與隱私閘門一律在伺服器；本頁只送條件、畫圖） ---------- */
-S.dash = null; S.dashId = null; S.filt = {}; S.subject = ''; S.dashReq = 0;
+S.dash = null; S.dashId = null; S.filt = {}; S.subject = ''; S.dashReq = 0; S.ck = {};
 var MONTHS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 /* 成效儀表板資訊架構：總覽 → 四大類 → 各儀表板。分類依控制台名稱（使用者裁決之對照）；控制台若提供 category 欄位則優先採用 */
 /* 已併入成效儀表板、不在資料查詢列出的分頁（分頁代碼＝控制台「分頁開放」K 欄；標題為代碼變動時的備援比對） */
@@ -2389,7 +2498,7 @@ var DASH_LAYOUT = {
     hide: [/（CbD）五大面向/, /（CbD）晨會簡報/, /^簡報分數/, /^簡報各評核面向/, /^簡報文字回饋/],
     collapse: [/里程碑/, /可信賴專業活動|EPAs/, /^綜合分數/, /^CBME 教師質性回饋/, /（CbD）質性回饋/, /^臨床能力委員會/], collapseTitle: '後台原始圖表（已整併至上方：能力地圖、質性回饋；此處保留原始呈現供查核）'
   },
-  'UGY 學生個人成績': { order: ['ax:growth', 'ax:hl', 'ax:ilp', /^個人實習總分/, /^DOPS/, /^簡報分數/, /^教師質性回饋/, 'ax:cmp'], hide: [/^實習總成績組成/, /^個人整體實習分數/], collapse: [/^個人各面向分數/], collapseTitle: '後台原始統計：個人各面向分數（與上方能力剖面重複）' },
+  'UGY 學生個人成績': { order: ['ax:growth', 'ax:hours', 'ax:hl', 'ax:ilp', /^個人實習總分/, /^DOPS/, /^簡報分數/, /^教師質性回饋/, 'ax:cmp'], hide: [/^實習總成績組成/, /^個人整體實習分數/], collapse: [/^個人各面向分數/], collapseTitle: '後台原始統計：個人各面向分數（與上方能力剖面重複）' },
   '教師個人成績': { order: ['ax:growth', 'ax:hl', 'ax:ilp', /^學員質性回饋/, /^教師評核等第一覽/, /^各評核來源等第/, 'ax:cmp'] },
   'CBME 成效': { order: ['ax:team', 'ax:hl', 'ax:ind2', 'ax:ind', /綜合分數/], collapse: [/里程碑（Milestones）/], collapseTitle: '後台原始統計：里程碑／EPA 各級達成率（判定來源依後台設定，非正式 G01）' },
   '學生學習成效': { order: ['ax:board', 'ax:team', 'ax:ind', 'ax:matrix'], hide: [/^實習總成績組成/] },
@@ -2513,6 +2622,7 @@ function setCrumb(title, sub) {
   }
   var h = document.createElement('span'); h.className = 'crumb-title'; h.textContent = title; cr.appendChild(h);
   if (sub) { var sm = document.createElement('small'); sm.textContent = sub; cr.appendChild(sm); }
+  if (typeof statsCrumb === 'function') statsCrumb();
 }
 $('slicerReset').addEventListener('click', function () { if (S.dashId) openDashboard(S.dashId); });
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.querySelector('.chart.focused')) { e.stopPropagation(); unfocusChart(); } }, true);
@@ -2533,6 +2643,7 @@ function openDashboard(id) {
   S.dashCat = catOfId(id);
   renderDashNav();
   setCrumb(dashName(id));
+  if (id !== OVERVIEW_ID && id.indexOf(OVERVIEW_ID + ':') !== 0 && typeof statsTrack === 'function') statsTrack('view', '儀表板', 'D:' + id, dashName(id));
   $('dashKpis').innerHTML = '';
   var isOv = id === OVERVIEW_ID || id.indexOf(OVERVIEW_ID + ':') === 0;
   $('slicerReset').hidden = isOv;
@@ -3440,7 +3551,7 @@ function drawKanban(c) {
       var cd = document.createElement('div'); cd.className = 'kcard';
       var sec = null, secStem = null, seen = {};
       (k.v || []).forEach(function (v, i) {
-        var tv = normGlyph(v || '').trim();
+        var tv = kbMask(normGlyph(v || '').trim()); /* v4.3：看板顯示前遮蔽病歷號／床號樣式 */
         if (!tv || /^(無|none|null|n\/a|-)$/i.test(tv)) return;
         var lab = fl[i] || '', st = stem(lab), multi = stemCount[st] > 1;
         if (sameStem) { var d0 = document.createElement('div'); d0.className = 'kline'; d0.appendChild(linkifyText(tv)); cd.appendChild(d0); return; }
@@ -3904,10 +4015,11 @@ function enhanceDashboard(d, box) {
   var name = dashName(S.dashId) || d.name;
   if (catOfId(S.dashId) === 'personal') axPeerApply(); else box.classList.remove('ax-peeroff');
   var fn = AX_PANELS[name]; if (!fn) return;
+  S.ck = {};
   var host = axEl('div', 'ax-host'); box.insertBefore(host, box.firstChild);
   var ld = axEl('div', 'chart ax-card ax-loading'); ld.innerHTML = '<div class="ax-spin" aria-hidden="true"></div><span>分析資料載入中…</span>'; host.appendChild(ld);
   var gen = S.dashReq;
-  Promise.resolve().then(function () { return fn(host, d); }).then(function () { ld.remove(); if (gen === S.dashReq) { axApplyLayout(box, host, name); if (catOfId(S.dashId) === 'personal') axPeerApply(); } }, function (e) {
+  Promise.resolve().then(function () { return fn(host, d); }).then(function () { ld.remove(); if (gen === S.dashReq) { axApplyLayout(box, host, name); if (catOfId(S.dashId) === 'personal') axPeerApply(); if (typeof ckBuild === 'function') try { ckBuild(box, name, d); } catch (e) { if (window.console) console.error(e); } } }, function (e) {
     if (gen !== S.dashReq) return; ld.classList.remove('ax-loading'); ld.className = 'chart ax-card';
     ld.innerHTML = ''; ld.appendChild(axEl('div', 'state', e && e.code === 'NO_PERMISSION' ? (AX_NOPERM[name] || '目前角色無法讀取此分析資料。') : isRebuild(e) ? REBUILD_TEXT : '分析資料暫時無法載入：' + ((e && e.message) || e)));
     if (isRebuild(e)) axRebuildRetry();
@@ -4168,7 +4280,7 @@ function axPresGroup(host) {
       names.forEach(function (w) {
         var star = [], best = null, own = [];
         D.items.forEach(function (it) { if (itm[it] && itm[it][w] !== undefined) own.push(itm[it][w]); }); var om = axMean(own);
-        if (sc[w] !== undefined && scs.length >= 5 && sc[w] > q[1] && sc[w] >= q[2]) star.push({ item: '簡報分數 ' + axFmt(sc[w], 1), tip: '同期群領先：本人簡報分數 ' + axFmt(sc[w], 1) + '，同期群中位數 ' + axFmt(q[1], 1) + '、第 75 百分位 ' + axFmt(q[2], 1) + '（同期 ' + scs.length + ' 人）' });
+        if (sc[w] !== undefined && scs.length >= 5 && ppl[w].length >= 2 && sc[w] > q[1] && sc[w] >= q[2]) star.push({ item: '簡報分數 ' + axFmt(sc[w], 1), tip: '同期群領先：本人簡報分數 ' + axFmt(sc[w], 1) + '，同期群中位數 ' + axFmt(q[1], 1) + '、第 75 百分位 ' + axFmt(q[2], 1) + '（同期 ' + scs.length + ' 人）' });
         D.items.forEach(function (it) { var o = itm[it] && itm[it][w]; if (o === undefined) return; var all = Object.keys(itm[it]).map(function (k) { return itm[it][k]; }); var md = axMedian(all); if (all.length >= 5 && o >= md && o - om > 0 && (!best || o - om > best.rel)) best = { item: it, mean: o, rel: o - om, n: ppl[w].length, cohMed: md }; });
         var qs = []; ppl[w].forEach(function (p) { qs = qs.concat(p.good); });
         if (star.length || best) items.push({ name: ppl[w][0].name.replace(/^\s*[A-Za-z]{0,2}\d+\s+/, ''), sub: '簡報 ' + ppl[w].length + ' 場' + (sc[w] !== undefined ? '｜簡報分數 ' + axFmt(sc[w], 1) : ''), hl: { star: star, diamond: best }, quotes: axQuotes(qs, 1) });
@@ -4477,6 +4589,7 @@ function axUgyGrowthBlock(host, who, MA, quotes) {
   var strong = stat.filter(function (x) { return x.m !== null && x.n >= 3 && x.m - om >= .1; }).sort(function (a, b) { return b.m - a.m; }).slice(0, 2);
   var nxt = stat.filter(function (x) { return x.m !== null && x.n >= 3; }).map(function (x) { return { x: x, sc: (om - x.m) * 10 + (x.d !== null && x.d >= .5 ? 5 : 0) }; }).filter(function (y) { return y.sc > 0; }).sort(function (a, b) { return b.sc - a.sc; }).slice(0, 2);
   var sec = axEl('section', 'chart ax-card ax-growth'); sec.dataset.ax = 'growth'; host.appendChild(sec);
+  try { S.ck.ugy = { om: om, n: axRows(oth), units: units.length, self: self.length, cal: cal, strong: strong.map(function (x) { return x.it.replace(/^\d+\.\s*/, ''); }), next: nxt.map(function (y) { return { k: y.x.it.replace(/^\d+\.\s*/, ''), m: y.x.m }; }) }; } catch (e) { /* 只影響駕駛艙 */ }
   axGrowthHead(sec, '我的學習成長（UGY）', who + '｜他評 ' + axRows(oth) + ' 份｜輪訓單位 ' + units.length + ' 個',
     '<b>評估架構</b>：UGY-360 的 8 題即《醫院藥學實習辦法》（1100729 修訂版）附件一「醫院藥學實習評估表」的八個評估項目——壹、專業素養（專業態度的表現、有效的溝通、成為團隊中積極的成員、經營個人及專業的成長）、貳、技術單元（調劑、藥品管理觀念的認知與了解、臨床藥事服務、藥品諮詢）。辦法規定「並非逐條評分，以綜合表現評分」，評分為五等；院內採 1–6 分，與辦法的五等不是同一量尺，本頁不換算。<br><b>他評</b>＝教師與同儕評核（1–6 分）；<b>自評</b>單獨呈現，用來對照自己的判斷，不計入他評。<br><b>自評與他評差異</b>：同一題自評與他評平均相差 0.5 分以上，標示「自評較高／較低」；這是反思素材，不是扣分。<br><b>優勢</b>：他評平均高於本人整體平均 0.1 分以上、且至少 3 份的題目。<br><b>下一步發展重點</b>：相對較弱、或自評明顯高於他評的題目，供與教師討論後寫入 ILP。<br><b>正式成績</b>：辦法第捌條（合約第十條）規定實習期滿由醫院填寫成績送交學校；本頁「個人實習總分」為院內總結性成績，由後台提供。', true);
   var g = axEl('div', 'ax-gtiles'); sec.appendChild(g);
@@ -4878,6 +4991,7 @@ function axEpaPlanCard(host, G, P, cbdBySrc, d) {
     else if (lc && lc.C[k].v >= 4 - AX_EPS) { st = '已判定 L4；公版證據量未達，請核對紀錄是否完整'; cls = 'low'; }
     else { st = (due ? '已到 L4 時機，' : '') + '證據量未達'; cls = due ? 'warn' : 'low'; }
     if (pl.recManual && recOk === true && cls === 'ok') { st = '紀錄筆數已達；' + pl.recManual; cls = 'low'; }
+    if (S.ck) (S.ck.epaPlan = S.ck.epaPlan || []).push({ no: e.no, name: e.name, l4: e.l4, due: due, st: st, cls: cls });
     var tr = document.createElement('tr');
     tr.appendChild(axEl('th', '', 'EPA ' + e.no + ' ' + e.name + '（' + e.l4 + ' 個月）'));
     tr.appendChild(axEl('td', '', cur));
@@ -4979,6 +5093,7 @@ function axPgyGrowthBlock(host, who, P, cbdN, cbdFb, extra) {
   var sec = axEl('section', 'chart ax-card ax-growth'); sec.dataset.ax = 'growth'; host.appendChild(sec);
   if (G.ambiguous) { axGrowthHead(sec, '我的專業成長（CBME）', who, '同名資料無法安全區分，系統停止計算。', false); sec.appendChild(axEl('div', 'state', '「' + axName(who) + '」在學員CBME 中對應到多位學員（' + G.ambiguous.join('、') + '），為避免誤配，暫停顯示。請在對象選單使用含學員代碼的名稱。')); return; }
   var last = G.last;
+  try { S.ck.pgy = { met: G.met, req: G.req.length, stage: last.stage, src: last.src, date: last.date, prev: G.prev ? G.prev.stage : '', tr: G.tr, epa: G.epa, cand: (G.cand || []).map(function (c) { return { k: c.k, safety: !!c.safety }; }), rows: m.rows.map(function (r) { return { stage: r.stage, mo: axStageMonths(r.stage), date: r.date ? axFmtDate(r.date) : '', t: r.date ? r.date.getTime() : 0, any: !!r.any }; }) }; } catch (e) { /* 只影響駕駛艙 */ }
   // 期程進度（v3.5）：每個公版期程的狀態——已判定（CCC）／僅教師觀察／已排程未評（有 CCC 日期無等級）／未排程；預定日期由起訓年月推估
   var allR = m.rows.slice().sort(function (a, b) { return (a.mo || 0) - (b.mo || 0); }), noLv = allR.filter(function (r) { return !r.any && (r.date || r.fb.length); });
   axGrowthHead(sec, '我的專業成長（CBME）', axIdKey(who) + '｜最近有等級的期程 ' + last.stage + '｜判定來源：' + last.src + (last.date ? '｜CCC 日期 ' + axFmtDate(last.date) : '') + (noLv.length ? '｜另有 ' + noLv.map(function (r) { return r.stage; }).join('、') + ' 已建檔但尚無等級' : ''),
@@ -5686,11 +5801,11 @@ function axStudentPersonal(host, d) {
   var who = axSubjName(d); if (!who) return Promise.resolve();
   return Promise.all([axPrep('stu'), axLoad(AX.KEYS.stuScore).catch(function () { return null; })]).then(function (r) {
     var M = r[0], sc = r[1];
-    var mine = M.recs.filter(function (x) { return axName(x.subj) === who; });
+    var lab43 = axSubjLabel(d), mine = M.recs.filter(function (x) { return axSameSubj(x.subj, lab43); }); if (ax43Ambig(mine, host, who)) return; /* v4.3.1：代碼＋姓名比對，同名歧義 fail-closed */
     if (!mine.length) { host.appendChild(axTag(axEl('div', 'chart ax-card state', '「' + who + '」在學生學習成效資料中沒有評分紀錄。'), 'hl')); return; }
     var years = Object.keys(axGroup(mine, 'year'));
     var cohort = M.recs.filter(function (x) { return years.indexOf(x.year) >= 0; });
-    var hl = axHighlights(cohort, 'subj', 'year'), key = Object.keys(hl).filter(function (k) { return axName(k) === who; })[0];
+    var hl = axHighlights(cohort, 'subj', 'year'), key = Object.keys(hl).filter(function (k) { return axSameSubj(k, lab43); })[0];
     var quotes = axFeedbackFor(sc, /學生姓名/, /具體內容/, who);
     try { axUgyGrowthBlock(host, who, axMelt(M.src, Object.assign({}, AX_SPEC.stu, { selfCol: null })), axQuotes(quotes, 20)); } catch (e) { if (window.console) console.error(e); }
     axIlpPanel(host, who, 'UGY 學生｜依 UGY-360 他評與自評自動帶入');
@@ -5702,6 +5817,7 @@ function axStudentPersonal(host, d) {
     var M2 = { recs: tag(mine, '本人').concat(tag(cohort, '同期群')), dims: [{ k: 'item', label: '評分題目' }, { k: 'who', label: '本人／同期群' }, { k: 'unit', label: '教學單位' }, { k: 'year', label: '年份' }] };
     axMatrix(host, M2, { ax: 'cmp', title: '同期參照：本人與同年份學生（評分題目）', desc: '第二層參照，不作排名；同期群為同年份全體學生，不顯示他人身分。本人欄不受最小份數限制。', row: 'item', col: 'who', facet: '', minNKeys: { '本人': 1 }, note: axFlagNote(M.flags) });
     var cm = host.querySelector('[data-ax=cmp]'); if (cm) cm.classList.add('ax-peer');
+    return typeof ugyHoursPanel === 'function' ? ugyHoursPanel(host, d) : null;
   });
 }
 function axTeacherPersonal(host, d) {
@@ -5710,10 +5826,10 @@ function axTeacherPersonal(host, d) {
     var M = rr[0];
     try { axTeaGrowthBlock(host, who, axMelt(M.src, axTeaSpecAll()), rr[2], []); } catch (e) { if (window.console) console.error(e); }
     axIlpPanel(host, who, '教師專業發展｜依學員評核自動帶入');
-    var mine = M.recs.filter(function (x) { return axName(x.subj) === who; });
+    var lab43 = axSubjLabel(d), mine = M.recs.filter(function (x) { return axSameSubj(x.subj, lab43); }); if (ax43Ambig(mine, host, who)) return; /* v4.3.1：代碼＋姓名比對，同名歧義 fail-closed */
     if (!mine.length) { host.appendChild(axTag(axEl('div', 'chart ax-card state', '「' + who + '」在教師教學成效資料中沒有評分紀錄。'), 'hl')); return; }
     var years = axSortKeys(Object.keys(axGroup(mine, 'year')), 'year');
-    var hl = axHighlights(M.recs, 'subj', 'year'), key = Object.keys(hl).filter(function (k) { return axName(k) === who; })[0];
+    var hl = axHighlights(M.recs, 'subj', 'year'), key = Object.keys(hl).filter(function (k) { return axSameSubj(k, lab43); })[0];
     var qs = axQuotes(axFeedbackFor(rr[1], /受評者姓名/, /具體內容/, who), 3);
     var cards = [], skip = [];
     years.slice().reverse().forEach(function (y, i) { var h = key && hl[key][y], q2 = i === 0 ? qs : []; if ((h && (h.star.length || h.diamond)) || q2.length) cards.push(axHLCard(who, y + '｜' + (h ? h.n : 0) + ' 份評核｜同期群 ' + Object.keys(axGroup(M.recs.filter(function (x) { return x.year === y; }), 'subj')).length + ' 位教師', h, q2)); else skip.push(y + '（' + (h ? h.n : 0) + ' 份）'); });
@@ -5745,6 +5861,7 @@ function axTraineePersonal(host, d) {
     if (mo) {
       var nm = axCol(mo.cols, /簡報者姓名/), dI = axCol(mo.cols, /簡報日期/), tI = axCol(mo.cols, /簡報主題/), kI = axCol(mo.cols, /簡報分類/), uI = axCol(mo.cols, /簡報檔|上傳/);
       var mrows = mo.rows.filter(function (row) { return axSameSubj(row[nm], axSubjLabel(d)); });
+      try { var ms = mrows.slice().sort(function (a, b) { return (axDate(b[dI]) || 0) - (axDate(a[dI]) || 0); }); S.ck.morning = { n: mrows.length, last: ms[0] ? String(ms[0][dI] || '') : '', topic: ms[0] ? normGlyph(ms[0][tI] || '') : '' }; } catch (e) { /* 只影響駕駛艙 */ }
       if (mrows.length) {
         var sec = axEl('section', 'chart ax-card'); sec.dataset.ax = 'morning'; sec.appendChild(axEl('h3', 'ax-title', '晨會病例簡報（' + mrows.length + ' 場）'));
         var tl = axEl('ol', 'ax-tl');
@@ -7663,9 +7780,10 @@ function planTile(pid, label) {
     var cur = p.current, pm = cur >= 1 && cur <= 24 ? p.perMonth[cur - 1] : null;
     v.textContent = cur === 0 ? '尚未起訓' : cur >= 25 ? '已結訓（24／24 月）' : '第 ' + cur + '／24 月' + (p.months[cur - 1].kind === '階段評量月' ? '・階段評量月' : '');
     var last = (j.versions || [])[0];
-    n.textContent = (pm ? '本月 ' + pm.n + (pm.extra ? '＋' + pm.extra : '') + ' 項、約 ' + pm.hours + ' 小時' : '') + (last ? '｜上次重排：' + String(last.trigger || '').split('；')[0].slice(0, 40) + '（' + String(last.at).slice(0, 10) + '）' : '') + (o.stale ? '｜可能不是最新' : '');
+    n.textContent = (pm ? '本月 ' + pm.n + (pm.extra ? '＋' + pm.extra : '') + ' 項、約 ' + pm.hours + ' 小時' : '') + (last ? '｜上次重排 ' + String(last.at).slice(5, 10).replace('-', '/') + '：' + String(last.trigger || '').split('；')[0].replace(/（\d{4}-\d{2}-\d{2}）/, '').slice(0, 32) : '') + (o.stale ? '｜可能不是最新' : '');
     (p.badges || []).forEach(function (b) { bd.appendChild(axEl('span', 'pl-b ' + planBadgeCls(b), b)); });
     if (j.me && (j.me.writer || j.me.all) && j.myTodo) bd.appendChild(axEl('span', 'pl-b warn', '待辦 ' + j.myTodo));
+    if (j.me && j.me.self && typeof dqApi === 'function') dqApi('today').then(function (q) { var left = (q.items || []).filter(function (i) { return !(i.done && i.done.stage >= 5); }).length; if (left) { var l = axEl('small', 'note dq-link', '今日疑義處方題目 ' + left + ' 題未做'); l.addEventListener('click', function (e) { e.stopPropagation(); dqOpen(); }); t.appendChild(l); } }).catch(function () { /* 未啟用 */ });
   }).catch(function (e) {
     if (e && e.code === 'PLAN_OFF') { t.remove(); return; }
     v.textContent = '暫時無法載入'; n.textContent = (e && e.message) || '';
@@ -7685,6 +7803,7 @@ function planOpen(pid, label, tab) {
   var x = axEl('button', 'ilp-x', '×'); x.type = 'button'; x.setAttribute('aria-label', '關閉'); x.addEventListener('click', close); hd.appendChild(x); dlg.appendChild(hd);
   var body = axEl('div', 'ilp-body pl-body'); dlg.appendChild(body); body.appendChild(axEl('div', 'state', '載入課程…'));
   S.plan.open = { pid: pid, label: label, tab: tab || 'now', redraw: null };
+  if (typeof statsTrack === 'function') statsTrack('view', '課程卡片', 'PLAN', '個人化訓練課程安排');
   function load(force) {
     return Promise.all([planFetch(pid, force), planLib().catch(function () { return null; })]).then(function (r) { draw(r[0], r[1]); }).catch(function (e) {
       body.innerHTML = ''; body.appendChild(axEl('div', 'state', (e && e.message) || '暫時無法載入課程'));
@@ -7795,13 +7914,13 @@ function planViewCcc(pane, ctx) {
   var p = ctx.p, nx = (p.stages || []).filter(function (s) { return !s.closed; })[0];
   if (nx) {
     var box = axEl('div', 'pl-kv');
-    [['下次 CCC', nx.stage + '（預定 ' + (nx.cccDate || nx.predicted) + '）'], ['教學完成截止', nx.teachDue], ['證據擷取截止（CCC−7 天）', nx.evidenceDue], ['期程狀態', nx.state]].forEach(function (kv) { var d = axEl('div', ''); d.appendChild(axEl('b', '', kv[0])); d.appendChild(axEl('span', '', kv[1])); box.appendChild(d); });
+    [['下次 CCC（學員CBME）', nx.stage + '｜' + (nx.cccDate || '尚未排定')], ['教學完成截止（依起訓日）', nx.teachDue], ['證據擷取截止（CCC−7 天）', nx.cccDate ? nx.evidenceDue : '待 CCC 日期排定'], ['期程狀態', nx.state]].forEach(function (kv) { var d = axEl('div', ''); d.appendChild(axEl('b', '', kv[0])); d.appendChild(axEl('span', '', kv[1])); box.appendChild(d); });
     pane.appendChild(box);
   } else pane.appendChild(planNote('info', '五個期程均已結案。'));
-  var tb = axEl('div', 'pl-gt'); var hd = axEl('div', 'pl-gr head'); ['期程', '預定日', 'CCC 日期', '狀態', '完成'].forEach(function (h) { hd.appendChild(axEl('span', '', h)); }); tb.appendChild(hd);
+  var tb = axEl('div', 'pl-gt'); var hd = axEl('div', 'pl-gr head'); ['期程', '排程推估（非 CCC）', 'CCC 日期（學員CBME）', '狀態', '完成'].forEach(function (h) { hd.appendChild(axEl('span', '', h)); }); tb.appendChild(hd);
   (p.stages || []).forEach(function (s) {
     var done = p.slots.filter(function (x) { return x.counted && planStageOfMonth(x.month) === s.stage; }).length, all = p.slots.filter(function (x) { return planStageOfMonth(x.month) === s.stage; }).length;
-    var r = axEl('div', 'pl-gr ' + (s.overdue ? 'low' : '')); [s.stage, s.predicted, s.cccDate || '—', s.state, done + '／' + all].forEach(function (v) { r.appendChild(axEl('span', '', v)); }); tb.appendChild(r);
+    var r = axEl('div', 'pl-gr ' + (s.overdue ? 'low' : '')); [s.stage, s.predicted, s.cccDate || '尚未排定', s.state, done + '／' + all].forEach(function (v) { r.appendChild(axEl('span', '', v)); }); tb.appendChild(r);
   });
   pane.appendChild(tb);
   var src = (p.stats && p.stats.bySource) || {}; var keys = Object.keys(src);
@@ -7957,6 +8076,1297 @@ function planPrint(ctx) {
   var done = function () { document.body.classList.remove('pl-printing'); box.remove(); window.removeEventListener('afterprint', done); };
   window.addEventListener('afterprint', done); window.print(); setTimeout(function () { if (document.body.contains(box)) done(); }, 60000);
 }
+/* ====================================================================
+ * 使用統計（v3.10.0）：全站累積登入次數；各儀表板／資料分頁／網頁檔／課程卡片累積點閱數
+ * 同一人同一天同一項目只計 1 次（後台判定）；統計失敗不影響任何功能。
+ * ==================================================================== */
+S.stats = null;
+function statsDevice() { try { return (window.matchMedia && matchMedia('(pointer:coarse)').matches) || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? '手機／平板' : '電腦'; } catch (e) { return '電腦'; } }
+function statsLoad() {
+  return apiRaw('stats', { op: 'get' }).then(function (j) { S.stats = j.totals || null; statsApply(); }).catch(function () { /* 後台未更新時不顯示 */ });
+}
+function statsSeen(code) {
+  var day = new Date().toISOString().slice(0, 10), k = 'st_seen_' + day, m = {};
+  try { m = JSON.parse(sessionStorage.getItem(k) || '{}'); } catch (e) { m = {}; }
+  if (m[code]) return true; m[code] = 1;
+  try { sessionStorage.setItem(k, JSON.stringify(m)); } catch (e) { /* 無痕模式 */ }
+  return false;
+}
+function statsTrack(kind, cat, code, name) {
+  if (!S.session) return;
+  if (kind === 'view' && statsSeen(code)) return;
+  apiRaw('stats', { op: 'track', kind: kind, cat: cat, code: code, name: name, device: statsDevice() }).then(function (j) {
+    if (!S.stats || !j.counted) return;
+    if (typeof j.logins === 'number') S.stats.logins = j.logins;
+    if (kind === 'view' && typeof j.views === 'number') S.stats.views[code] = j.views;
+    statsApply();
+  }).catch(function () { /* 忽略 */ });
+}
+function statsViews(code) { return S.stats && S.stats.views ? S.stats.views[code] || 0 : null; }
+function statsFmt(n) { return Number(n || 0).toLocaleString('zh-TW'); }
+function statsApply() {
+  if (!S.stats) return;
+  var el = $('siteLogins');
+  if (!el) { el = document.createElement('span'); el.id = 'siteLogins'; el.className = 'site-logins'; var br = document.querySelector('.top .brand'); if (br) br.appendChild(el); }
+  el.textContent = '全站累積登入 ' + statsFmt(S.stats.logins) + ' 次'; el.title = '統計時間 ' + (S.stats.at || '');
+  try { if (S.catalog) { buildScope(); buildPages(); } } catch (e) { /* 略 */ }
+  statsCrumb();
+}
+function statsCrumb() {
+  var cr = $('dashCrumb'); if (!cr || !S.stats) return;
+  var old = cr.querySelector('.views'); if (old) old.remove();
+  var id = S.dashId; if (!id || id === OVERVIEW_ID || id.indexOf(OVERVIEW_ID + ':') === 0) return;
+  var v = document.createElement('small'); v.className = 'views'; v.textContent = '累積點閱 ' + statsFmt(statsViews('D:' + id)) + ' 人次'; cr.appendChild(v);
+}
+/* ====================================================================
+ * 疑義處方每日一題（v3.11.0；v3.14.0 依題庫複核修正）：先作答、再揭曉、（題庫有不接受案例時）猜結局、最後自評；不排名、不計分、不進 CCC。
+ * ==================================================================== */
+S.dq = { today: null, map: null };
+var DQ_TYPE = { A: '找問題', B: '給建議', C: '猜結局', G: '折衷題' };
+function dqApi(op, extra) { return apiRaw('dailyq', Object.assign({ op: op }, extra || {})); }
+function dqCards(box) {
+  var r = S.user && S.user.active_role;
+  if (r === 'TRAINEE' || r === 'STUDENT') box.insertBefore(dqCard('疑義處方每日一題', '每天 3 題〔模擬〕案例：找問題、給建議、猜結局；本週主題輪替', function () { dqOpen(); }), box.firstChild);
+  else if (r && r !== 'STUDENT') box.insertBefore(dqCard('每日一題・導師檢視', '指派學員近 30 天答題天數與弱點類型', function () { dqMentorOpen(); }), box.firstChild);
+}
+function dqCard(name, desc, fn) {
+  var b = document.createElement('button'); b.type = 'button'; b.className = 'page-card dq-card';
+  b.innerHTML = '<span class="ic" aria-hidden="true">' + ICONS.page + '</span><span><small></small><b></b><p></p></span>';
+  b.querySelector('small').textContent = '互動練習'; b.querySelector('b').textContent = name; b.querySelector('p').textContent = desc;
+  b.addEventListener('click', fn);
+  (S.dq.cardP = S.dq.cardP || dqApi(S.user.active_role === 'TRAINEE' || S.user.active_role === 'STUDENT' ? 'map' : 'mentor')).then(function (j) {
+    if (j.cells) b.querySelector('small').textContent = '互動練習・本月完成 ' + j.monthDays + ' 天';
+  }).catch(function (e) { if (e && (e.code === 'DAILYQ_OFF' || e.code === 'INVALID_QUERY')) b.remove(); });
+  return b;
+}
+function dqShell(title) {
+  var prev = document.activeElement, ov = axEl('div', 'ilp-ov'), dlg = axEl('div', 'ilp-dlg dq-dlg'); dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true'); dlg.setAttribute('aria-labelledby', 'dqT');
+  ov.appendChild(dlg); document.body.appendChild(ov); document.body.style.overflow = 'hidden';
+  function close() { ov.remove(); document.body.style.overflow = ''; document.removeEventListener('keydown', esc); if (prev && prev.focus) prev.focus(); }
+  function esc(e) { if (e.key === 'Escape') close(); }
+  ov.addEventListener('click', function (e) { if (e.target === ov) close(); }); document.addEventListener('keydown', esc);
+  var hd = axEl('div', 'ilp-hd'), ht = axEl('div'), h3 = axEl('h3', '', title); h3.id = 'dqT'; ht.appendChild(h3); var sub = axEl('small', '', ''); ht.appendChild(sub); hd.appendChild(ht);
+  var x = axEl('button', 'ilp-x', '×'); x.type = 'button'; x.setAttribute('aria-label', '關閉'); x.addEventListener('click', close); hd.appendChild(x); dlg.appendChild(hd);
+  var body = axEl('div', 'ilp-body dq-body'); dlg.appendChild(body); body.appendChild(axEl('div', 'state', '載入中…'));
+  return { body: body, sub: sub, close: close };
+}
+function dqOpen() {
+  var sh = dqShell('疑義處方每日一題');
+  if (typeof statsTrack === 'function') statsTrack('view', '網頁檔', 'P:dailyq', '疑義處方每日一題');
+  function load() {
+    Promise.all([dqApi('today'), dqApi('map').catch(function () { return null; })]).then(function (r) {
+      var t = r[0], m = r[1]; S.dq.today = t; S.dq.map = m; sh.body.innerHTML = '';
+      sh.sub.textContent = t.day + '｜今天 ' + t.items.filter(function (i) { return i.done && i.done.stage >= 5; }).length + '／' + t.items.length + ' 題完成' + (m ? '｜本月完成 ' + m.monthDays + '／' + m.monthElapsed + ' 天' : '') + (m && m.redline ? '｜安全天數 ' + m.redline.safeDays : '');
+      if (t.theme) sh.body.appendChild(axEl('p', 'dq-theme', '本週主題：' + t.theme + '（每週輪替；標籤相符的題目優先出現）'));
+      if (t.empty || !t.items.length) { sh.body.appendChild(axEl('div', 'state', t.empty ? '題庫尚在教師複核中，完成後就會出題。' : '今天沒有可出的新題目。')); }
+      t.items.forEach(function (it, i) { sh.body.appendChild(dqItem(it, i + 1, load)); });
+      if (m) sh.body.appendChild(dqMap(m));
+      sh.body.appendChild(axEl('p', 'pl-note', (t.note ? t.note + ' ' : '') + '這是練習：不計分、不排名、不作為考核或 CCC 依據；作答紀錄只有您自己看得到逐題內容，導師只看到類型統計。'));
+      var first = sh.body.querySelector('.dq-item:not(.done) input, .dq-item:not(.done) button'); if (first) first.focus();
+    }).catch(function (e) { sh.body.innerHTML = ''; sh.body.appendChild(axEl('div', 'state', (e && e.message) || '暫時無法載入')); });
+  }
+  load();
+}
+function dqItem(it, n, reload) {
+  var stage = it.done ? it.done.stage : 1, box = axEl('section', 'dq-item' + (stage >= 5 ? ' done' : '')), t0 = Date.now();
+  var hd = axEl('div', 'pl-rt'); hd.appendChild(axEl('span', 'pl-tier', '第 ' + n + ' 題・' + DQ_TYPE[it.type] + (it.level ? '・' + it.level : ''))); hd.appendChild(axEl('span', 'pl-code', it.why)); if (it.risk === '極高') hd.appendChild(axEl('span', 'dq-risk', '極高風險・答錯計紅線')); if (stage >= 5) hd.appendChild(axEl('span', 'pl-st done', '完成')); box.appendChild(hd);
+  var ctx = axEl('div', 'dq-case'); ctx.appendChild(axEl('p', 'dq-sum', it.stem)); box.appendChild(ctx);
+  var area = axEl('div', 'dq-area'); box.appendChild(area);
+  function msg(t) { var m = area.querySelector('.pl-msg'); if (!m) { m = axEl('p', 'pl-msg'); area.appendChild(m); } m.textContent = t; }
+  function radios(name, legend, opts) { var fs = axEl('fieldset', 'dq-opts'); fs.appendChild(axEl('legend', '', legend)); opts.forEach(function (o) { var l = axEl('label', 'dq-opt'), r = document.createElement('input'); r.type = 'radio'; r.name = name; r.value = o.v; l.appendChild(r); l.appendChild(document.createTextNode(' ' + o.t)); fs.appendChild(l); }); return fs; }
+  if (stage === 1) {
+    var get, name = 'dq' + it.id + it.type;
+    if (it.type === 'G') {
+      var o = it.options, f1 = radios(name + 'o', '1. 醫師會全部採納，還是只採納一部分？', o.outcome.map(function (x) { return { v: x, t: x }; }));
+      var f2 = axEl('fieldset', 'dq-opts'); f2.appendChild(axEl('legend', '', '2. 哪一項沒被採納？（可複選）'));
+      o.items.forEach(function (x) { var l = axEl('label', 'dq-opt'), c = document.createElement('input'); c.type = 'checkbox'; c.value = x.v; l.appendChild(c); l.appendChild(document.createTextNode(' ' + x.v + '. ' + x.t)); f2.appendChild(l); });
+      var f3 = radios(name + 'r', '3. 最可能的理由？', o.reasons.map(function (x) { return { v: x, t: x }; }));
+      var sync = function () { var part = (f1.querySelector('input:checked') || {}).value === '只採納一部分'; [f2, f3].forEach(function (f) { f.disabled = !part; f.style.opacity = part ? 1 : 0.45; }); };
+      f1.addEventListener('change', sync); area.appendChild(f1); area.appendChild(f2); area.appendChild(f3); sync();
+      get = function () { var oc = (f1.querySelector('input:checked') || {}).value; if (!oc) return null; if (oc === '全部採納') return { outcome: oc }; var items = Array.prototype.map.call(f2.querySelectorAll('input:checked'), function (c) { return +c.value; }), rs = (f3.querySelector('input:checked') || {}).value; return items.length && rs ? { outcome: oc, items: items, reason: rs } : null; };
+    } else {
+      var q = { A: '這張處方的問題屬於哪一類原因（PCNE）？', B: '您會向醫師提出哪一種處方調整？（擬議）', C: '醫師會全部採納，還是只採納一部分？' }[it.type];
+      var fs = radios(name, q, it.options); area.appendChild(fs);
+      var ta = null; if (it.type !== 'C') { ta = document.createElement('textarea'); ta.rows = 2; ta.className = 'ilp-q'; ta.placeholder = '您的判斷依據（一句，可略；只有您看得到）'; ta.setAttribute('aria-label', '判斷依據'); area.appendChild(ta); }
+      get = function () { var c = fs.querySelector('input:checked'); return c ? { choice: c.value, text: ta ? ta.value : '' } : null; };
+    }
+    var go = axEl('button', 'btn', '送出，看解析'); go.type = 'button'; area.appendChild(go);
+    go.addEventListener('click', function () {
+      var a = get(); if (!a) { msg('請完成作答'); return; }
+      go.disabled = true; msg('送出中…');
+      dqApi('answer', Object.assign({ id: it.id, type: it.type, secs: Math.round((Date.now() - t0) / 1000) }, a)).then(function (j) {
+        it.reveal = j.reveal; it.done = { stage: 4, correct: j.correct, mine: j.mine, redline: !!j.redline }; box.replaceWith(dqItem(it, n, reload));
+      }).catch(function (e) { go.disabled = false; msg(e.message); });
+    });
+    return box;
+  }
+  var rv = it.reveal || {}, res = axEl('div', 'dq-reveal'), d = it.done || {};
+  if (d.correct) res.appendChild(axEl('p', 'dq-verdict ' + (d.correct === '對' ? 'ok' : d.correct === '部分' ? 'part' : 'no'), d.correct === '對' ? '判斷一致' : d.correct === '部分' ? '方向一致，細節不同' : '和參考答案不同'));
+  if (d.mine) res.appendChild(axEl('p', 'dq-mine', '您的作答：' + d.mine));
+  if (d.redline) res.appendChild(axEl('p', 'dq-red', '安全紅線：這題是極高風險用藥，判斷與參考答案不一致會記入您的紅線紀錄（只有您與導師看得到次數，不看內容；不作考核）。請把下方「本題紅線」讀完再進下一題。'));
+  var kv = function (k, v, cls) { if (!v) return; var p = axEl('p', cls || ''); p.appendChild(axEl('b', '', k + '　')); p.appendChild(document.createTextNode(v)); res.appendChild(p); };
+  kv('參考答案', rv.answer, 'dq-point'); kv('解析', rv.explain); kv('PCNE', [rv.problem, rv.cause, rv.iTxt].filter(Boolean).join('｜'));
+  if (rv.iNote && (it.type === 'A' || it.type === 'B')) res.appendChild(axEl('p', 'pl-why', rv.iNote));
+  if (rv.oNote && (it.type === 'C' || it.type === 'G')) res.appendChild(axEl('p', 'pl-why', rv.oNote));
+  if (rv.g) {
+    var ul = axEl('ul', 'dq-gitems'); rv.g.items.forEach(function (x, i) { var miss = (rv.g.notAdopted || []).indexOf(i + 1) >= 0; ul.appendChild(axEl('li', miss ? 'miss' : 'hit', (miss ? '✕ 未採納：' : '✓ 採納：') + x)); }); res.appendChild(ul);
+    kv('醫師理由', rv.g.reason); kv('較符合實證', rv.g.who === '醫師' ? '這次醫師的做法較符合實證' : rv.g.who === '原建議' ? '原建議較符合實證' : rv.g.who); kv('溝通啟示', rv.g.lesson);
+  }
+  if (rv.point) res.appendChild(axEl('p', 'dq-point', '教學重點：' + rv.point));
+  if (rv.crl) { var cr = axEl('p', 'dq-red'); cr.appendChild(axEl('b', '', '本題紅線　')); cr.appendChild(document.createTextNode(rv.crl)); res.appendChild(cr); }
+  kv('監測與升級', rv.mo); kv('跨專業分工', rv.tm); kv('EPA 對應', rv.ep);
+  if (rv.ur && rv.ur.length) { var evT = axEl('p', ''); evT.appendChild(axEl('b', '', '參考依據')); res.appendChild(evT); var evl = axEl('ul', 'dq-ev'); rv.ur.forEach(function (u) { var li = axEl('li'); if (u.u && /^https?:\/\//.test(u.u)) { var a = document.createElement('a'); a.href = u.u; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = u.t || u.u; li.appendChild(a); } else li.textContent = u.t; evl.appendChild(li); }); res.appendChild(evl); res.appendChild(axEl('p', 'pl-why', '連結為題庫整理時登錄之來源入口，未逐一人工驗證版本；臨床仍以院內藥品資料與現行仿單為準。')); }
+  if (rv.unverified) res.appendChild(axEl('p', 'pl-flag', '【未經查證】' + rv.unverified.replace(/^【未經查證】/, '') + '（請以院內藥品資料核對）'));
+  if (rv.note) res.appendChild(axEl('p', 'pl-why', rv.note));
+  area.appendChild(res);
+  if (stage === 4) {
+    var fs3 = axEl('fieldset', 'dq-opts');
+    if (rv.rbl && rv.rbl.length) {
+      fs3.appendChild(axEl('legend', '', '對照解析自評：您剛才的判斷有提到哪些要點？（勾選後完成）'));
+      var rbl = axEl('div', 'dq-rbl');
+      rv.rbl.forEach(function (t, i) { var l = axEl('label'), c = document.createElement('input'); c.type = 'checkbox'; c.value = i + 1; l.appendChild(c); l.appendChild(document.createTextNode(t)); rbl.appendChild(l); });
+      fs3.appendChild(rbl);
+      var ok3 = axEl('button', 'btn', '完成自評'); ok3.type = 'button'; ok3.addEventListener('click', function () {
+        var hits = Array.prototype.map.call(rbl.querySelectorAll('input:checked'), function (c) { return +c.value; }); ok3.disabled = true;
+        dqApi('reflect', { id: it.id, type: it.type, hits: hits }).then(function () { it.done.stage = 5; box.replaceWith(dqItem(it, n, reload)); }).catch(function (e) { ok3.disabled = false; msg(e.message); });
+      }); fs3.appendChild(ok3);
+    } else {
+      fs3.appendChild(axEl('legend', '', '對照解析，您這題：'));
+      ['有抓到', '部分', '沒抓到'].forEach(function (s) { var b = axEl('button', 'btn ghost', s); b.type = 'button'; b.addEventListener('click', function () {
+        dqApi('reflect', { id: it.id, type: it.type, self: s }).then(function () { it.done.stage = 5; box.replaceWith(dqItem(it, n, reload)); }).catch(function (e) { msg(e.message); });
+      }); fs3.appendChild(b); });
+    }
+    area.appendChild(fs3);
+  }
+  return box;
+}
+function dqMap(m) {
+  var sec = axEl('section', 'dq-map'); sec.appendChild(axEl('h4', 'pl-h', '我的能力地圖（PCNE 原因類型＋讀懂醫師）'));
+  var extra = m.predict && m.predict.n ? '・預判正確 ' + m.predict.hit + '／' + m.predict.n : '';
+  sec.appendChild(axEl('p', 'pl-sum', '連續 ' + m.streak + ' 天・本月完成 ' + m.monthDays + '／' + m.monthElapsed + ' 天・全站本月 ' + m.siteMonth + ' 題' + extra + (m.reasonCards ? '・理由卡 ' + m.reasonCards.have.length + '／' + m.reasonCards.total : '')));
+  var g = axEl('div', 'dq-grid');
+  m.cells.forEach(function (c) { var d = axEl('div', 'dq-cell' + (c.n === 0 ? ' none' : c.last >= 3 && c.hit / c.last >= 0.8 ? ' good' : c.last >= 3 && c.hit / c.last < 0.5 ? ' weak' : '')); d.appendChild(axEl('b', '', (c.code === 'ICS2' ? '' : c.code + ' ') + c.name)); d.appendChild(axEl('span', '', c.n ? '做過 ' + c.n + '・最近 ' + c.last + ' 題抓到 ' + c.hit : c.bankN === 0 ? '題庫暫無此類（待補題）' : '尚未練習')); g.appendChild(d); });
+  sec.appendChild(g);
+  if (m.redline) sec.appendChild(axEl('p', 'pl-sum', '安全天數 ' + m.redline.safeDays + ' 天（最近一次紅線之後的作答天數）・近 30 天紅線 ' + m.redline.n30 + ' 次' + (m.rubric && m.rubric.total ? '・自評要點命中 ' + m.rubric.hit + '／' + m.rubric.total + '（' + Math.round(100 * m.rubric.hit / m.rubric.total) + '%）' : '')));
+  if (m.themeWeek) { var tw = m.themeWeek, twp = axEl('div', 'dq-chal'); twp.appendChild(axEl('b', '', '本週主題挑戰・' + tw.theme)); var twb = axEl('div', 'dq-chalbar'), twi = axEl('i'); twi.style.width = Math.min(100, Math.round(100 * tw.done / tw.goal)) + '%'; twb.appendChild(twi); twp.appendChild(twb); twp.appendChild(axEl('span', '', tw.done >= tw.goal ? '已完成（' + tw.done + ' 題）' : tw.done + '／' + tw.goal + ' 題')); sec.appendChild(twp); }
+  if (m.streakMarks && m.streakMarks.length) { var sm = axEl('div', 'dq-badges'); m.streakMarks.forEach(function (n) { sm.appendChild(axEl('span', 'dq-badge st', '連續 ' + n + ' 天')); }); sec.appendChild(sm); }
+  if (m.badges && m.badges.length) { var bd = axEl('div', 'dq-badges'); var nm = {}; m.cells.forEach(function (c) { nm[c.code] = c.name; }); m.badges.forEach(function (b) { bd.appendChild(axEl('span', 'dq-badge', '徽章・' + b + ' ' + (nm[b] || '') + '（最近 5 題抓到 ≥4）')); }); sec.appendChild(bd); }
+  if (m.reasonCards && m.reasonCards.have.length) sec.appendChild(axEl('p', 'pl-why', '已收集理由卡：' + m.reasonCards.have.join('、') + '（' + m.reasonCards.have.length + '／' + m.reasonCards.total + '）'));
+  return sec;
+}
+function dqMentorOpen() {
+  var sh = dqShell('每日一題・導師檢視');
+  dqApi('mentor').then(function (j) {
+    sh.body.innerHTML = ''; sh.sub.textContent = j.note;
+    if (j.bank) sh.body.appendChild(axEl('p', 'pl-sum', '題庫：可出題 ' + j.bank.ready + '／' + j.bank.total + '（待複核 ' + j.bank.pending + '）'));
+    if (!j.people.length) sh.body.appendChild(axEl('div', 'state', '沒有指派的 PGY 學員。'));
+    j.people.forEach(function (p) {
+      var r = axEl('div', 'pl-row ' + (p.weak.length ? 'late' : 'done'));
+      r.appendChild(axEl('div', 'pl-title', p.label));
+      r.appendChild(axEl('div', 'pl-meta', '近 30 天作答 ' + p.days30 + ' 天、' + p.n30 + ' 題' + (p.red30 ? '、安全紅線 ' + p.red30 + ' 次（極高風險題判斷不一致；建議於 CbD 討論同類案例）' : '') + (p.rub30 !== null && p.rub30 !== undefined ? '、自評要點命中 ' + p.rub30 + '%' : '')));
+      r.appendChild(axEl('div', p.weak.length ? 'pl-flag' : 'pl-why', p.weak.length ? '待加強類型：' + p.weak.join('、') + '（可在 CbD 選同類案例討論）' : '近 30 天無明顯弱點類型（每類至少 3 題才判讀）'));
+      sh.body.appendChild(r);
+    });
+  }).catch(function (e) { sh.body.innerHTML = ''; sh.body.appendChild(axEl('div', 'state', (e && e.message) || '暫時無法載入')); });
+}
+/* ====================================================================
+ * 學習駕駛艙（v3.12.0）：PGY／UGY 個人成績頁頂端的「下一步看板」＋區段導覽
+ * 只彙整本頁既有分析與後台快照，不重新判定能力；不排名、不與他人比較。
+ * ==================================================================== */
+var CK_COLS = [{ k: 'now', t: '現在要做', d: '本月或今天就能行動' }, { k: 'next', t: '準備中', d: '下一次 CCC 前要累積' }, { k: 'done', t: '已達成', d: '有正式紀錄的進展' }];
+var CK_NAV = { hours: '實習時數', cockpit: '駕駛艙', growth: '能力成長', epaplan: 'EPA 規劃', ilp: 'ILP', cbdMatrix: 'CbD', feedback: '質性回饋', morning: '晨會簡報', pres: '簡報評核', hl: '個人亮點', cmp: '同期參照' };
+function ckScroll(sel) { var el = document.querySelector('#charts [data-ax="' + sel + '"]'); if (!el) return; el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); el.classList.add('ck-flash'); setTimeout(function () { el.classList.remove('ck-flash'); }, 1600); }
+function ckBuild(box, name, d) {
+  if (!/PGY\s*學員個人成績|UGY\s*學生個人成績/.test(name)) return;
+  var pgy = /PGY/.test(name), gen = S.dashReq, ck = S.ck || {};
+  Array.prototype.forEach.call(box.querySelectorAll('.ck,.ck-nav'), function (x) { x.remove(); });
+  var role = S.user && S.user.active_role, learner = role === 'TRAINEE' || role === 'STUDENT';
+  var label = ''; (d.subjects || []).forEach(function (x) { if (x.pid === d.subject) label = x.label; });
+  var sec = axEl('section', 'chart ck'); sec.dataset.ax = 'cockpit'; sec.setAttribute('aria-labelledby', 'ckT');
+  var hd = axEl('header', 'ck-hd'), ht = axEl('div'); var h = axEl('h3', 'ck-title', '學習駕駛艙'); h.id = 'ckT'; ht.appendChild(h);
+  ht.appendChild(axEl('p', 'ck-sub', (label ? axIdKey(label) + '｜' : '') + (pgy ? '彙整本頁 CBME、EPA、訓練課程、每日一題的下一步' : '彙整本頁 UGY-360 他評與自評、每日一題的下一步') + '；不排名、不與他人比較'));
+  hd.appendChild(ht); var stamp = axEl('span', 'ck-stamp', '彙整中…'); hd.appendChild(stamp); sec.appendChild(hd);
+  var grid = axEl('div', 'ck-board'), cols = {};
+  CK_COLS.forEach(function (c) { var col = axEl('div', 'ck-col ' + c.k); col.setAttribute('role', 'list'); col.setAttribute('aria-label', c.t); var ch = axEl('div', 'ck-colh'); ch.appendChild(axEl('b', '', c.t)); var cnt = axEl('span', 'ck-cnt', '0'); ch.appendChild(cnt); ch.appendChild(axEl('small', '', !pgy && c.k === 'next' ? '下一個輪訓單位要練的' : c.d)); col.appendChild(ch); var list = axEl('div', 'ck-list'); col.appendChild(list); cols[c.k] = { list: list, cnt: cnt, n: 0 }; grid.appendChild(col); });
+  sec.appendChild(grid);
+  var pending = 0, empty = function () { CK_COLS.forEach(function (c) { var o = cols[c.k]; o.cnt.textContent = String(o.n); var e = o.list.querySelector('.ck-empty'); if (!o.n && !e) o.list.appendChild(axEl('div', 'ck-empty', c.k === 'done' ? '尚無正式紀錄的進展' : '目前沒有項目')); if (o.n && e) e.remove(); }); };
+  function add(col, c) {
+    var o = cols[col]; o.n++;
+    var el = axEl(c.act ? 'button' : 'div', 'ck-card' + (c.tone ? ' ' + c.tone : '')); el.setAttribute('role', 'listitem'); if (c.act) { el.type = 'button'; el.addEventListener('click', c.act); }
+    var top = axEl('div', 'ck-ct'); top.appendChild(axEl('span', 'ck-tag', c.tag)); if (c.big) top.appendChild(axEl('span', 'ck-big', c.big)); el.appendChild(top);
+    el.appendChild(axEl('div', 'ck-t', c.title)); if (c.meta) el.appendChild(axEl('div', 'ck-m', c.meta));
+    if (c.bar !== undefined) { var b = axEl('div', 'ck-bar'); var i = axEl('i'); i.style.width = Math.max(0, Math.min(100, c.bar)) + '%'; b.appendChild(i); el.appendChild(b); }
+    if (c.act) el.appendChild(axEl('span', 'ck-go', c.go || '查看'));
+    o.list.appendChild(el); empty();
+  }
+  var cap = function () { CK_COLS.forEach(function (c) { var o = cols[c.k], cards = Array.prototype.slice.call(o.list.querySelectorAll('.ck-card')), more = o.list.querySelector('.ck-more'); if (more) more.remove(); if (cards.length <= 4 || o.open) { cards.forEach(function (x) { x.hidden = false; }); return; } cards.forEach(function (x, i) { x.hidden = i >= 4; }); var b = axEl('button', 'ck-more', '顯示其餘 ' + (cards.length - 4) + ' 項'); b.type = 'button'; b.addEventListener('click', function () { o.open = true; cap(); }); o.list.appendChild(b); }); };
+  var done = function () { if (gen !== S.dashReq) return; empty(); cap(); stamp.textContent = '更新 ' + new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }); };
+  /* ---- 本頁分析（同步） ---- */
+  if (pgy && ck.pgy) {
+    var P = ck.pgy;
+    if (P.req) add('done', { tag: '正式判定', big: P.met + '／' + P.req, title: P.stage + ' 公版應達項目達標', meta: '只計 CCC 正式判定；判定來源 ' + P.src, bar: P.met / P.req * 100, act: function () { ckScroll('growth'); }, go: '看能力地圖' });
+    if (P.epa && P.epa.nPub) add('done', { tag: 'EPA', big: P.epa.formalPub + '／' + P.epa.nPub, title: 'CCC 正式可獨立執行的公版 EPA', meta: P.epa.expired ? '另有 ' + P.epa.expired + ' 項逾維持期限需重新評量' : '維持期限內', tone: P.epa.expired ? 'warn' : '', bar: P.epa.formalPub / P.epa.nPub * 100, act: function () { ckScroll('epaplan'); }, go: '看 EPA 規劃' });
+    if (P.tr && P.prev && P.tr.up) add('done', { tag: '成長', big: '▲ ' + P.tr.up, title: P.prev + ' → ' + P.stage + ' 同來源進步的能力', meta: '持平 ' + (P.tr.same || 0) + '、下降 ' + (P.tr.down || 0) });
+    if (P.tr && P.tr.down) add('next', { tag: '成長', big: '▼ ' + P.tr.down, title: '同來源較前期下降的能力', meta: '在能力地圖以 ▼ 標示，建議與導師一起確認原因', tone: 'warn', act: function () { ckScroll('growth'); }, go: '看能力地圖' });
+    (function () {
+      var STD = [3, 6, 12, 18, 24], lastMo = axStageMonths(P.stage) || 0, nextMo = STD.filter(function (x) { return x > lastMo; })[0];
+      if (!nextMo) { add('done', { tag: 'CCC', title: 'PGY24M 已有 CCC 判定', meta: '來源：學員CBME' }); return; }
+      var r = (P.rows || []).filter(function (x) { return x.mo === nextMo; })[0], stg = 'PGY' + nextMo + 'M';
+      if (r && r.date) { var past = r.t && r.t < Date.now(); add(past && !r.any ? 'now' : 'next', { tag: 'CCC', title: stg + ' CCC 日期 ' + r.date, meta: (past && !r.any ? '已過日期，學員CBME 尚無等級；請教學行政確認' : '證據擷取截止為 CCC 前 7 天') + '｜來源：學員CBME', tone: past && !r.any ? 'warn' : '', act: function () { ckScroll('growth'); }, go: '看期程進度' }); }
+      else add('next', { tag: 'CCC', title: '下一期程 ' + stg + '：尚未排定 CCC 日期', meta: '以學員CBME 的【CCC】日期為唯一來源；排定後自動顯示' });
+    })();
+    (P.cand || []).slice(0, 3).forEach(function (c) { add('next', { tag: c.safety ? '病安優先' : 'ILP 候選', title: c.k, meta: '與指導教師討論後再定案；每期聚焦 1–2 項', tone: c.safety ? 'safety' : '', act: function () { ckScroll('growth'); }, go: '看依據' }); });
+  }
+  if (pgy && ck.epaPlan) {
+    var warn = ck.epaPlan.filter(function (x) { return x.cls === 'warn'; }), okE = ck.epaPlan.filter(function (x) { return x.cls === 'ok'; }), low = ck.epaPlan.filter(function (x) { return x.cls === 'low' && !x.due; });
+    warn.forEach(function (x) { add('now', { tag: 'EPA ' + x.no, title: x.name + '：已到 L4 時機，證據量未達', meta: '公版 L4 時機 ' + x.l4 + ' 個月；請補紀錄或安排直接觀察', tone: 'warn', act: function () { ckScroll('epaplan'); }, go: '看證據表' }); });
+    if (low.length) add('next', { tag: 'EPA 證據', big: String(low.length), title: '累積中：' + low.map(function (x) { return 'EPA ' + x.no; }).join('、'), meta: '尚未到公版 L4 時機', act: function () { ckScroll('epaplan'); }, go: '看證據表' });
+    if (okE.length) add('done', { tag: 'EPA 證據', big: String(okE.length), title: '證據量已達：' + okE.map(function (x) { return 'EPA ' + x.no; }).join('、'), meta: '依公版可計數要求' });
+  }
+  if (pgy) {
+    [[/^藥事照會紀錄/, '藥事照會', 'PCNE 照會紀錄（依專業活動）'], [/^藥品諮詢紀錄/, '藥品諮詢', '藥品諮詢紀錄']].forEach(function (q) {
+      var raw = q[1] === '藥事照會' && ck.pcN !== null && ck.pcN !== undefined; /* v4.3：照會改用原始分頁累計數，與 EPA 規劃卡一致 */
+      var c = raw ? { ok: true, n: ck.pcN } : axChartCount(S.dash, q[0]); if (!c || !c.ok) return;
+      add('done', { tag: q[1], big: c.n + ' 筆', title: q[2], meta: raw ? '原始分頁累計至今；與 EPA 規劃卡同一計數' : '依頁首年度／月份篩選範圍', act: function () { raw ? ckScroll('epaplan') : ckScrollTitle(q[0]); }, go: '看紀錄' });
+    });
+    if (ck.morning) { if (ck.morning.n) add('done', { tag: '晨會簡報', big: ck.morning.n + ' 場', title: '最近：' + (ck.morning.topic || '（未填主題）'), meta: ck.morning.last ? '簡報日期 ' + ck.morning.last : '', act: function () { ckScroll('morning'); }, go: '看簡報' }); else add('next', { tag: '晨會簡報', title: '尚無晨會病例簡報紀錄', meta: '與導師排定本期簡報主題' }); }
+  }
+  if (!pgy && ck.hours && Array.isArray(ck.hours.rows)) {
+    var H = ck.hours;
+    if (!H.rows.length) add('next', { tag: '實習時數', title: '教學行政尚未登錄實習時數', meta: '控制台「UGY實習時數」；登錄後自動顯示進度' });
+    else {
+      add('done', { tag: '實習時數', big: H.total + '／' + H.totalRequired, title: '累計實習時數' + (H.estimated ? '（部分推估）' : ''), meta: '《醫院藥學實習辦法》全部 640 小時（16 週）', bar: H.total / H.totalRequired * 100, act: function () { ckScroll('hours'); }, go: '看時數明細' });
+      Object.keys(H.required).forEach(function (k) { var got = H.sum[k] || 0, req = H.required[k]; if (got < req) add('next', { tag: '基本項目', big: got + '／' + req, title: k, meta: '尚差 ' + (req - got) + ' 小時', bar: got / req * 100, act: function () { ckScroll('hours'); }, go: '看時數明細' }); });
+    }
+  }
+  if (!pgy && ck.ugy) {
+    var U = ck.ugy;
+    if (U.om !== null && U.om !== undefined) add('done', { tag: '他評整體', big: axFmt(U.om, 2) + '／6', title: U.n + ' 份他評、' + U.units + ' 個輪訓單位', meta: '依《醫院藥學實習辦法》附件一 8 題', bar: (U.om - 1) / 5 * 100, act: function () { ckScroll('growth'); }, go: '看能力剖面' });
+    (U.strong || []).forEach(function (t) { add('done', { tag: '優勢', title: t, meta: '他評高於本人整體平均' }); });
+    (U.next || []).slice(0, 2).forEach(function (x) { add('next', { tag: 'ILP 候選', title: x.k, meta: '他評 ' + axFmt(x.m, 2) + '；與教師討論後再定案', act: function () { ckScroll('growth'); }, go: '看依據' }); });
+    if (!U.self && learner) add('now', { tag: '自評', title: '完成 UGY-360 自評', meta: '有自評才能對照自己的判斷與他評差異' });
+    else if (U.cal && U.cal.hi) add('next', { tag: '自評校準', big: String(U.cal.hi), title: '自評明顯高於他評的題目', meta: '差距 ≥0.5 分；建議與教師討論評分依據', tone: 'warn', act: function () { ckScroll('growth'); }, go: '看對照' });
+  }
+  /* ---- 訓練課程快照（PGY，非同步） ---- */
+  if (pgy && typeof planFetch === 'function' && typeof PLAN_ON !== 'undefined' && PLAN_ON && d.subject) {
+    pending++;
+    planFetch(d.subject).then(function (o) {
+      if (gen !== S.dashReq) return; var j = o.d, p = j.plan || {};
+      if (j.none || p.status !== 'OK') { if (!j.none) return; add('next', { tag: '訓練課程', title: '尚未建立個人化課表', meta: j.message || '' }); return; }
+      var cur = p.current, inMonth = cur >= 1 && cur <= 24 ? p.slots.filter(function (s) { return s.month === cur && !s.counted && !/^例外/.test(s.status); }) : [];
+      var mode = p.mode === '正式' ? '' : '（預覽）';
+      if (inMonth.length) add('now', { tag: '訓練課程' + mode, big: String(inMonth.length), title: '第 ' + cur + ' 月課程進行中', meta: inMonth.filter(function (s) { return s.risk === '高' || s.risk === '極高'; }).length + ' 項高風險主題需依監督要求', act: function () { planOpen(d.subject, label, 'now'); }, go: '開啟本月課程' });
+      var nx = (p.stages || []).filter(function (s) { return !s.closed; })[0];
+      var cbLast = ck.pgy ? axStageMonths(ck.pgy.stage) || 0 : 0;
+      if (nx && nx.teachDue && (axStageMonths(nx.stage) || 0) > cbLast) add('next', { tag: '訓練課程', title: nx.stage + ' 教學完成截止 ' + nx.teachDue, meta: '依起訓日推算；CCC 日期以學員CBME 為準', act: function () { planOpen(d.subject, label, 'ccc'); }, go: 'CCC 準備' });
+      var sr = p.slots.filter(function (s) { return s.safetyR && s.month >= cur && !s.counted; });
+      sr.slice(0, 2).forEach(function (s) { add('next', { tag: '病安補強', title: s.code + '（第 ' + s.month + ' 月）', meta: s.reason || '', tone: 'safety', act: function () { planOpen(d.subject, label, 'all'); }, go: '看課表' }); });
+      var exc = p.slots.filter(function (s) { return /^例外：(未完成|未通過)/.test(s.status); }).length;
+      if (exc) add('now', { tag: '補課', big: String(exc), title: '例外主題待補課或補強', meta: '已自動排入後續月份', tone: 'warn', act: function () { planOpen(d.subject, label, 'all'); }, go: '看課表' });
+      if (p.stats) add('done', { tag: '訓練課程' + mode, big: p.stats.completed + '／' + p.stats.slots, title: '主題完成（期程 CCC 結案推定）', meta: (p.stats.extras ? '含名額外補排 ' + p.stats.extras + ' 項；' : '') + '完成＝課程已執行之推定，不代表能力達標', bar: p.stats.completed / p.stats.slots * 100, act: function () { planOpen(d.subject, label, 'ccc'); }, go: '看完成來源' });
+      if (j.me && (j.me.writer || j.me.all)) { var td = (j.todos || []).filter(function (t) { return t.status === '未處理'; }).length; if (td) add('now', { tag: '導師待辦', big: String(td), title: '課程待辦未處理', meta: '排程衝突、病安補強通知、學員異議', tone: 'warn', act: function () { planOpen(d.subject, label, 'todo'); }, go: '處理待辦' }); }
+    }).catch(function () { /* 課程未啟用時不顯示 */ }).then(function () { if (!--pending) done(); });
+  }
+  /* ---- 每日一題（本人：個人進度＋本月全站題數；導師：該學員近 30 天作答） ---- */
+  if (typeof dqApi === 'function') {
+    var isSelf = learner && (!d.subjects || d.subjects.length <= 1 || (d.subjects[0] && d.subjects[0].pid === d.subject));
+    pending++;
+    (isSelf ? Promise.all([dqApi('today'), dqApi('map')]) : dqApi('mentor').then(function (m) { return [null, null, m]; })).then(function (r) {
+      if (gen !== S.dashReq) return;
+      if (isSelf) {
+        var t = r[0], m = r[1], left = (t.items || []).filter(function (i) { return !(i.done && i.done.stage >= 5); }).length;
+        if (left) add('now', { tag: '每日一題', big: String(left), title: '今天還有 ' + left + ' 題疑義處方練習', meta: '約 ' + left * 3 + ' 分鐘；先判斷再看藥師怎麼做', act: function () { dqOpen(); }, go: '開始練習' });
+        else if ((t.items || []).length) add('done', { tag: '每日一題', title: '今天的練習已完成', meta: '明天會依您的弱點類型換題' });
+        add('done', { tag: '每日一題', big: m.monthDays + '／' + m.monthElapsed + ' 天', title: '本月練習天數' + (m.streak ? '・連續 ' + m.streak + ' 天' : ''), meta: '全站本月共 ' + statsFmt(m.siteMonth) + ' 題（只顯示總數，不排名）', bar: m.monthDays / Math.max(1, m.monthElapsed) * 100, act: function () { dqOpen(); }, go: '看能力地圖' });
+      } else {
+        var mm = r[2], me = (mm.people || []).filter(function (x) { return axIdKey(x.label) === axIdKey(label) || axName(x.label) === axName(label); })[0];
+        if (me) { add('done', { tag: '每日一題', big: me.days30 + ' 天', title: '近 30 天作答 ' + me.n30 + ' 題', meta: '導師只看類型統計，不看逐題對錯' }); if (me.weak.length) add('next', { tag: '每日一題', title: '待加強題型：' + me.weak.join('、'), meta: '可在 CbD 選同類案例討論', tone: 'warn' }); }
+      }
+    }).catch(function () { /* 未啟用 */ }).then(function () { if (!--pending) done(); });
+  }
+  box.insertBefore(sec, box.firstChild);
+  empty(); if (!pending) done();
+  ckNav(box, sec);
+}
+function ckScrollTitle(re) { var el = Array.prototype.filter.call(document.querySelectorAll('#charts .chart'), function (x) { return x.dataset && re.test(x.dataset.title || ''); })[0]; if (!el) return; var fold = el.closest('details'); if (fold) fold.open = true; el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); el.classList.add('ck-flash'); setTimeout(function () { el.classList.remove('ck-flash'); }, 1600); }
+function ckNav(box, after) {
+  var items = Array.prototype.filter.call(box.children, function (el) { return el.dataset && (el.dataset.ax || el.classList.contains('chart')) && !el.classList.contains('ck-nav'); }).map(function (el) {
+    var k = el.dataset.ax || '', h = el.querySelector('h3, .ax-title'), t = CK_NAV[k] || (h ? h.textContent.replace(/（[^）]*）/g, '').trim().slice(0, 10) : '');
+    return t ? { el: el, t: t } : null;
+  }).filter(Boolean);
+  if (items.length < 3) return;
+  var nav = axEl('nav', 'ck-nav'); nav.setAttribute('aria-label', '本頁區段');
+  items.forEach(function (x, i) { var b = axEl('button', 'ck-nb', x.t); b.type = 'button'; b.addEventListener('click', function () { x.el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); }); x.btn = b; nav.appendChild(b); });
+  after.parentNode.insertBefore(nav, after.nextSibling);
+  var place = function () { var hd = document.querySelector('.bi-head'), tb = document.querySelector('.top'), off = (tb ? tb.offsetHeight : 56) + (hd && getComputedStyle(hd).position === 'sticky' ? hd.offsetHeight : 0) + 6; document.documentElement.style.setProperty('--ck-top', off + 'px'); };
+  place(); if (!S.ckPlaceBound) { S.ckPlaceBound = 1; window.addEventListener('resize', function () { if (document.querySelector('.ck-nav')) place(); }); }
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (ents) {
+    ents.forEach(function (e) { if (!e.isIntersecting) return; items.forEach(function (x) { var on = x.el === e.target; x.btn.classList.toggle('on', on); if (on) { x.btn.setAttribute('aria-current', 'true'); var l = x.btn.offsetLeft - 24; if (nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: l, behavior: 'auto' }); } else x.btn.removeAttribute('aria-current'); }); });
+  }, { rootMargin: '-' + (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--ck-top'), 10) + 60 || 180) + 'px 0px -55% 0px' });
+  items.forEach(function (x) { io.observe(x.el); });
+}
+/* ---------- UGY 實習時數進度（v3.13.0）：依《醫院藥學實習辦法》640 小時；資料由教學行政於控制台登錄 ---------- */
+function ugyHoursPanel(host, d) {
+  if (!d || !d.subject) return null;
+  return apiRaw('ugyh', { subject: d.subject }).then(function (j) {
+    if (!j || !Array.isArray(j.rows)) return;
+    S.ck.hours = j;
+    var sec = axEl('section', 'chart ax-card uh'); sec.dataset.ax = 'hours';
+    axGrowthHead(sec, '實習時數進度（醫院藥學實習辦法）', '全部 640 小時（16 週）｜基本項目 門急診調劑 160、住院調劑 160、臨床藥事服務 120、藥品諮詢 80｜資料：' + j.source,
+      '<b>時數來源</b>：控制台「UGY實習時數」由教學行政逐單位登錄。<br><b>推估</b>：時數欄空白時，以起訖日推估（週數×40 小時），並標示「推估」，請以實際簽到為準。<br><b>藥品管理</b>：辦法規定含於調劑時數內，不另計門檻。<br>本卡只呈現時數，不代表學習成效；成效請看上方能力剖面。', false);
+    if (!j.rows.length) { sec.appendChild(axEl('div', 'state', '教學行政尚未登錄此學生的實習時數。登錄後此處自動顯示總時數、四項基本項目進度與各單位明細。')); host.appendChild(sec); return; }
+    var top = axEl('div', 'uh-top');
+    var tot = axEl('div', 'uh-total'); tot.appendChild(axEl('small', '', '累計實習時數' + (j.estimated ? '（部分推估）' : '')));
+    var big = axEl('div', 'uh-big'); big.appendChild(axEl('b', '', String(j.total))); big.appendChild(axEl('span', '', '／' + j.totalRequired + ' 小時')); tot.appendChild(big);
+    var bar = axEl('div', 'uh-bar'); var bi = axEl('i'); bi.style.width = Math.min(100, j.total / j.totalRequired * 100) + '%'; bar.appendChild(bi); tot.appendChild(bar);
+    tot.appendChild(axEl('small', '', '約 ' + Math.round(j.total / 40 * 10) / 10 + '／16 週' + (j.total >= j.totalRequired ? '｜已達辦法規定總時數' : '｜尚差 ' + (j.totalRequired - j.total) + ' 小時')));
+    top.appendChild(tot);
+    var cats = axEl('div', 'uh-cats');
+    Object.keys(j.required).forEach(function (k) {
+      var got = j.sum[k] || 0, req = j.required[k], ok = got >= req, c = axEl('div', 'uh-cat' + (ok ? ' ok' : ''));
+      var h = axEl('div', 'uh-ch'); h.appendChild(axEl('b', '', k)); h.appendChild(axEl('span', '', got + '／' + req)); c.appendChild(h);
+      var b = axEl('div', 'uh-bar sm'); var i = axEl('i'); i.style.width = Math.min(100, got / req * 100) + '%'; b.appendChild(i); c.appendChild(b);
+      c.appendChild(axEl('small', '', ok ? '已達基本項目時數' : '尚差 ' + (req - got) + ' 小時')); cats.appendChild(c);
+    });
+    top.appendChild(cats); sec.appendChild(top);
+    var el = Object.keys(j.sum).filter(function (k) { return !j.required[k]; });
+    if (el.length) sec.appendChild(axEl('p', 'ax-muted', '選修與其他：' + el.map(function (k) { return k.replace(/^選修：/, '') + ' ' + j.sum[k] + ' 小時'; }).join('、') + '（藥品管理含於調劑，不另計門檻）'));
+    var t = axEl('table', 'ax-ttab uh-tab'); t.innerHTML = '<thead><tr><th>期間</th><th>實習單位</th><th>類別</th><th>時數</th></tr></thead>';
+    var tb = document.createElement('tbody');
+    j.rows.forEach(function (r) { var tr = document.createElement('tr'); [r.from + (r.to ? '～' + r.to : ''), r.unit, r.cat, r.hours + (r.est ? '（推估）' : '')].forEach(function (x, i) { var td = axEl(i ? 'td' : 'th', '', x); tr.appendChild(td); }); tb.appendChild(tr); });
+    t.appendChild(tb); var sw = axEl('div', 'ax-scroll'); sw.appendChild(t); sec.appendChild(sw);
+    host.appendChild(sec);
+  }).catch(function (e) {
+    if (e && e.code === 'NO_PERMISSION') { var s2 = axEl('section', 'chart ax-card'); s2.dataset.ax = 'hours'; s2.appendChild(axEl('h3', 'ax-title', '實習時數進度')); s2.appendChild(axEl('div', 'state', '目前角色無權查看此學生的實習時數。')); host.appendChild(s2); }
+    /* 後台尚未部署 ugyh：不顯示，不影響其他區塊 */
+  });
+}
+
+/* ===================== v4.2（2026-11-04）：整併 v4.0 CBME 成效（群體）＋ v4.1 PGY 個人頁重建 =====================
+ * 來源：index_v3.9.0_to_v4.0.0.patch、index_v3.9.0_to_v4.1.0.patch（使用者上傳，已簽核）。
+ * 整併規則：純新增區段，覆寫同名函式；駕駛艙資料鉤子（S.ck.pgy／S.ck.epaPlan／S.ck.morning）於新函式內重植。 */
+
+/* ===================== v4.0（2026-11-03）：CBME 成效（群體）重建 =====================
+ * 依 2026-11-03 零信任審查（A1–A8、B1–B6）重寫「CBME 成效」頁；本區段函式覆寫前面同名函式。
+ * 原則：
+ *  1. 單一資料來源＝後台「學員CBME」分頁（控制台分頁代碼 d3550fcb622ecb9a）；試算表更新→後台重算→本頁自動同步，前端不存任何數字。
+ *  2. 三態統一：每一「學員×期程」依【CCC】日期與等級分為 已判定／逾期待補／未到期／僅教師觀察／預填（日期未到卻已有 CCC 等級）／無日期。
+ *     正式結論（G01、EPA 信賴、G02、KPI）只用「已判定」；其餘列只進入進度與資料品質。
+ *  3. 兩層年份：頁首「評量年份」篩選直接讀學員CBME 年份欄（BR）；亮點看板同期群＝同一評量年份＋同一期程。起訓年月不再由 CCC 日期反推。
+ *  4. 所有「平均」＝去除最高 25%、最低 25% 後之中間 50% 平均（trimmed mean），並同列中位數與 n。
+ *  5. 公版時程與院內實際分開呈現：公版 L4 時機達成率為 0% 時，標示「公版時程早於院內節奏」而非訓練失敗。
+ *  6. 訓練狀態：若學員CBME 有「訓練狀態」欄（在訓／完訓／離訓／中止），離訓與中止不列入分母；無此欄時全部視為在訓並標示。 */
+var AX4 = { year: null, src: 'CCC', lv: null, stages: ['PGY3M', 'PGY6M', 'PGY12M', 'PGY18M', 'PGY24M'], today: null };
+function ax4Today() { if (!AX4.today) { var d = new Date(); AX4.today = new Date(d.getFullYear(), d.getMonth(), d.getDate()); } return AX4.today; }
+function ax4Trim(a) { // 中間 50% 平均：去除最高 25%、最低 25%；n<4 時退回全體平均並標示
+  if (!a.length) return null; var b = a.slice().sort(function (x, y) { return x - y; });
+  if (b.length < 4) return axMean(b);
+  var k = Math.floor(b.length / 4); return axMean(b.slice(k, b.length - k));
+}
+function ax4Rows(src) { // 解析：在 v3 解析之上加入年份、訓練狀態、三態
+  var P = axCbmeParse(src), cols = src.cols, yI = axCol(cols, /^年份$/), stI = axCol(cols, /^訓練狀態$/), today = ax4Today();
+  P.hasYear = yI >= 0; P.hasStatus = stI >= 0;
+  P.rows.forEach(function (r, i) {
+    var raw = src.rows[i];
+    r.year = yI >= 0 ? String(raw[yI] || '').trim() : '';
+    r.status = stI >= 0 ? String(raw[stI] || '').trim() : '';
+    r.excluded = /離訓|中止|退訓/.test(r.status);
+    var due = r.date ? r.date.getTime() <= today.getTime() : null;
+    r.state = r.mo === 0 ? 'baseline' : !r.date ? (r.any ? 'undated' : 'nodate') : r.ccc ? (due ? 'done' : 'prefill') : r.any ? (due ? 'obs' : 'obsEarly') : due ? 'overdue' : 'pending';
+    r.formal = r.state === 'done';
+  });
+  P.years = axSortKeys(Object.keys(axGroup(P.rows.filter(function (r) { return r.year; }), 'year')), 'year');
+  return P;
+}
+var AX4_STATE = {
+  done: ['已判定', 'CCC 日期已到且有 CCC 等級（正式）', 'done'], overdue: ['逾期待補', 'CCC 日期已過、尚無任何等級', 'overdue'], obs: ['僅教師觀察', 'CCC 日期已到、只有教師觀察等級、尚無 CCC 判定', 'obs'],
+  pending: ['未到期', 'CCC 日期尚未到', 'pending'], obsEarly: ['未到期（已有觀察）', 'CCC 日期未到，已有教師觀察', 'pending'], prefill: ['預填', 'CCC 日期未到卻已有 CCC 等級；不計正式', 'prefill'],
+  undated: ['無日期', '有等級但無 CCC 日期；不計正式', 'prefill'], nodate: ['無日期無等級', '', 'none'], baseline: ['到職基線 PGY0', '院內基線，不列公版期程', 'none']
+};
+function ax4Filtered(P) { return P.rows.filter(function (r) { return !r.excluded && (!AX4.year || r.year === AX4.year); }); }
+function ax4Sel(P, onChange) {
+  var opts = [{ v: '', t: '全部評量年份' }].concat(P.years.map(function (y) { return { v: y, t: y }; }));
+  if (AX4.year === null) AX4.year = ''; /* v4.3：桌機與手機預設相同（全部年份），避免同一資料兩種數字 */
+  if (AX4.year && P.years.indexOf(AX4.year) < 0) AX4.year = '';
+  return axSelect('評量年份', opts, AX4.year, function (v) { AX4.year = v; onChange(); });
+}
+function ax4Pct(a, b) { return b ? Math.round(a / b * 1000) / 10 + '%' : 'N/A'; }
+function ax4Num(td, a, b, warn) { td.className = 'num' + (warn ? ' warn' : ''); td.innerHTML = b ? '<b>' + a + '</b>／' + b + '　<span>' + ax4Pct(a, b) + '</span>' : '<span>N/A</span>'; return td; }
+
+/* ---------- 1. 總覽 KPI ---------- */
+function ax4Overview(host, P, redraw) {
+  var sec = axGroupSec(host, 'ov', 'CBME 成效總覽', '資料來源：後台「學員CBME」分頁（即時）｜正式判定只採 CCC 日期已到且有 CCC 等級之列',
+    '<b>資料流</b>：Google 試算表「學員CBME」→ 控制台分頁開放 → 後台 API → 本頁重算；試算表更新後，網頁下次載入即同步，無任何前端固定數字。<br><b>三態</b>：' + Object.keys(AX4_STATE).filter(function (k) { return AX4_STATE[k][1]; }).map(function (k) { return '<b>' + AX4_STATE[k][0] + '</b>＝' + AX4_STATE[k][1]; }).join('；') + '。<br><b>評量年份</b>＝學員CBME「年份」欄（評量所屬半年，如 114年(上)），篩選套用到本頁全部分析卡；後台原始圖表不受此篩選影響。<br><b>訓練狀態</b>：' + (P.hasStatus ? '已讀取「訓練狀態」欄，離訓／中止者不列入分母。' : '學員CBME 尚無「訓練狀態」欄，全部學員視為在訓（含已無後續期程者），分母可能偏大。') + '<br><b>平均</b>＝去除最高 25%、最低 25% 之中間 50% 平均，另列中位數與 n。');
+  var bar = axEl('div', 'ax-bar'); bar.appendChild(ax4Sel(P, redraw)); sec.appendChild(bar);
+  var R = ax4Filtered(P).filter(function (r) { return r.mo > 0; }), persons = {}; R.forEach(function (r) { persons[r.key] = 1; });
+  var st = {}; R.forEach(function (r) { st[r.state] = (st[r.state] || 0) + 1; });
+  var dueN = (st.done || 0) + (st.overdue || 0) + (st.obs || 0);
+  var formal = R.filter(function (r) { return r.formal; });
+  var req24 = formal.filter(function (r) { return r.mo >= 24; }), full24 = 0;
+  req24.forEach(function (r) { var ok = true; P.keys.forEach(function (k) { var t = axTgtApproved(P.kinds[k], r.stage, k); if (t === undefined) return; var c = r.C[k]; if (!c || c.v < t - AX_EPS) ok = false; }); if (ok) full24++; });
+  var g = axEl('div', 'ax-gtiles'); sec.appendChild(g);
+  g.appendChild(axTile('學員數（本篩選）', '<b>' + Object.keys(persons).length + '</b><small> 人</small>', '學員×期程 ' + R.length + ' 列（不含 PGY0 基線）'));
+  g.appendChild(axTile('CCC 判定完成率', dueN ? '<b>' + (st.done || 0) + '</b><small>／' + dueN + ' 已到期</small>' : '—', dueN ? ax4Pct(st.done || 0, dueN) + '｜逾期待補 ' + (st.overdue || 0) + '｜僅教師觀察 ' + (st.obs || 0) + '｜未到期 ' + ((st.pending || 0) + (st.obsEarly || 0)) : '尚無已到期的評核單位', (st.overdue || 0) ? 'warn' : ''));
+  g.appendChild(axTile('PGY24M 公版完訓條件', req24.length ? '<b>' + full24 + '</b><small>／' + req24.length + ' 人</small>' : '—', req24.length ? '15 項里程碑 L4＋8 項公版 EPA L4，皆經 CCC 判定（已判定之 PGY24M）' : '尚無已判定之 PGY24M'));
+  var dq = (st.prefill || 0) + (st.undated || 0) + R.filter(function (r) { return !r.year && P.hasYear; }).length;
+  g.appendChild(axTile('資料品質待處理', '<b>' + dq + '</b><small> 筆</small>', dq ? '預填／無日期／年份空白，詳見頁尾「資料品質與待辦」' : '無異常', dq ? 'warn' : ''));
+  return sec;
+}
+
+/* ---------- 2. 評核進度（三態，依期程）＋ 逾期名單 ---------- */
+function ax4Progress(host, P) {
+  var sec = axGroupSec(host, 'prog', '評核進度（三態，依期程）', '每一「學員×期程」只歸一態；完成率分母只算已到期',
+    '<b>完成率</b>＝已判定 ÷（已判定＋逾期待補＋僅教師觀察）；未到期、預填、無日期不入分母。<br><b>取代</b>後台「各訓練期程完成人數／完成率」（該圖以全部列為分母、以教師觀察欄是否填寫為完成，未到期也算未完成）。<br><b>逾期待補名單</b>＝CCC 日期已過但尚無任何等級，依日期由遠到近；供教學負責人催辦。');
+  var R = ax4Filtered(P).filter(function (r) { return r.mo > 0; });
+  var tab = axEl('table', 'ax-gtab'); tab.innerHTML = '<thead><tr><th>期程</th><th>列數</th><th>完成率（已到期）</th><th>狀態分布</th></tr></thead>';
+  var tb = document.createElement('tbody');
+  AX4.stages.forEach(function (s) {
+    var rs = R.filter(function (r) { return r.stage === s; }); if (!rs.length) return;
+    var c = {}; rs.forEach(function (r) { c[r.state] = (c[r.state] || 0) + 1; });
+    var due = (c.done || 0) + (c.overdue || 0) + (c.obs || 0);
+    var tr = document.createElement('tr'); tr.appendChild(axEl('th', '', s)); tr.appendChild(axEl('td', 'c', rs.length + ' 列'));
+    tr.appendChild(ax4Num(document.createElement('td'), c.done || 0, due, (c.overdue || 0) > 0));
+    var td = document.createElement('td'); td.appendChild(axStackBar([{ n: c.done || 0, c: 'up', t: '已判定' }, { n: c.obs || 0, c: 'same', t: '僅教師觀察' }, { n: c.overdue || 0, c: 'down', t: '逾期待補' }, { n: (c.pending || 0) + (c.obsEarly || 0), c: 'none', t: '未到期' }, { n: (c.prefill || 0) + (c.undated || 0) + (c.nodate || 0), c: 'pf', t: '預填／無日期' }], rs.length)); tr.appendChild(td);
+    tb.appendChild(tr);
+  });
+  tab.appendChild(tb); var sw = axEl('div', 'ax-scroll'); sw.appendChild(tab); sec.appendChild(sw);
+  var lg = axEl('div', 'ax-legend'); lg.innerHTML = '<span><i class="ax-sw2 up"></i>已判定</span><span><i class="ax-sw2 same"></i>僅教師觀察（待 CCC）</span><span><i class="ax-sw2 down"></i>逾期待補</span><span><i class="ax-sw2 none"></i>未到期</span><span><i class="ax-sw2 pf"></i>預填／無日期</span>'; sec.appendChild(lg);
+  var od = R.filter(function (r) { return r.state === 'overdue' || r.state === 'obs'; }).sort(function (a, b) { return a.date - b.date; });
+  if (od.length) {
+    var w = axEl('div', 'ax-g2'); w.appendChild(axEl('div', 'ax-ftitle', '逾期待補 CCC 判定（' + od.length + ' 筆，依日期）'));
+    var chips = axChips(od.map(function (r) { var days = Math.round((ax4Today() - r.date) / 864e5); return { t: r.key + '｜' + r.stage + '｜' + axFmtDate(r.date) + '（逾 ' + days + ' 天' + (r.state === 'obs' ? '，已有教師觀察' : '') + '）', tip: AX4_STATE[r.state][1] }; }), ''); w.appendChild(chips); sec.appendChild(w);
+  }
+  return sec;
+}
+
+/* ---------- 3. 團體 G01 正式達標 ＋ 公版／院內時程校準 ---------- */
+function ax4Team(host, P) {
+  var sec = axGroupSec(host, 'team', '團體 CBME 成效（正式 G01）', '母體＝已判定之「學員×期程」；應評集合＝本期有公版目標的全部項目',
+    '<b>正式全項達標</b>：該學員本期每一應評項目都有 CCC 判定且達公版 L4。<br><b>裁決涵蓋</b>＝有 CCC 判定的應評項次 ÷ 全部應評項次。<br><b>公版 vs 院內</b>：公版 EPA 1、2 要求到職 6 個月 L4、EPA 3 為 12 個月；本院 CCC 在 PGY6M／PGY12M 多判 2b–3b，故公版時機達成率為 0% 屬「公版時程早於院內節奏」，不是訓練失敗；院內目標待教學負責人裁決後另列。<br>' + axTargetTableHtml() + '<br><b>院內草案參照</b>以全部 25 項與院內草案目標計算（含教師觀察），不得作正式成效。<br>與 v3 差異：未到期卻已有 CCC 等級（預填）與無 CCC 日期之列不再計入正式。');
+  var R = ax4Filtered(P).filter(function (r) { return r.formal; });
+  var tab = axEl('table', 'ax-gtab'); tab.innerHTML = '<thead><tr><th>期程</th><th>公版應評</th><th>正式全項達標</th><th>CCC 裁決涵蓋</th><th>正式項次達標</th><th>院內草案參照（非正式）</th><th>CCC 等級分布（里程碑）</th></tr></thead>';
+  var tb = document.createElement('tbody');
+  AX4.stages.forEach(function (s) {
+    var rs = R.filter(function (r) { return r.stage === s; }); if (!rs.length) return;
+    var req = P.keys.filter(function (k) { return axTgtApproved(P.kinds[k], s, k) !== undefined; });
+    var full = 0, cov = 0, met = 0, dFull = 0, dist = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    rs.forEach(function (r) {
+      var ok = req.length > 0;
+      req.forEach(function (k) { var c = r.C[k], t = axTgtApproved(P.kinds[k], s, k); if (c) { cov++; if (c.v >= t - AX_EPS) met++; else ok = false; } else ok = false; });
+      if (ok) full++;
+      var dok = true; P.keys.forEach(function (k) { var t = axTgt(P.kinds[k], s, k), u = r.use[k]; if (t === undefined) return; if (!u || u.v < t - AX_EPS) dok = false; }); if (dok) dFull++;
+      Object.keys(r.C).forEach(function (k) { if (P.kinds[k] === 'ms') dist[Math.max(1, Math.min(5, Math.floor(r.C[k].v + AX_EPS)))]++; });
+    });
+    var N = rs.length * req.length, tr = document.createElement('tr'); tr.appendChild(axEl('th', '', s));
+    var rq = axEl('td', 'c', req.length ? req.length + ' 項' : '未訂'); rq.title = req.length ? req.map(function (k) { var e = axEpaId(k); return e ? 'EPA ' + e.no : k.split(' ')[0]; }).join('、') : '本期公版未訂應達項目'; tr.appendChild(rq);
+    var c1 = document.createElement('td'); if (req.length) ax4Num(c1, full, rs.length); else { c1.className = 'num'; c1.innerHTML = '<span>N/A</span>'; } tr.appendChild(c1);
+    tr.appendChild(ax4Num(document.createElement('td'), cov, N, N && cov < N));
+    var c3 = ax4Num(document.createElement('td'), met, N); if (N && !met) { c3.classList.add('draft'); c3.title = '公版時程早於院內節奏（院內 CCC 多判 2b–3b）'; } tr.appendChild(c3);
+    tr.appendChild(axEl('td', 'num draft', dFull + '／' + rs.length + '（全 25 項）'));
+    var tot = 0; Object.keys(dist).forEach(function (k) { tot += dist[k]; });
+    var c4 = document.createElement('td'); c4.appendChild(axStackBar([1, 2, 3, 4, 5].map(function (k) { return { n: dist[k], c: 'l' + k, t: 'Level ' + k }; }), tot || 1)); tr.appendChild(c4);
+    tb.appendChild(tr);
+  });
+  tab.appendChild(tb); var sw = axEl('div', 'ax-scroll'); sw.appendChild(tab); sec.appendChild(sw);
+  var lg = axEl('div', 'ax-legend'); lg.innerHTML = [1, 2, 3, 4, 5].map(function (k) { return '<span><i class="ax-sw2 l' + k + '"></i>Level ' + k + '</span>'; }).join('') + '<span>N/A＝本期公版未訂應達項目</span><span>0 ＝ 公版時機達成 0 人（見說明）</span>'; sec.appendChild(lg);
+  // 公版／院內時程校準：各 EPA 首次 CCC L4 的期程分布（證據，供訂院內目標）
+  var w = axEl('div', 'ax-g2'); w.appendChild(axEl('div', 'ax-ftitle', '公版 L4 時機 vs 院內首次 CCC L4 期程（供教學負責人訂院內目標）'));
+  var byP = {}; R.forEach(function (r) { (byP[r.key] = byP[r.key] || []).push(r); });
+  var t2 = axEl('table', 'ax-gtab ax-nowrap'); t2.innerHTML = '<thead><tr><th>EPA</th><th>公版 L4</th><th>已 L4 學員</th><th>首次 L4 期程分布</th><th>中位期程</th></tr></thead>'; var tb2 = document.createElement('tbody'), anyRow = false;
+  AX_EPA_REG.filter(function (e) { return !e.inhouse; }).forEach(function (e) {
+    var k = P.keys.filter(function (x) { return P.kinds[x] === 'epa' && axEpaId(x) === e; })[0]; if (!k) return;
+    var firsts = []; Object.keys(byP).forEach(function (pk) { var a = byP[pk].slice().sort(function (x, y) { return x.mo - y.mo; }); for (var i = 0; i < a.length; i++) { var c = a[i].C[k]; if (c && c.v >= 4 - AX_EPS) { firsts.push(a[i].mo); break; } } });
+    if (!firsts.length) return; anyRow = true;
+    var cnt = {}; firsts.forEach(function (m) { cnt[m] = (cnt[m] || 0) + 1; });
+    var tr = document.createElement('tr'); tr.appendChild(axEl('th', '', 'EPA ' + e.no + ' ' + e.name)); tr.appendChild(axEl('td', 'c', e.l4 + ' 個月')); tr.appendChild(axEl('td', 'num', String(firsts.length)));
+    var td = document.createElement('td'); td.appendChild(axStackBar(AX4.stages.map(function (s, i) { return { n: cnt[axStageMonths(s)] || 0, c: 's' + (i + 1), t: s }; }), firsts.length)); tr.appendChild(td);
+    var med = axMedian(firsts), late = med > e.l4; var tm = axEl('td', 'num' + (late ? ' warn' : '')); tm.innerHTML = '<b>PGY' + med + 'M</b>' + (late ? '　<span>晚於公版 ' + (med - e.l4) + ' 個月</span>' : '　<span>符合公版</span>'); tr.appendChild(tm);
+    tb2.appendChild(tr);
+  });
+  if (anyRow) { t2.appendChild(tb2); var sw2 = axEl('div', 'ax-scroll'); sw2.appendChild(t2); w.appendChild(sw2); var lg2 = axEl('div', 'ax-legend'); lg2.innerHTML = AX4.stages.map(function (s, i) { return '<span><i class="ax-sw2 s' + (i + 1) + '"></i>' + s + '</span>'; }).join('') + '<span>只計已判定列；中位期程為院內實際，非目標</span>'; w.appendChild(lg2); sec.appendChild(w); }
+  return sec;
+}
+
+/* ---------- 4. 各 EPA 正式信賴狀態（人層） ---------- */
+function ax4Epa(host, P) {
+  var sec = axGroupSec(host, 'epa', '各 EPA 於公版 L4 時機的正式信賴狀態', '分母＝最近已判定期程已達該 EPA 公版時機的學員（人）',
+    '<b>CCC 正式 L4</b>＝最近一次 CCC 判定 ≥ L4，且未逾公版維持期限（EPA 1、2、3、5、7 一年；4、6、8 二年；以 CCC 日期近似最近執行日）。<br><b>教師觀察 L4、待 CCC</b>＝最近期程教師觀察 ≥ L4 但無 CCC 判定。<br><b>分母差異</b>：本表以「人」為單位，G01 以「學員×期程」為單位，故數值不可直接互相相除。<br>' + (P.hasStatus ? '離訓／中止者已排除。' : '學員CBME 無「訓練狀態」欄：已無後續期程的學員仍在分母（例：最近評核距今 ≥ 9 個月者以「疑似中斷」標示）。'));
+  var R = ax4Filtered(P).filter(function (r) { return r.formal; }), byP = {}; R.forEach(function (r) { (byP[r.key] = byP[r.key] || []).push(r); });
+  var obsR = ax4Filtered(P).filter(function (r) { return r.any && r.mo > 0; }), byO = {}; obsR.forEach(function (r) { (byO[r.key] = byO[r.key] || []).push(r); });
+  var now = ax4Today().getTime(), et = axEl('table', 'ax-gtab ax-nowrap'); et.innerHTML = '<thead><tr><th>EPA（公版 L4 時機）</th><th>已到時機</th><th>CCC 正式 L4</th><th>逾維持期限</th><th>教師觀察 L4、待 CCC</th><th>低於 L4</th><th>疑似中斷</th></tr></thead>';
+  var etb = document.createElement('tbody'), anyE = false;
+  AX_EPA_REG.filter(function (e) { return !e.inhouse; }).forEach(function (e) {
+    var k = P.keys.filter(function (x) { return P.kinds[x] === 'epa' && axEpaId(x) === e; })[0]; if (!k) return; anyE = true;
+    var due = 0, formal = 0, exp = 0, obs = 0, low = 0, stale = 0;
+    Object.keys(byO).forEach(function (pk) {
+      var a = (byP[pk] || []).slice().sort(function (x, y) { return x.mo - y.mo; }), ao = byO[pk].slice().sort(function (x, y) { return x.mo - y.mo; }), lastO = ao[ao.length - 1];
+      var last = a.length ? a[a.length - 1] : null; if (!last || last.mo < e.l4) return; due++;
+      if (!P.hasStatus && last.date && (now - last.date.getTime()) / (30.44 * 864e5) >= 9 && last.mo < 24 && !P.rows.some(function (x) { return x.key === pk && x.mo > last.mo; })) stale++;
+      var lc = null; for (var i = a.length - 1; i >= 0; i--) if (a[i].C[k]) { lc = a[i]; break; }
+      var c = lc ? lc.C[k] : null;
+      if (c && c.v >= 4 - AX_EPS) { if (e.keep && lc.date && now - lc.date.getTime() > e.keep * 30.44 * 864e5) exp++; else formal++; }
+      else if (lastO.T[k] && lastO.T[k].v >= 4 - AX_EPS && !lastO.C[k]) obs++; else low++;
+    });
+    var tr = document.createElement('tr'); tr.appendChild(axEl('th', '', 'EPA ' + e.no + ' ' + e.name + '（到職 ' + e.l4 + ' 個月）'));
+    tr.appendChild(axEl('td', 'num', String(due))); tr.appendChild(ax4Num(document.createElement('td'), formal, due));
+    tr.appendChild(axEl('td', 'num' + (exp ? ' warn' : ''), String(exp))); tr.appendChild(axEl('td', 'num' + (obs ? ' warn' : ''), String(obs))); tr.appendChild(axEl('td', 'num', String(low)));
+    var ts = axEl('td', 'num draft', String(stale)); ts.title = '最近已判定期程距今 ≥ 9 個月、未達 PGY24M 且無任何後續期程列；屬推論，請以訓練狀態欄取代'; tr.appendChild(ts);
+    etb.appendChild(tr);
+  });
+  if (!anyE) { sec.appendChild(axEl('div', 'state', '學員CBME 找不到可對應公版 EPA 的欄位。')); return sec; }
+  et.appendChild(etb); var ew = axEl('div', 'ax-scroll'); ew.appendChild(et); sec.appendChild(ew);
+  return sec;
+}
+
+/* ---------- 5. 能力達標熱圖（項目 × 期程；CCC／教師觀察；門檻可切換） ---------- */
+function ax4Heat(host, P) {
+  var sec = axGroupSec(host, 'heat', '能力達標熱圖（項目 × 期程）', '格內＝達到所選等級以上之學員比率；分母＝該期程該項目有該來源等級之已到期列',
+    '<b>取代</b>後台「臺灣藥師學習里程碑（Milestones）」「臺灣藥師可信賴專業活動（EPAs）」兩張達成率圖（後台只用教師觀察欄）。<br><b>來源切換</b>：CCC＝正式判定（只用已判定列）；教師觀察＝發展性參照。<br><b>門檻</b>：里程碑 L1–L5；EPA 2a＜2b＜3a＜3b＜3c＜4＜5。<br>分母少於 ' + AX.MIN_N + ' 人之格顯示 n，不顯示百分比。');
+  var ctrl = axEl('div', 'ax-bar'); sec.appendChild(ctrl); var body = axEl('div'); sec.appendChild(body);
+  function draw() {
+    ctrl.innerHTML = ''; body.innerHTML = '';
+    ctrl.appendChild(axSelect('判定來源', [{ v: 'CCC', t: 'CCC 正式判定' }, { v: 'T', t: '教師觀察（參照）' }], AX4.src, function (v) { AX4.src = v; draw(); }));
+    var lvOpts = [{ v: 'tgt', t: '本期目標（公版粗體／草案）' }, { v: '4', t: 'L4（完訓／獨立）' }, { v: '3', t: 'L3／3a 以上' }, { v: '2', t: 'L2／2a 以上' }, { v: '5', t: 'L5' }];
+    if (!AX4.lv) AX4.lv = '4';
+    ctrl.appendChild(axSelect('門檻', lvOpts, AX4.lv, function (v) { AX4.lv = v; draw(); }));
+    var R = ax4Filtered(P).filter(function (r) { return r.mo > 0 && (AX4.src === 'CCC' ? r.formal : (r.state === 'done' || r.state === 'obs')); });
+    var t = axEl('table', 'ax-maptab'), th = document.createElement('thead'), tr0 = document.createElement('tr'); tr0.appendChild(axEl('th', 'ax-corner', '能力項目'));
+    AX4.stages.forEach(function (s) { var h = axEl('th', 'ax-ch'); h.appendChild(axEl('span', '', s)); h.appendChild(axEl('small', '', R.filter(function (r) { return r.stage === s; }).length + ' 列')); tr0.appendChild(h); });
+    th.appendChild(tr0); t.appendChild(th); var tb = document.createElement('tbody');
+    [['ms', '臺灣藥師學習里程碑（15 項次核心能力）'], ['epa', '可信賴專業活動（8 項公版 EPA＋2 項院內 EPA）']].forEach(function (grp) {
+      var gr = document.createElement('tr'); var gh = axEl('th', 'ax-grp', grp[1]); gh.colSpan = AX4.stages.length + 1; gr.appendChild(gh); tb.appendChild(gr);
+      P.keys.filter(function (k) { return P.kinds[k] === grp[0]; }).forEach(function (k) {
+        var tr = document.createElement('tr'), r0 = grp[0] === 'epa' ? axEpaId(k) : null; var rh = axEl('th', 'ax-rh', (r0 ? (r0.inhouse ? '院內 ' : 'EPA ' + r0.no + ' ') : '') + k); tr.appendChild(rh);
+        AX4.stages.forEach(function (s) {
+          var td = document.createElement('td'), thr = AX4.lv === 'tgt' ? axTgt(grp[0], s, k) : +AX4.lv, src = AX4.lv === 'tgt' ? axTgtSrc(grp[0], s, k) : '';
+          var vals = R.filter(function (r) { return r.stage === s; }).map(function (r) { var o = AX4.src === 'CCC' ? r.C[k] : r.T[k]; return o ? o.v : null; }).filter(function (v) { return v !== null; });
+          if (thr === undefined || !vals.length) { td.className = 'ax-na'; td.title = s + '｜' + k + (thr === undefined ? '：本期未訂目標' : '：無資料'); tr.appendChild(td); return; }
+          var hit = vals.filter(function (v) { return v >= thr - AX_EPS; }).length, p = hit / vals.length;
+          if (vals.length < AX.MIN_N) { td.className = 'ax-none'; td.appendChild(axEl('b', '', hit + '／' + vals.length)); td.title = s + '｜' + k + '：' + hit + '／' + vals.length + '（少於 ' + AX.MIN_N + ' 人，不顯示百分比）'; }
+          else { var col = axColor(p); td.style.background = col.bg; td.style.color = col.fg; td.appendChild(axEl('b', '', Math.round(p * 100) + '%')); td.appendChild(axEl('small', '', hit + '／' + vals.length)); td.title = s + '｜' + k + '：達 ' + axLvText(thr, grp[0]) + ' 以上 ' + hit + '／' + vals.length + (src ? '（' + src + '目標）' : ''); }
+          if (src === '公版') td.classList.add('strong');
+          tr.appendChild(td);
+        });
+        tb.appendChild(tr);
+      });
+    });
+    t.appendChild(tb); var sc = axEl('div', 'ax-scroll'); sc.appendChild(t); body.appendChild(sc);
+    var lg = axEl('div', 'ax-legend'); lg.innerHTML = '<span>顏色深＝達標比率高</span><span>斜紋＝本期未訂目標或無資料</span><span>灰格＝n＜' + AX.MIN_N + '</span><span>來源：' + (AX4.src === 'CCC' ? 'CCC 正式判定' : '教師觀察（非正式）') + '</span>'; body.appendChild(lg);
+  }
+  draw(); return sec;
+}
+
+/* ---------- 6. G02 配對轉移（相鄰／跨期分開） ---------- */
+function ax4G2(host, P) {
+  var sec = axGroupSec(host, 'g2', 'G02 項目層配對轉移（CCC 對 CCC）', '同一學員、同一能力、兩期皆有 CCC 判定才配對；相鄰期程與跨期程分開',
+    '<b>UP／SAME／DOWN</b>：後期 CCC 等級高於／等於／低於前期。任一期缺 CCC 為「不可比較」。<br><b>人層</b>＝至少一項進展且無下降 ÷ 有可比配對的學員。<br><b>跨期程</b>（例 PGY6M→PGY18M）表示中間期程缺 CCC 判定，間隔不同不與相鄰期程合併。<br>年份篩選以「後期」所屬評量年份為準。');
+  var all = P.rows.filter(function (r) { return r.formal && !r.excluded; }), byK = {}; all.forEach(function (r) { (byK[r.key] = byK[r.key] || []).push(r); });
+  var pairs = {};
+  Object.keys(byK).forEach(function (pk) {
+    var a = byK[pk].sort(function (x, y) { return x.mo - y.mo; });
+    for (var i = 1; i < a.length; i++) {
+      if (AX4.year && a[i].year !== AX4.year) continue;
+      var adj = AX4.stages.indexOf(a[i].stage) - AX4.stages.indexOf(a[i - 1].stage) === 1;
+      var lab = a[i - 1].stage + ' → ' + a[i].stage, o = pairs[lab] = pairs[lab] || { up: 0, same: 0, down: 0, nc: 0, pUp: 0, pAny: 0, adj: adj, o: (adj ? 0 : 1e4) + a[i].mo * 100 + a[i - 1].mo };
+      var u = 0, d = 0, any = 0;
+      P.keys.forEach(function (k) { var x = a[i - 1].C[k], y = a[i].C[k]; if (!x || !y) { o.nc++; return; } any++; if (y.v > x.v + AX_EPS) { o.up++; u++; } else if (y.v < x.v - AX_EPS) { o.down++; d++; } else o.same++; });
+      if (any) { o.pAny++; if (u && !d) o.pUp++; }
+    }
+  });
+  var keys = Object.keys(pairs).sort(function (a, b) { return pairs[a].o - pairs[b].o; });
+  if (!keys.length) { sec.appendChild(axEl('div', 'state', '目前沒有兩期皆有 CCC 判定的配對。')); return sec; }
+  [['相鄰期程', true], ['跨期程（中間期程缺 CCC）', false]].forEach(function (g) {
+    var ks = keys.filter(function (k) { return pairs[k].adj === g[1]; }); if (!ks.length) return;
+    var w2 = axEl('div', 'ax-g2'); w2.appendChild(axEl('div', 'ax-ftitle', g[0]));
+    ks.forEach(function (k) { var o = pairs[k], n = o.up + o.same + o.down; var row = axEl('div', 'ax-g2row'); row.appendChild(axEl('span', 'ax-g2k', k)); row.appendChild(n ? axStackBar([{ n: o.up, c: 'up', t: '進展' }, { n: o.same, c: 'same', t: '維持' }, { n: o.down, c: 'down', t: '下降' }], n) : axEl('span', 'ax-muted', '無可比較配對')); var v = axEl('span', 'ax-g2v'); v.innerHTML = '<b>' + o.up + '</b>／' + n + ' 項次進展｜人層 ' + o.pUp + '／' + o.pAny + '｜不可比較 ' + o.nc; row.appendChild(v); w2.appendChild(row); });
+    sec.appendChild(w2);
+  });
+  var lg2 = axEl('div', 'ax-legend'); lg2.innerHTML = '<span><i class="ax-sw2 up"></i>進展</span><span><i class="ax-sw2 same"></i>維持</span><span><i class="ax-sw2 down"></i>下降</span><span>分母＝兩期皆有 CCC 判定的「學員×項目」</span>'; sec.appendChild(lg2);
+  return sec;
+}
+
+/* ---------- 7. 綜合分數趨勢（中間 50% 平均／中位數） ---------- */
+function ax4Sum(host, P) {
+  var sec = axGroupSec(host, 'sum', '各訓練期程綜合分數（全體學員）', '綜合分數為試算表「綜合分數」欄（有 CCC 綜合分數時採 CCC）；趨勢參考，非能力判定',
+    '<b>平均</b>＝去除最高 25%、最低 25% 後之中間 50% 平均；同列中位數、IQR 與 n；n＜' + AX.MIN_N + ' 之期程不顯示數值。<br><b>取代</b>後台「各訓練期程綜合分數（全體學員）」（該圖為中位數，且 PGY0 單人亦顯示）。<br>只計已到期且有等級之列（已判定、僅教師觀察）。');
+  var R = ax4Filtered(P).filter(function (r) { return r.mo > 0 && (r.state === 'done' || r.state === 'obs') && r.sum !== null && r.sum !== undefined; });
+  var tab = axEl('table', 'ax-gtab'); tab.innerHTML = '<thead><tr><th>期程</th><th>n</th><th>中間 50% 平均</th><th>中位數</th><th>IQR</th><th>分布</th></tr></thead>'; var tb = document.createElement('tbody'), any = false;
+  var allV = R.map(function (r) { return r.sum; }), lo = allV.length ? Math.min.apply(null, allV) : 0, hi = allV.length ? Math.max.apply(null, allV) : 100;
+  AX4.stages.forEach(function (s) {
+    var v = R.filter(function (r) { return r.stage === s; }).map(function (r) { return r.sum; }); if (!v.length) return; any = true;
+    var tr = document.createElement('tr'); tr.appendChild(axEl('th', '', s)); tr.appendChild(axEl('td', 'num', String(v.length)));
+    if (v.length < AX.MIN_N) { var td = axEl('td', 'c', '少於 ' + AX.MIN_N + ' 人，不顯示'); td.colSpan = 4; tr.appendChild(td); tb.appendChild(tr); return; }
+    var q = axIQR(v); tr.appendChild(axEl('td', 'num', axFmt(ax4Trim(v), 1))); tr.appendChild(axEl('td', 'num', axFmt(q[1], 1))); tr.appendChild(axEl('td', 'num', axFmt(q[0], 1) + '–' + axFmt(q[2], 1)));
+    var td2 = document.createElement('td'), bar = axEl('div', 'ax-range'); var span = hi - lo || 1; var i1 = axEl('i'); i1.style.left = ((q[0] - lo) / span * 100) + '%'; i1.style.width = ((q[2] - q[0]) / span * 100) + '%'; var m = axEl('b'); m.style.left = ((q[1] - lo) / span * 100) + '%'; bar.appendChild(i1); bar.appendChild(m); bar.title = s + '：IQR ' + axFmt(q[0], 1) + '–' + axFmt(q[2], 1) + '，中位數 ' + axFmt(q[1], 1); td2.appendChild(bar); tr.appendChild(td2);
+    tb.appendChild(tr);
+  });
+  if (!any) { sec.appendChild(axEl('div', 'state', '目前沒有可計算的綜合分數。')); return sec; }
+  tab.appendChild(tb); var sw = axEl('div', 'ax-scroll'); sw.appendChild(tab); sec.appendChild(sw);
+  sec.appendChild(axEl('p', 'ax-muted', '分布軸範圍 ' + axFmt(lo, 1) + '–' + axFmt(hi, 1) + '（全體列）。'));
+  return sec;
+}
+
+/* ---------- 8. 學員個人亮點（同期群＝評量年份 × 期程） ---------- */
+function ax4Highlights(host, P) {
+  var R = P.rows.filter(function (r) { return !r.excluded && r.any && r.mo > 0 && r.key && (r.state === 'done' || r.state === 'obs'); });
+  var years = P.hasYear ? P.years.slice() : ['（無年份欄）'];
+  var groups = years.map(function (y) {
+    var rs = R.filter(function (r) { return !P.hasYear || r.year === y; }), byW = {}; rs.forEach(function (r) { (byW[r.key] = byW[r.key] || []).push(r); });
+    var items = [];
+    Object.keys(byW).forEach(function (w) {
+      var mine = byW[w].sort(function (a, b) { return a.mo - b.mo; }), last = mine[mine.length - 1];
+      var coh = rs.filter(function (r) { return r.stage === last.stage; }), hist = P.rows.filter(function (r) { return r.key === w && !r.excluded && (r.state === 'done' || r.state === 'obs'); }).sort(function (a, b) { return a.mo - b.mo; });
+      var stars = [], best = null, ownMed = axMedian(Object.keys(last.use).map(function (k) { return last.use[k].v; }));
+      Object.keys(last.use).forEach(function (k) {
+        var own = last.use[k].v, vals = coh.map(function (r) { return r.use[k] && r.useSrc[k] === last.useSrc[k] ? r.use[k].v : null; }).filter(function (x) { return x !== null; });
+        var q = vals.length ? axIQR(vals) : null, kind = P.kinds[k];
+        if (q && vals.length >= AX.MIN_N && own > q[1] && own >= q[2]) stars.push({ item: k + ' ' + axLvText(own, kind) + (last.useSrc[k] === 'CCC' ? '' : '（觀察）'), tip: '同期群領先：' + y + ' ' + last.stage + ' 本人 ' + axLvText(own, kind) + '，同期群中位數 ' + axLvText(q[1], kind) + '、第 75 百分位 ' + axLvText(q[2], kind) + '（同期群 ' + vals.length + ' 人；' + last.useSrc[k] + '）', d: own - q[1] });
+        if (own - ownMed > 0 && (!q || vals.length < AX.MIN_N || own >= q[1]) && (!best || own - ownMed > best.rel)) best = { item: k + ' ' + axLvText(own, kind), mean: own, rel: own - ownMed, n: 1, cohMed: q ? q[1] : null, tip: '個人強項：' + last.stage + ' 本人 ' + axLvText(own, kind) + '，高於本人各項中位數 ' + axLvText(ownMed, kind) };
+      });
+      stars.sort(function (a, b) { return b.d - a.d; });
+      var ups = []; if (hist.length > 1) Object.keys(last.use).forEach(function (k) { var first = null; hist.some(function (r) { if (r.use[k]) { first = r; return true; } return false; }); if (first && first !== last && first.useSrc[k] === last.useSrc[k] && last.use[k].v > first.use[k].v) ups.push({ k: k, from: first.stage + ' ' + axLvText(first.use[k].v, P.kinds[k]), to: last.stage + ' ' + axLvText(last.use[k].v, P.kinds[k]), d: last.use[k].v - first.use[k].v, src: last.useSrc[k] }); });
+      ups.sort(function (a, b) { return b.d - a.d; });
+      var extra = ups.slice(0, 2).map(function (u) { return axBadge('↑', 'up', u.k + '（' + u.from + '→' + u.to + '）', '同一項目最早期程與最近期程比較，兩期皆為' + u.src); });
+      var qs = []; mine.forEach(function (r) { qs = qs.concat(r.fb); });
+      if (stars.length || best || extra.length) items.push({ name: w, sub: last.stage + '（' + last.src + '）｜同期群 ' + coh.length + ' 人', hl: { star: stars, diamond: best }, extra: extra, quotes: axQuotes(qs, 1) });
+    });
+    return { key: y, label: y, n: Object.keys(byW).length, items: items };
+  }).filter(function (g) { return g.n; });
+  return axCohortBoard(host, '學員個人亮點（CBME：Milestones & EPAs，依評量年份同期群）', groups, { ax: 'hl', groupLabel: '評量年份', def: groups.length - 1,
+    note: AX_RULE_CBME + '<br><b>同期群</b>＝同一評量年份（學員CBME「年份」欄）且同一期程、同一判定來源的全體學員；每張卡取該學員該年份最近一個期程。↑ 進步比較本人全部期程（不限年份）。只用已到期之列（已判定、僅教師觀察）。', desc: '一次只看一個評量年份；卡片依亮點強度排序。' });
+}
+
+/* ---------- 9. 教學評量指標（CBME）：修正一致率與進展率分母 ---------- */
+function ax4Kpi(host, P) {
+  var R = ax4Filtered(P).filter(function (r) { return r.mo > 0; });
+  var due = R.filter(function (r) { return r.state === 'done' || r.state === 'overdue' || r.state === 'obs'; }), done = due.filter(function (r) { return r.state === 'done'; });
+  var agree = 0, pairs = 0; R.filter(function (r) { return r.formal; }).forEach(function (x) { Object.keys(x.C).forEach(function (k) { if (x.T[k]) { pairs++; if (x.T[k].t === x.C[k].t) agree++; } }); });
+  var byW = {}; R.filter(function (r) { return r.formal; }).forEach(function (x) { (byW[x.key] = byW[x.key] || []).push(x); });
+  var cMed = function (row) { var a = []; Object.keys(row.C).forEach(function (k) { if (P.kinds[k] === 'ms') a.push(row.C[k].v); }); return a.length ? axMedian(a) : null; };
+  var pg = 0, pgD = 0; Object.keys(byW).forEach(function (w) { var a = byW[w].sort(function (p, q) { return p.mo - q.mo; }); if (a.length < 2) return; pgD++; var m1 = cMed(a[a.length - 1]), m0 = cMed(a[0]); if (m1 !== null && m0 !== null && m1 > m0) pg++; });
+  var withLv = R.filter(function (r) { return r.state === 'done' || r.state === 'obs'; }), fbDone = withLv.filter(function (r) { return r.fb.length; }).length;
+  var full = 0, fullD = 0; R.filter(function (r) { return r.formal; }).forEach(function (r) { var req = P.keys.filter(function (k) { return axTgtApproved(P.kinds[k], r.stage, k) !== undefined; }); if (!req.length) return; fullD++; if (req.every(function (k) { return r.C[k]; })) full++; });
+  var pend = due.filter(function (r) { return r.state !== 'done'; });
+  return axKpiSection(host, '教學評量指標：PGY 學員（CBME：Milestones／EPAs）', '以學員CBME 為資料來源，套用頁首評量年份篩選。「學員×期程」為一個評核單位；只有 CCC 日期已到者入分母；預填、無日期、PGY0 基線不計。EPA 次等級依 2a＜2b＜3a＜3b＜3c＜4 換算。', [
+    { name: 'CCC 判定完成率', kind: 'rate', num: done.length, den: due.length, numDef: '有 CCC 等級', denDef: 'CCC 日期已到之「學員×期程」', warn: pend.length > 0, note: pend.length ? '待補 ' + pend.length + ' 筆（見「評核進度」名單）' : '' },
+    { name: '公版應評項目 CCC 裁決完整率', kind: 'rate', num: full, den: fullD, numDef: '本期全部公版應評項目皆有 CCC 等級', denDef: '已判定且本期有公版應評項目之「學員×期程」', na: !fullD, naText: '尚無本期有公版應評項目之已判定列' },
+    { name: '教師評核與 CCC 判定一致率', kind: 'rate', num: agree, den: pairs, numDef: '同一項目教師評核等級＝CCC 判定', denDef: '已判定列中兩者皆有等級之項目' },
+    { name: '里程碑進展率', kind: 'rate', num: pg, den: pgD, numDef: '最近一次 CCC 里程碑中位等級高於最早一次', denDef: '有 ≥2 個已判定期程之學員', na: !pgD, naText: '尚無學員具 ≥2 個已判定期程' },
+    { name: 'CBME 質性回饋覆蓋率', kind: 'rate', num: fbDone, den: withLv.length, numDef: '有質性回饋文字', denDef: '已到期且有等級之「學員×期程」' }
+  ], null, 'ind2');
+}
+
+/* ---------- 10. 資料品質與待辦（更新試算表即自動消失） ---------- */
+function ax4Dq(host, P) {
+  var sec = axGroupSec(host, 'dq', '資料品質與待辦', '每一項皆可在「學員CBME」試算表直接修正；修正後本頁自動更新',
+    '本卡列出會影響上方數字的資料問題與修正位置；不列個人表現。<br>欄位參照：年份＝BR 欄；【CCC】日期＝AO 欄；CCC 等級＝AP–BN 欄；教師觀察＝E–AC 欄。');
+  var items = [];
+  P.rows.forEach(function (r) {
+    if (r.excluded) return;
+    if (r.state === 'prefill') items.push({ t: '預填', d: r.key + '｜' + r.stage + '：CCC 日期 ' + axFmtDate(r.date) + ' 未到，卻已有 CCC 等級；不計正式。請確認日期或等級。' });
+    if (r.state === 'undated') items.push({ t: '無日期', d: r.key + '｜' + r.stage + '：有等級但【CCC】日期空白；不計正式。' });
+    if (P.hasYear && r.any && !r.year) items.push({ t: '年份空白', d: r.key + '｜' + r.stage + '：年份欄（BR）空白，年份篩選時不會出現。' });
+    P.keys.forEach(function (k) { if (P.kinds[k] !== 'epa') return; ['T', 'C'].forEach(function (s) { var o = r[s][k]; if (o && /^[123]$/.test(o.t)) items.push({ t: '量尺錯誤', d: r.key + '｜' + r.stage + '｜' + k + '（' + (s === 'C' ? 'CCC' : '教師觀察') + '）填 Level ' + o.t + '：EPA 量尺為 2a–5，無整數 ' + o.t + '。' }); }); });
+    if (r.mo > 0 && r.ccc && r.sum !== null && r.sum !== undefined) { /* 綜合分數一致性由後台公式維護，略 */ }
+  });
+  var dup = {}; P.rows.forEach(function (r) { var k = r.key + '|' + r.stage; dup[k] = (dup[k] || 0) + 1; }); Object.keys(dup).forEach(function (k) { if (dup[k] > 1) items.push({ t: '重複列', d: k.replace('|', '｜') + '：同一學員同一期程 ' + dup[k] + ' 列。' }); });
+  if (!P.hasStatus) items.push({ t: '缺欄位', d: '學員CBME 無「訓練狀態」欄（建議於 BS 欄新增，值：在訓／完訓／離訓／中止）；目前已無後續期程的學員仍計入各 EPA 分母。' });
+  if (!P.hasYear) items.push({ t: '缺欄位', d: '學員CBME 無「年份」欄，年份篩選與同期群停用。' });
+  if (!items.length) { sec.appendChild(axEl('div', 'state', '目前沒有資料品質問題。')); return sec; }
+  var ul = axEl('div', 'ax-dq'); items.forEach(function (it) { var row = axEl('div', 'ax-dqrow'); row.appendChild(axEl('b', '', it.t)); row.appendChild(axEl('span', '', it.d)); ul.appendChild(row); }); sec.appendChild(ul);
+  return sec;
+}
+
+/* ---------- 組裝：首次渲染放入 host；年份切換時就地替換同 data-ax 的區塊（版面已由 axApplyLayout 排好） ---------- */
+function axCbmeGroup(host) {
+  return axLoad(AX.KEYS.cbme).then(function (cb) {
+    if (!cb.rows.length) throw { code: 'NO_PERMISSION' };
+    var P = ax4Rows(cb);
+    function build() { var tmp = axEl('div'); ax4Overview(tmp, P, redraw); ax4Progress(tmp, P); ax4Team(tmp, P); ax4Epa(tmp, P); ax4Heat(tmp, P); ax4G2(tmp, P); ax4Sum(tmp, P); ax4Highlights(tmp, P); ax4Kpi(tmp, P); ax4Dq(tmp, P); return Array.prototype.slice.call(tmp.children); }
+    function redraw() {
+      var root = $('charts') || document;
+      build().forEach(function (n) { var old = root.querySelector('section[data-ax="' + n.dataset.ax + '"]'); if (old) old.parentNode.replaceChild(n, old); else root.appendChild(n); });
+    }
+    build().forEach(function (n) { host.appendChild(n); });
+  }).catch(function (e) { if (e && e.code === 'NO_PERMISSION') throw e; if (window.console) console.error(e); }).then(function () { return axTraineeIndicators(host); }).then(function () {
+    var olds = host.querySelectorAll('section[data-ax=ind2]'); if (olds.length > 1) olds[olds.length - 1].remove(); // v3 的 ind2 未套用三態，移除
+  });
+}
+DASH_LAYOUT['CBME 成效'] = { order: ['ax:ov', 'ax:prog', 'ax:team', 'ax:epa', 'ax:heat', 'ax:g2', 'ax:sum', 'ax:hl', 'ax:ind2', 'ax:ind', 'ax:dq'], collapse: [/./], collapseTitle: '後台原始圖表（教師觀察填寫統計；判定來源與分母與上方不同，僅供核對）' };
+
+
+/* ===================== v4.1（2026-11-03）：PGY 學員個人成績 重建 =====================
+ * 依 2026-11-03 零信任審查 P1–P13 修正；本區段函式覆寫前面同名函式。
+ *  1. 三態與 CBME 成效頁一致：CCC 日期未到卻已有 CCC 等級（預填）、有等級無日期者不計正式判定，於頁首標示。
+ *  2. EPA 證據直讀原始分頁：PCNE-DRPs 依 A 欄「專業活動」前綴分 EPA 1／4／5／6（病歷號已由後端遮蔽，前端不顯示 A 欄）；
+ *     EPA 6 品項數由「影響藥物」欄自動計；CbD 以「期程×病例來源」計案例數（教師＋同儕兩列＝1 案）；
+ *     藥品諮詢仍讀後台看板，若控制台有依「諮詢來源對象」分組的看板即自動分 EPA 3／7。證據累積不隨頁首年度／月份篩選（公版要求為累積量）。
+ *  3. 期程預定日期優先讀學員CBME「到職日期」欄；無此欄時沿用 CCC 日期反推並標「推估」。
+ *  4. 卡片順序：成長 → ILP → EPA 證據（明細可展開：PCNE／諮詢／晨會）→ CbD → 質性回饋 → 簡報評核 → 後台原始圖。 */
+(function () { var e4 = AX_EPA_REG.filter(function (r) { return r.id === 'EPA-04'; })[0]; if (e4) e4.alias = (e4.alias || []).concat(['藥物不良反應ADR', '藥物不良反應', '藥品不良反應', 'ADR', '藥物不良反應評估']); })();
+function ax41StripSeq(s) { return String(s || '').replace(/\s*[（(]\d+[）)]\s*$/, ''); }
+function ax41Act(s) { var m = /^\s*([^-－]+?)\s*[-－]/.exec(String(s || '')); return m ? m[1].trim() : String(s || '').trim(); }
+function ax41Drugs(s) { var o = {}; String(s || '').split(/[,，、;；\/\n]+/).forEach(function (x) { x = x.trim().toLowerCase().replace(/\s+/g, ' '); if (x && !/^(無|none|-)$/.test(x)) o[x] = 1; }); return Object.keys(o); }
+/* 個人三態：回傳 {P2: 不含預填／無日期 CCC 等級的解析結果, flags:[...]} */
+function ax41Personal(cb, lab) {
+  var P = ax4Rows(cb), flags = [], m = axRowsFor(P, lab);
+  m.rows.forEach(function (r) {
+    if (r.state === 'prefill' || r.state === 'undated') {
+      flags.push(r.stage + '：' + (r.state === 'prefill' ? 'CCC 日期 ' + axFmtDate(r.date) + ' 未到卻已有 CCC 等級（預填）' : '有 CCC 等級但無 CCC 日期') + '，不計正式判定');
+      r.C = {}; r.use = {}; r.useSrc = {}; P.keys.forEach(function (k) { if (r.T[k]) { r.use[k] = r.T[k]; r.useSrc[k] = '教師觀察'; } });
+      var nu = Object.keys(r.use).length; r.ccc = false; r.any = nu > 0; r.src = nu ? '教師觀察（CCC 預填不計）' : '未評量'; r.formal = false;
+    }
+  });
+  var stI = axCol(cb.cols, /^到職日期$/), start = null;
+  if (stI >= 0) { var d0 = null; cb.rows.forEach(function (row, i) { if (P.rows[i].key === axIdKey(lab) || (axCodeOf(lab) && P.rows[i].code === axCodeOf(lab) && P.rows[i].who === axName(lab))) { var d = axDate(row[stI]); if (d && (!d0 || d < d0)) d0 = d; } }); if (d0) start = d0.getFullYear() * 12 + d0.getMonth(); }
+  return { P: P, flags: flags, start: start, hasStart: stI >= 0 };
+}
+/* CbD 案例：同一學員、同一期程、同一病例來源＝1 案；評核者數＝該案各視角「表現良好」非空格數之最大值（推估） */
+function ax41CbdCases(src, lab) {
+  if (!src || !src.rows.length) return { cases: [], rows: [], bySrc: {}, byStage: {} };
+  var cols = src.cols, nI = axCol(cols, /^學員姓名$/), sI = axCol(cols, /^期程$/), pI = axCol(cols, /^病例來源$/), vI = axCol(cols, /^評核視角$/), gI = []; cols.forEach(function (c, i) { if (/表現良好/.test(c)) gI.push(i); });
+  var rows = src.rows.filter(function (row) { return axSameSubj(row[nI], lab); }), cases = {};
+  rows.forEach(function (row) { var st = String(row[sI] || '').trim(), sc = String(row[pI] || '').trim(), v = String(row[vI] || '').trim(), k = st + '|' + sc; var c = cases[k] = cases[k] || { stage: st, src: sc, views: {}, evaluators: 0 }; c.views[v] = 1; var n = gI.filter(function (i) { var t = String(row[i] || '').trim(); return t && !/^(無|none|-)$/i.test(t); }).length; c.evaluators = Math.max(c.evaluators, n); });
+  var list = Object.keys(cases).map(function (k) { return cases[k]; }), bySrc = {}, byStage = {};
+  list.forEach(function (c) { bySrc[c.src] = (bySrc[c.src] || 0) + 1; byStage[c.stage] = (byStage[c.stage] || 0) + 1; });
+  return { cases: list, rows: rows, bySrc: bySrc, byStage: byStage };
+}
+/* PCNE-DRPs 原始分頁（控制台分頁代碼 70335a7b1890a2a4）：依「我的姓名」取本人列，依 A 欄「專業活動」前綴分類 */
+function ax41Pcne(src, lab) {
+  if (!src || !src.rows.length) return null;
+  var cols = src.cols, aI = axCol(cols, /^專業活動/), nI = axCol(cols, /^我的姓名$/), dI = axCol(cols, /^影響藥物$/), tI = axCol(cols, /^照會日期$/);
+  if (aI < 0 || nI < 0) return { ok: false, reason: '原始分頁缺「專業活動」或「我的姓名」欄' };
+  var rows = src.rows.filter(function (row) { return axSameSubj(row[nI], lab); }), by = {}, drugs = {}, undated = 0;
+  rows.forEach(function (row) { var a = ax41Act(row[aI]), e = axEpaId(a), id = e ? e.id : '其他：' + a; by[id] = (by[id] || 0) + 1; if (e && e.id === 'EPA-06' && dI >= 0) ax41Drugs(row[dI]).forEach(function (x) { drugs[x] = 1; }); if (tI >= 0 && !axDate(row[tI])) undated++; });
+  return { ok: true, n: rows.length, by: by, tdmDrugs: Object.keys(drugs).length, undated: undated };
+}
+/* 公版 EPA 評量規劃與證據累積（v4.1）：計數來源與門檻逐欄標示；明細看板收於卡內可展開 */
+function ax41EpaPlanCard(host, G, P, C, pc, d) {
+  var sec = axEl('section', 'chart ax-card ax-plancard'); sec.dataset.ax = 'epaplan'; host.appendChild(sec);
+  axGrowthHead(sec, '公版 EPA 評量規劃與證據累積', '依 2023 公版各 EPA 評量規劃｜證據為累積量，不隨頁首年度／月份篩選',
+    '<b>用途</b>：對照公版各 EPA「評量規劃」可計數的要求，看證據是否足以送 CCC 判定；不是能力判定。<br><b>CbD</b>：學員CbD 同一期程、同一病例來源＝1 案（教師＋同儕兩列不重複計）；病例來源對應 EPA（門診處方評估→EPA 1、藥物不良反應 ADR→EPA 4、住院病人用藥評估→EPA 5、藥物治療監測→EPA 6）。<br><b>紀錄</b>：藥事照會紀錄 PCNE-DRPs 直讀原始分頁，依「專業活動」分 EPA 1／4／5／6，EPA 6 品項數＝「影響藥物」不同品項數（自動）；藥品諮詢紀錄讀後台看板，' + '控制台若有依「諮詢來源對象」分組的看板即自動分 EPA 3（病人／家屬）與 EPA 7（醫療人員），否則以全部筆數計並標「未區分」。<br><b>未含</b>：職場直接觀察（DOPS／ad-hoc EPA）每月次數——後台無 PGY 直接觀察資料。<br>門檻為公版文字；目前（CCC）只採已到期之正式判定。', false);
+  var tab = axEl('table', 'ax-gtab ax-plant2'); tab.innerHTML = '<thead><tr><th>EPA（公版 L4 時機）</th><th>目前（CCC）</th><th>CbD（公版要求）</th><th>紀錄（公版要求）</th><th>證據狀態</th></tr></thead>';
+  var tb = document.createElement('tbody'), last = G.last, mo = last.mo || 0;
+  AX_EPA_REG.filter(function (e) { return !e.inhouse; }).forEach(function (e) {
+    var pl = AX_EPA_PLAN[e.id] || {}, k = P.keys.filter(function (x) { return P.kinds[x] === 'epa' && axEpaId(x) === e; })[0];
+    var lc = null; if (k) for (var i = G.wd.length - 1; i >= 0; i--) if (G.wd[i].C[k]) { lc = G.wd[i]; break; }
+    var cur = lc ? axLvText(lc.C[k].v, 'epa') + '（' + lc.stage + '）' : (k && last.T[k] ? '觀察 ' + axLvText(last.T[k].v, 'epa') + '、待 CCC' : '—');
+    var nC = 0; Object.keys(C.bySrc).forEach(function (s2) { var r = axEpaId(s2); if (r && r.id === e.id) nC += C.bySrc[s2]; });
+    var cbdTxt = pl.cbdText ? nC + ' 案／' + pl.cbdText.replace(/^.*?(≥|每月)/, '$1') : (nC ? nC + ' 案（公版未訂次數）' : '—');
+    var cbdOk = pl.cbd !== undefined ? nC >= pl.cbd : null, manual = !!pl.cbdMonthly;
+    var recTxt = '—', recOk = null;
+    if (/^EPA-0[1456]$/.test(e.id)) {
+      if (!pc) recTxt = pl.rec + '：本頁讀不到藥事照會原始分頁（需控制台開放「PCNE-DRPs」分頁）';
+      else if (!pc.ok) recTxt = pl.rec + '：' + pc.reason;
+      else { var n2 = pc.by[e.id] || 0; recTxt = n2 + '／' + pl.recN + ' 例 ' + pl.rec.replace(/（.*$/, '') + '（PCNE 專業活動＝' + e.name.replace(/評估與建議$/, '') + '）'; recOk = n2 >= pl.recN; if (e.id === 'EPA-06') { recTxt = pc.tdmDrugs + '／' + pl.recN + ' 種監測藥品（影響藥物不同品項，' + n2 + ' 筆）'; recOk = pc.tdmDrugs >= pl.recN; } }
+    } else if (/^EPA-0[37]$/.test(e.id) && pl.recSrc) {
+      var R = axChartGroups(d, pl.recSrc, pl.recPick);
+      if (!R) recTxt = '本頁無「' + pl.recLab + '」看板';
+      else if (!R.ok) recTxt = pl.recLab + '：' + (EMPTY_TEXT[R.status] || R.status);
+      else { var keys2 = Object.keys(R.groups), pick = keys2.filter(function (g2) { return pl.recPick.test(g2); }); var n3 = pick.length ? pick.reduce(function (a, g2) { return a + R.groups[g2]; }, 0) : R.total; recTxt = n3 + '／' + pl.recN + ' 例 ' + pl.rec + (pick.length ? '（諮詢來源對象：' + pick.join('、') + '）' : '（全部筆數，未區分病人／醫療人員：控制台尚無依「諮詢來源對象」分組的看板）'); recOk = pick.length ? n3 >= pl.recN : null; }
+    } else if (pl.rec) recTxt = pl.rec;
+    var due = mo >= e.l4, st = '', cls = '', oks = [cbdOk, recOk].filter(function (x) { return x !== null; });
+    if (!oks.length) { st = manual ? '每月次數要求：需人工逐月核對' : (pl.recN && recOk === null ? '紀錄未區分，暫不判定' : '公版無可計數要求'); cls = manual || (pl.recN && recOk === null) ? 'low' : 'na'; }
+    else if (oks.every(Boolean)) { st = '證據量已達公版要求'; cls = 'ok'; }
+    else if (lc && lc.C[k].v >= 4 - AX_EPS) { st = '已判定 L4；公版證據量未達，請核對紀錄是否完整'; cls = 'low'; }
+    else { st = (due ? '已到 L4 時機，' : '') + '證據量未達'; cls = due ? 'warn' : 'low'; }
+    if (e.id === 'EPA-06' && cls === 'ok' && manual) { st = '紀錄已達；每月 CbD ≥2 次需人工逐月核對'; cls = 'low'; }
+    if (S.ck) (S.ck.epaPlan = S.ck.epaPlan || []).push({ no: e.no, name: e.name, l4: e.l4, due: due, st: st, cls: cls }); /* v4.2 re-plant */
+    var tr = document.createElement('tr');
+    tr.appendChild(axEl('th', '', 'EPA ' + e.no + ' ' + e.name + '（' + e.l4 + ' 個月）'));
+    tr.appendChild(axEl('td', '', cur)); tr.appendChild(axEl('td', cbdOk === true ? 'ok' : cbdOk === false ? 'low' : '', cbdTxt)); tr.appendChild(axEl('td', recOk === true ? 'ok' : recOk === false ? 'low' : '', recTxt)); tr.appendChild(axEl('td', 'st ' + cls, st));
+    tb.appendChild(tr);
+  });
+  tab.appendChild(tb); var sw2 = axEl('div', 'ax-scroll'); sw2.appendChild(tab); sec.appendChild(sw2);
+  var other = pc && pc.ok ? Object.keys(pc.by).filter(function (x) { return /^其他/.test(x); }) : [];
+  sec.appendChild(axEl('p', 'ax-muted', (pc && pc.ok ? '藥事照會紀錄本人共 ' + pc.n + ' 筆' + (other.length ? '（未對應 EPA：' + other.map(function (x) { return x.replace(/^其他：/, '') + ' ' + pc.by[x]; }).join('、') + '）' : '') + (pc.undated ? '；' + pc.undated + ' 筆無照會日期' : '') + '。' : '') + '下方「證據明細」為後台看板原始呈現（照會、諮詢、晨會簡報），可展開核對。'));
+  var dt = document.createElement('details'); dt.className = 'ax-fold ax-evfold'; var sm = document.createElement('summary'); sm.textContent = '證據明細（藥事照會紀錄、藥品諮詢紀錄、晨會病例簡報）'; dt.appendChild(sm); var inner = axEl('div', 'ax-foldbody'); dt.appendChild(inner); sec.appendChild(dt);
+  sec._evBody = inner; sec._evSummary = sm;
+  return sec;
+}
+/* 簡報評核（併入本頁，v4.1）：後台「簡報分數／簡報各評核面向／簡報文字回饋」三張合為一卡；無資料時不顯示 */
+function ax41PresCard(box, d) {
+  var titles = [/^簡報分數/, /^簡報各評核面向/, /^簡報文字回饋/], charts = (d && d.charts || []).filter(function (c) { return titles.some(function (re) { return re.test(c.title || ''); }); });
+  var ok = charts.filter(function (c) { return c.status === 'OK'; });
+  var secs = Array.prototype.slice.call(box.querySelectorAll('section.chart')).filter(function (s) { return s.dataset && s.dataset.title && !s.dataset.ax && titles.some(function (re) { return re.test(s.dataset.title); }); });
+  if (!ok.length) { secs.forEach(function (s) { s.remove(); }); return null; }
+  var sec = axEl('section', 'chart ax-card ax-prescard'); sec.dataset.ax = 'pres';
+  axGrowthHead(sec, '簡報評核（分數、評核面向、文字回饋）', '來源：簡報回饋（PGY 本人）｜' + ok.length + ' 張後台圖整併', '原後台三張圖（簡報分數、各評核面向、文字回饋）整併於此；評核者身分不顯示。無資料的圖自動略去。', false);
+  var body = axEl('div', 'ax-presbody'); sec.appendChild(body);
+  secs.forEach(function (s) { var c = charts.filter(function (x) { return x.title === s.dataset.title; })[0]; if (c && c.status === 'OK') body.appendChild(s); else s.remove(); });
+  return sec;
+}
+
+function ax41GrowthBlock(host, who, P, C, extra) {
+  var cbdN = C.cases.length, cbdFb = C.rows.length;
+  var G = axPgyGrowth(P, who), m = axRowsFor(P, who);
+  if (!G) { var sec0 = axEl('section', 'chart ax-card ax-growth'); sec0.dataset.ax = 'growth'; host.appendChild(sec0); sec0.appendChild(axEl('h3', 'ax-title', '我的專業成長（CBME）')); sec0.appendChild(axEl('div', 'state', m.rows.length ? '「' + axIdKey(who) + '」在學員CBME 有 ' + m.rows.length + ' 列（' + m.rows.map(function (r) { return r.stage; }).join('、') + '），但尚無任何等級；CCC 判定完成後即顯示。' : '「' + axIdKey(who) + '」在學員CBME 尚無資料。')); return; }
+  var sec = axEl('section', 'chart ax-card ax-growth'); sec.dataset.ax = 'growth'; host.appendChild(sec);
+  if (G.ambiguous) { axGrowthHead(sec, '我的專業成長（CBME）', who, '同名資料無法安全區分，系統停止計算。', false); sec.appendChild(axEl('div', 'state', '「' + axName(who) + '」在學員CBME 中對應到多位學員（' + G.ambiguous.join('、') + '），為避免誤配，暫停顯示。請在對象選單使用含學員代碼的名稱。')); return; }
+  var last = G.last;
+  try { S.ck.pgy = { met: G.met, req: G.req.length, stage: last.stage, src: last.src, date: last.date, prev: G.prev ? G.prev.stage : '', tr: G.tr, epa: G.epa, cand: (G.cand || []).map(function (c) { return { k: c.k, safety: !!c.safety }; }), rows: m.rows.map(function (r) { return { stage: r.stage, mo: axStageMonths(r.stage), date: r.date ? axFmtDate(r.date) : '', t: r.date ? r.date.getTime() : 0, any: !!r.any }; }) }; } catch (e) { /* 只影響駕駛艙（v4.2 re-plant） */ }
+  // 期程進度（v3.5）：每個公版期程的狀態——已判定（CCC）／僅教師觀察／已排程未評（有 CCC 日期無等級）／未排程；預定日期由起訓年月推估
+  var allR = m.rows.slice().sort(function (a, b) { return (a.mo || 0) - (b.mo || 0); }), noLv = allR.filter(function (r) { return !r.any && (r.date || r.fb.length); });
+  axGrowthHead(sec, '我的專業成長（CBME）', axIdKey(who) + '｜最近有等級的期程 ' + last.stage + '｜判定來源：' + last.src + (last.date ? '｜CCC 日期 ' + axFmtDate(last.date) : '') + (noLv.length ? '｜另有 ' + noLv.map(function (r) { return r.stage; }).join('、') + ' 已建檔但尚無等級' : '') + (extra && extra.flags && extra.flags.length ? '｜' + extra.flags.join('；') : ''),
+    '<b>閱讀方式</b>：本區只和你自己過去的表現比較；同期程分布屬第二層，按右上「同期參照」才顯示。<br><b>正式階段判定</b>：本期「公版明定」應達項目（里程碑於 PGY24M 全部 L4；各 EPA 依公版 L4 時程）逐項需有 <b>CCC 正式判定</b>且達標才計入；只有教師觀察者列為「待 CCC」。公版未訂的中間期程目標屬院內草案，只作發展性參照，不計正式。<br>' + axTargetTableHtml() + '<br><b>里程碑 L4 ≠ EPA L4</b>：里程碑 L4＝該次核心能力達完訓目標；EPA L4＝該任務可獨立執行的信賴層級；兩者都不是法定執業授權。<br><b>成長軌跡</b>：同一能力、前後期同一判定來源（CCC 對 CCC、教師觀察對教師觀察）才比較；來源不同標「≈」。<br><b>EPA 維持期限</b>：公版第 8 項——EPA 1、2、3、5、7 一年、EPA 4、6、8 二年未執行應重新評量；本系統以 CCC 判定日期近似最近執行日期。<br><b>下一步發展重點</b>：依「低於公版目標（院內危害登錄者標病人安全）→ 公版項目待 CCC → 同來源較前期下降 → 低於院內草案」排序，僅供共同討論，不是自動指派。', true);
+  var strip = axEl('div', 'ax-stages'); sec.appendChild(strip);
+  (function () {
+    var t0 = extra && extra.start !== null && extra.start !== undefined ? extra.start : null, inferred = t0 === null;
+    if (inferred) allR.forEach(function (r) { if (r.date && r.mo !== null) { var t = r.date.getFullYear() * 12 + r.date.getMonth() - r.mo; if (t0 === null || t < t0) t0 = t; } });
+    var now = new Date(), nowI = now.getFullYear() * 12 + now.getMonth();
+    [['PGY0', 0], ['PGY3M', 3], ['PGY6M', 6], ['PGY12M', 12], ['PGY18M', 18], ['PGY24M', 24]].forEach(function (st) {
+      var r = allR.filter(function (x) { return String(x.stage).replace(/\s/g, '').toUpperCase() === st[0]; })[0];
+      var nC = r ? Object.keys(r.C).length : 0, nT = r ? Object.keys(r.T).length : 0, cls, txt, sub = '';
+      var expI = t0 !== null ? t0 + st[1] : null, expTxt = expI !== null ? (Math.floor(expI / 12) - 1911) + '/' + (expI % 12 + 1) : '';
+      if (r && nC) { cls = 'done'; txt = 'CCC 判定 ' + nC + ' 項'; sub = r.date ? axFmtDate(r.date) : ''; }
+      else if (r && nT) { cls = 'obs'; txt = '僅教師觀察 ' + nT + ' 項'; sub = '待 CCC'; }
+      else if (r && (r.date || r.fb.length)) { cls = r.date && r.date.getTime() < now.getTime() ? 'late' : 'sched'; txt = r.date ? 'CCC 日期 ' + axFmtDate(r.date) : '已建檔'; sub = r.date && r.date.getTime() < now.getTime() ? '已過日期，尚無等級' : '尚無等級'; }
+      else if (st[0] === 'PGY0') { cls = 'todo'; txt = '無紀錄'; sub = '到職基線（院內，非公版期程）'; }
+      else if (expI !== null && expI < nowI) { cls = 'miss'; txt = '無紀錄'; sub = (inferred ? '推估 ' : '預定 ') + expTxt + ' 已過'; }
+      else { cls = 'todo'; txt = '未到期'; sub = expTxt ? (inferred ? '推估 ' : '預定 ') + expTxt : ''; }
+      var d = axEl('div', 'ax-stage ' + cls); d.appendChild(axEl('b', '', st[0])); d.appendChild(axEl('span', '', txt)); if (sub) d.appendChild(axEl('small', '', sub)); d.title = st[0] + '｜' + txt + (sub ? '｜' + sub : '') + (expTxt ? '｜預定（起訓＋' + st[1] + ' 個月）約 ' + expTxt : '｜起訓年月無法推估');
+      strip.appendChild(d);
+    });
+    var lg = axEl('small', 'ax-muted', inferred ? '期程進度：預定時間＝推估起訓年月＋期程月數（學員CBME 尚無「到職日期」欄' + (extra && extra.hasStart ? '值' : '') + '，起訓年月由 CCC 日期反推，屬推論）；「已過日期尚無等級」與「無紀錄」為 CCC 待辦。PGY0 為院內到職基線，不列入公版期程。' : '期程進度：預定時間＝學員CBME「到職日期」＋期程月數；「已過日期尚無等級」與「無紀錄」為 CCC 待辦。PGY0 為院內到職基線，不列入公版期程。');
+    strip.appendChild(lg);
+  })();
+  var g = axEl('div', 'ax-gtiles'); sec.appendChild(g);
+  var bar = axEl('div', 'ax-kpi-bar'); var bi = axEl('i'); bi.style.width = (G.req.length ? Math.round(G.met / G.req.length * 100) : 0) + '%'; bar.appendChild(bi);
+  g.appendChild(axTile('正式階段判定（公版應達）', G.req.length ? '<b>' + G.met + '</b><small>／' + G.req.length + ' 項達標</small>' : '<small>本期公版未訂應達項目</small>',
+    G.req.length ? (G.pend ? '待 CCC 判定 ' + G.pend + ' 項｜' : '') + (G.below.length ? '低於目標 ' + G.below.length + ' 項｜' : '') + '另有院內草案參照 ' + G.draftReq.length + ' 項' : '只能參照院內草案 ' + G.draftReq.length + ' 項（不計正式）', G.pend ? 'warn' : '', G.req.length ? bar : null));
+  g.appendChild(axTile('成長軌跡｜同能力同來源', G.prev ? '<span class="ax-tr up">▲ ' + G.tr.up + '</span><span class="ax-tr same">● ' + G.tr.same + '</span><span class="ax-tr down">▼ ' + G.tr.down + '</span>' : '<small>首次評量</small>', G.prev ? G.prev.stage + ' → ' + last.stage + (G.tr.nc ? '｜' + G.tr.nc + ' 項不可比較（缺評或來源不同）' : '') : '下一期程評量後即可呈現'));
+  g.appendChild(axTile('EPA｜CCC 正式可獨立執行（公版）', G.epa.nPub ? '<b>' + G.epa.formalPub + '</b><small>／' + G.epa.nPub + ' 項</small>' + (G.epa.nIn ? '<small>｜院內 EPA ' + G.epa.formalIn + '／' + G.epa.nIn + '</small>' : '') : '—', [G.epa.obsOnly ? '教師觀察達 L4、待 CCC ' + G.epa.obsOnly + ' 項' : '', G.epa.expired ? '逾維持期限需重新評量 ' + G.epa.expired + ' 項' : '', G.epa.carried ? '沿用較早期程 CCC 判定 ' + G.epa.carried + ' 項（本期無新判定）' : '', G.epa.undated ? 'CCC 判定缺日期 ' + G.epa.undated + ' 項（無法確認維持期限，不計入）' : '', G.diff.length ? '觀察與 CCC 不同 ' + G.diff.length + ' 項（以 CCC 為準）' : ''].filter(Boolean).join('｜') || '正式判定與觀察一致', G.epa.expired ? 'warn' : ''));
+  var evN = C.cases.reduce(function (a, c) { return a + c.evaluators; }, 0), stagesC = Object.keys(C.byStage).length;
+  var fbT = axTile('回饋與支持', '<b>' + cbdN + '</b><small> 案 CbD</small>', (cbdN ? '評核者約 ' + evN + ' 人次（教師＋同儕）｜' + stagesC + ' 個期程｜' : '') + 'CBME 回饋 ' + last.fb.length + ' 則（' + last.stage + '）'); fbT.title = 'CbD 案＝學員CbD 同一期程、同一病例來源（教師＋同儕兩列＝1 案）；評核者人次＝各案「表現良好」非空格數最大值加總，屬推估；CBME 回饋＝學員CBME 該期程的具體內容欄'; g.appendChild(fbT);
+  // 已展現的優勢＝原「個人亮點（CBME）」卡併入（v3.4）：◆ 個人強項、↑ 同來源進步、▲ 高於本期目標、❝ 回饋摘錄；★ 同期領先屬第二層
+  var R0 = null; try { R0 = axCbmeCalc(P, who); } catch (e) { R0 = null; }
+  var sw = axEl('div', 'ax-strength');
+  var bl = axEl('div', 'ax-bl');
+  G.strong.slice(0, 2).forEach(function (s2) { bl.appendChild(axBadge('▲', 'pos', s2.k + ' ' + axLvText(s2.lv.v, s2.kind), (s2.src === 'CCC' ? 'CCC 判定' : '教師觀察') + '高於本期目標 ' + axTgtText(s2.kind, last.stage, s2.k))); });
+  if (R0 && R0.best) bl.appendChild(axBadge('◆', 'dia', R0.best.item, R0.best.tip || '個人強項'));
+  if (R0) R0.extra.forEach(function (x) { bl.appendChild(x); });
+  if (R0) R0.stars.slice(0, 3).forEach(function (st) { var b = axBadge('★', 'star ax-peer', st.item, st.tip); bl.appendChild(b); });
+  sw.appendChild(bl);
+  var qs0 = axQuotes(last.fb, 2); if (!qs0.length && R0) qs0 = axQuotes(R0.qs, 1).map(function (q) { return q + '（較早期程）'; }); qs0.forEach(function (q) { var bq = axEl('blockquote', 'ax-q'); bq.appendChild(axEl('i', '', '❝')); bq.appendChild(document.createTextNode(q)); sw.appendChild(bq); });
+  var anyS = bl.children.length || qs0.length;
+  g.appendChild(axTile('已展現的優勢', null, anyS ? '▲ 高於本期目標　◆ 相對最強項　↑ 同來源較前期進步　★ 同期程領先（開啟同期參照才顯示）　❝ 教師回饋摘錄（' + last.stage + '）' : '目前證據尚不足以標示優勢', 'wide', anyS ? sw : null));
+  var nx = axEl('div', 'ax-next');
+  if (G.cand.length) G.cand.forEach(function (c) { var li = axEl('div', 'ax-nextitem' + (c.safety ? ' safety' : '')); li.appendChild(axEl('b', '', c.k)); li.appendChild(axEl('span', '', '目前 ' + (c.lv ? axLvText(c.lv.v, c.kind) : '—') + (c.t !== undefined ? '｜目標 ' + axLvText(c.t, c.kind) + '（' + c.tSrc + '）' : '') + (c.safety ? '｜病人安全：' + c.hazard : c.pendingCcc ? '｜公版應達、待 CCC 判定' : c.dn ? '｜同來源較前期下降' : ''))); nx.appendChild(li); });
+  else nx.appendChild(axEl('p', 'ax-muted', '公版應達項目均已正式達標。可與指導教師共同選擇進階或興趣發展目標。'));
+  nx.appendChild(axIlpLink('trainee', '寫入 ILP'));
+  g.appendChild(axTile('下一步發展重點（ILP 候選）', null, '與指導教師討論後再定案；每期聚焦 1–2 項', 'wide next', nx));
+  // 能力地圖
+  var mapw = axEl('div', 'ax-map'); sec.appendChild(mapw);
+  var t = axEl('table', 'ax-maptab'); var th = document.createElement('thead'), tr0 = document.createElement('tr');
+  tr0.appendChild(axEl('th', 'ax-corner', '能力項目')); tr0.appendChild(axEl('th', 'ax-tg', '本期目標'));
+  G.rows.forEach(function (r) { var h = axEl('th', 'ax-ch'); h.appendChild(axEl('span', '', r.stage)); h.appendChild(axEl('small', '', r.any ? r.src : '未評量')); tr0.appendChild(h); });
+  th.appendChild(tr0); t.appendChild(th); var tb = document.createElement('tbody');
+  [['ms', '臺灣藥師學習里程碑（15 項次核心能力）'], ['epa', '可信賴專業活動（8 項公版 EPA＋2 項院內 EPA）']].forEach(function (grp) {
+    var gr = document.createElement('tr'); var gh = axEl('th', 'ax-grp', grp[1]); gh.colSpan = G.rows.length + 2; gr.appendChild(gh); tb.appendChild(gr);
+    G.items.filter(function (it) { return it.kind === grp[0]; }).forEach(function (it) {
+      var tr = document.createElement('tr'), r0 = it.kind === 'epa' ? axEpaId(it.k) : null;
+      var rh = axEl('th', 'ax-rh', (r0 ? (r0.inhouse ? '院內 ' : 'EPA ' + r0.no + ' ') : '') + it.k); rh.title = it.k + (r0 ? '｜' + r0.id + (r0.inhouse ? '（院內增訂）' : '｜公版 L4 時程：到職 ' + r0.l4 + ' 個月') : (it.kind === 'epa' ? '｜查無對應 EPA，停止正式判定' : '')); tr.appendChild(rh);
+      var src = axTgtSrc(it.kind, last.stage, it.k), tgc = axEl('td', 'ax-tg' + (src === '公版' ? ' pub' : ''), axTgtText(it.kind, last.stage, it.k)); tgc.title = src; tr.appendChild(tgc);
+      it.cells.forEach(function (c) {
+        var td = document.createElement('td');
+        if (!c.r.any) { td.className = 'ax-na'; td.title = c.r.stage + '：尚未評量'; tr.appendChild(td); return; }
+        if (!c.lv) { td.className = 'ax-none'; td.appendChild(axStateGlyph('none')); td.title = c.r.stage + '｜' + it.k + '：證據不足'; tr.appendChild(td); return; }
+        var col = axLvColor(c.lv.v, it.kind); td.style.background = col.bg; td.style.color = col.fg;
+        var ta = axTgtApproved(it.kind, c.r.stage, it.k), tdr = axTgtDraft(it.kind, c.r.stage, it.k);
+        if (ta !== undefined && c.C && c.C.v >= ta - AX_EPS) td.classList.add('met'); else if (ta === undefined && tdr !== undefined && c.lv.v >= tdr - AX_EPS) td.classList.add('metd');
+        td.appendChild(axEl('b', '', axLvText(c.lv.v, it.kind))); td.appendChild(axEl('i', 'ax-srcm', c.src === 'CCC' ? 'C' : 'T'));
+        var gl = axStateGlyph(c.st); if (gl) td.appendChild(gl);
+        if (c.T && c.C && c.T.t !== c.C.t) { var ne = axEl('i', 'ax-ne', '≠'); ne.title = '教師觀察 L' + c.T.t + '／CCC 判定 L' + c.C.t; td.appendChild(ne); }
+        var peers = P.rows.filter(function (x) { return x.stage === c.r.stage && x.useSrc[it.k] === c.src; }).map(function (x) { return x.use[it.k].v; });
+        if (peers.length >= AX.MIN_N) td.appendChild(axEl('small', 'ax-peer', '同期 ' + axLvText(axMedian(peers), it.kind)));
+        td.title = c.r.stage + '｜' + it.k + '：' + axLvText(c.lv.v, it.kind) + '（' + (c.src || '') + '｜' + (AX_ST[c.st] ? AX_ST[c.st][1] : '') + '）' + (c.T ? '｜教師觀察 L' + c.T.t : '') + (c.C ? '｜CCC 判定 L' + c.C.t : '｜尚無 CCC 判定') + (ta !== undefined ? '｜公版目標 ' + axLvText(ta, it.kind) : tdr !== undefined ? '｜院內草案 ' + axLvText(tdr, it.kind) : '');
+        tr.appendChild(td);
+      });
+      tb.appendChild(tr);
+    });
+  });
+  // 綜合分數（後台學員CBME「綜合分數」欄；有 CCC 綜合分數時採 CCC）：只作趨勢參考，不是能力判定
+  if (G.rows.some(function (r) { return r.sum !== null && r.sum !== undefined; })) {
+    var gs = document.createElement('tr'); var gh = axEl('th', 'ax-grp', '綜合分數（趨勢參考，非能力判定）'); gh.colSpan = G.rows.length + 2; gs.appendChild(gh); tb.appendChild(gs);
+    var trs = document.createElement('tr'); trs.appendChild(axEl('th', 'ax-rh', '綜合分數')); trs.appendChild(axEl('td', 'ax-tg', '—'));
+    G.rows.forEach(function (r) { var td = document.createElement('td'); if (r.sum === null || r.sum === undefined) { td.className = 'ax-na'; } else { var col = axColor(Math.max(0, Math.min(1, (r.sum - 70) / 25))); td.style.background = col.bg; td.style.color = col.fg; td.appendChild(axEl('b', '', axFmt(r.sum, 1))); var pv = P.rows.filter(function (x) { return x.stage === r.stage && x.sum !== null && x.sum !== undefined; }).map(function (x) { return x.sum; }); if (pv.length >= AX.MIN_N) td.appendChild(axEl('small', 'ax-peer', '同期 ' + axFmt(axMedian(pv), 1))); td.title = r.stage + '｜綜合分數 ' + axFmt(r.sum, 1) + '（' + (r.ccc ? 'CCC' : '教師') + '）'; } trs.appendChild(td); });
+    tb.appendChild(trs);
+  }
+  t.appendChild(tb); var sc = axEl('div', 'ax-scroll'); sc.appendChild(t); mapw.appendChild(axEl('div', 'ax-ftitle', '能力地圖（等級＋判定來源 C／T＋與前期比較）')); mapw.appendChild(sc);
+  var lg = axEl('div', 'ax-legend'); lg.innerHTML = AX_STATE_LEGEND + '<span><i class="ax-ne">≠</i>教師觀察與 CCC 不同</span><span><b>C</b>＝CCC 正式判定　<b>T</b>＝教師觀察</span>'; mapw.appendChild(lg);
+}
+function axTraineeCbd(host, who, src, M, mine, lab) {
+  var cols = src.cols, nI = axCol(cols, /^學員姓名$/), sI = axCol(cols, /^期程$/), pI = axCol(cols, /^病例來源$/), vI = axCol(cols, /^評核視角$/), cI = axCol(cols, /討論案例概要/);
+  var grp = function (re) { var a = []; cols.forEach(function (c, i) { if (re.test(c)) a.push(i); }); return a; };
+  var gI = grp(/表現良好/), wI = grp(/未來可加強/), aI = grp(/具體改進行動/);
+  var rows = src.rows.filter(function (row) { return lab ? axSameSubj(row[nI], lab) : axName(row[nI]) === who; });
+  var side = axEl('aside', 'ax-side'); side.hidden = true;
+  function showCell(st, rk, ck, f) {
+    var sel = rows.filter(function (row) { var m = { source: row[pI], stage: row[sI], view: row[vI] }; return String(m[st.row] || '') === rk && String(m[st.col] || '') === ck && (!st.facet || String(m[st.facet] || '') === f); });
+    side.hidden = false; side.innerHTML = '';
+    var h = axEl('div', 'ax-side-h'); h.appendChild(axEl('b', '', rk + '｜' + ck + (f ? '｜' + f : ''))); var x = axEl('button', 'ax-x', '×'); x.type = 'button'; x.setAttribute('aria-label', '關閉'); x.addEventListener('click', function () { side.hidden = true; }); h.appendChild(x); side.appendChild(h);
+    if (!sel.length) { side.appendChild(axEl('p', 'ax-muted', '此格沒有紀錄。')); return; }
+    sel.forEach(function (row) {
+      var c = axEl('div', 'kcard'); c.appendChild(axEl('div', 'ax-case', normGlyph(row[cI] || '（未填案例概要）')));
+      [[gI, '表現良好', 'pos'], [wI, '未來可加強', 'warn'], [aI, '具體改進行動計畫', 'act']].forEach(function (g) {
+        var seen = {}, vals = g[0].map(function (i) { return normGlyph(row[i] || '').trim(); }).filter(function (t) { if (!t || /^(無|none)$/i.test(t) || seen[t]) return false; seen[t] = 1; return true; });
+        if (!vals.length) return; var sec = axEl('div', 'ksec ' + g[2]); sec.appendChild(axEl('div', 'ksec-h', g[1])); vals.forEach(function (t) { var li = axEl('div', 'kline'); li.appendChild(linkifyText(t)); sec.appendChild(li); }); c.appendChild(sec);
+      });
+      side.appendChild(c);
+    });
+    side.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  var byItem = axGroup(mine, 'item'), own = axMean(mine.map(function (x) { return x.v; })), best = null;
+  Object.keys(byItem).forEach(function (it) { var v = byItem[it].map(function (x) { return x.v; }); if (v.length < AX.MIN_N) return; var m = axMean(v); if (!best || m - own > best.rel) best = { item: it, mean: m, rel: m - own, n: v.length, cohMed: axMedian(M.recs.filter(function (x) { return x.item === it && mine.some(function (y) { return y.stage === x.stage; }); }).map(function (x) { return x.v; })) }; }); /* v4.3.1：同期程比較 */
+  if (best && best.mean < best.cohMed) best = null;
+  var stages = axSortKeys(Object.keys(axGroup(mine, 'stage')), 'stage');
+  var qs = []; rows.forEach(function (row) { gI.forEach(function (i) { qs.push(row[i]); }); });
+  // 原「個人亮點（CbD）」卡併入本區摘要列（v3.4）：份數、期程、病例來源、評核視角、◆ 強項、↑ 進步、❝ 回饋摘錄
+  var wrap = axEl('div', 'ax-split'); wrap.dataset.ax = 'cbdMatrix'; host.appendChild(wrap);
+  var left = axEl('div'); wrap.appendChild(left); wrap.appendChild(side);
+  var sum = axEl('section', 'chart ax-card ax-cbdsum');
+  sum.appendChild(axEl('h3', 'ax-title', '病例導向討論（CbD）'));
+  var srcN = {}, viewN = {}; rows.forEach(function (row) { var a = String(row[pI] || '').trim(), b = String(row[vI] || '').trim(); if (a) srcN[a] = (srcN[a] || 0) + 1; if (b) viewN[b] = (viewN[b] || 0) + 1; });
+  var g2 = axEl('div', 'ax-gtiles');
+  var C41 = ax41CbdCases(src, lab || who), evN = C41.cases.reduce(function (a, c) { return a + c.evaluators; }, 0);
+  g2.appendChild(axTile('CbD 案例', '<b>' + C41.cases.length + '</b><small> 案｜' + rows.length + ' 列</small>', '期程 ' + (stages.join('、') || '—') + '｜評核者約 ' + evN + ' 人次（推估）'));
+  g2.appendChild(axTile('病例來源', '<b>' + Object.keys(C41.bySrc).length + '</b><small> 種</small>', Object.keys(C41.bySrc).map(function (k2) { return k2 + ' ' + C41.bySrc[k2] + ' 案'; }).join('｜') || '—'));
+  var single = C41.cases.filter(function (c) { return Object.keys(c.views).length < 2; });
+  g2.appendChild(axTile('評核視角', null, (Object.keys(viewN).map(function (k2) { return k2 + ' ' + viewN[k2] + ' 列'; }).join('｜') || '—') + (single.length ? '｜單一視角 ' + single.length + ' 案（' + single.map(function (c) { return c.stage + ' ' + c.src; }).join('、') + '）' : '｜每案皆有教師＋同儕')));
+  var hb = axEl('div', 'ax-bl'); if (best) hb.appendChild(axBadge('◆', 'dia', best.item.replace(/^[一二三四五]、\s*/, ''), '個人強項：本題平均 ' + axFmt(best.mean, 1) + '，高於本人總平均 ' + axFmt(best.rel, 1) + '；全體中位數 ' + axFmt(best.cohMed, 1) + '（n=' + best.n + '）')); axUpBadges(axUps(mine), 2).forEach(function (b) { hb.appendChild(b); });
+  var qq = axQuotes(qs, 2); var hw = axEl('div'); hw.appendChild(hb); qq.forEach(function (q) { var bq = axEl('blockquote', 'ax-q'); bq.appendChild(axEl('i', '', '❝')); bq.appendChild(document.createTextNode(q)); hw.appendChild(bq); });
+  g2.appendChild(axTile('CbD 亮點', null, '◆ 本人最強面向（不低於全體中位數）　↑ 同一面向後一期程較前期上升', 'wide', hb.children.length || qq.length ? hw : null));
+  sum.appendChild(g2); // 摘要磚放入下方矩陣卡的標題下（同一張卡），見 axMatrix 之後
+  axMatrix(left, { recs: mine, dims: [{ k: 'source', label: '病例來源' }, { k: 'stage', label: '期程' }, { k: 'view', label: '評核視角' }, { k: 'item', label: '五大面向' }] }, {
+    title: '病例導向討論（CbD）：病例來源 × 期程 × 評核視角', desc: '點任一格，右側顯示該格的案例概要與質性回饋（表現良好／未來可加強／具體改進行動計畫）。', row: 'source', col: 'stage', facet: 'view', measures: [{ v: 'mean', t: '平均' }, { v: 'median', t: '中位數' }], dec: 1, onCell: showCell, minN: 1, hideN: true,
+    note: '數值為五大面向分數（0–100），每列為該視角多位評核者的彙總分數（來源表已彙總，無法還原個別評核者）。本頁為本人資料，每格皆呈現數值；單一視角的案例請審慎判讀（點格子可看實際紀錄）。學員CbD 無日期欄，只能依期程排列。' + axFlagNote(M.flags)
+  });
+  var mc = left.querySelector('section'); if (mc) { var hd = mc.querySelector('.ax-head'); if (hd && hd.nextSibling) mc.insertBefore(g2, hd.nextSibling); else mc.appendChild(g2); }
+}
+
+/* ---------- 組裝（v4.1） ---------- */
+function axTraineePersonal(host, d) {
+  var who = axSubjName(d); if (!who) return Promise.resolve();
+  var L = function (k) { return axLoad(k).catch(function () { return null; }); };
+  return Promise.all([L(AX.KEYS.cbd), L(AX.KEYS.morning), L(AX.KEYS.cbme), L(AX.KEYS.pcne)]).then(function (r) {
+    var src = r[0], mo = r[1], cb = r[2], pcRaw = r[3], lab = axSubjLabel(d), plan = null;
+    var C = ax41CbdCases(src, lab);
+    if (cb && cb.rows.length) {
+      var X = ax41Personal(cb, lab), Pcb = X.P;
+      try { ax41GrowthBlock(host, lab, Pcb, C, { flags: X.flags, start: X.start, hasStart: X.hasStart, d: d }); } catch (e) { if (window.console) console.error(e); }
+      axIlpPanel(host, lab, 'PGY 學員｜依 CBME 證據自動帶入');
+      try { var G0 = axPgyGrowth(Pcb, lab); if (G0 && !G0.ambiguous) plan = ax41EpaPlanCard(host, G0, Pcb, C, ax41Pcne(pcRaw, lab), d); } catch (e) { if (window.console) console.error(e); }
+      try { axPgyFeedback(host, Pcb, lab, src); } catch (e) { if (window.console) console.error(e); }
+    }
+    if (src && src.rows.length) {
+      var M = axMelt(src, axCbdSpec()), mine = M.recs.filter(function (x) { return axSameSubj(x.subj, lab); });
+      if (!mine.length) host.appendChild(axTag(axEl('div', 'chart ax-card state', '「' + who + '」目前沒有 CbD 評核紀錄。'), 'cbdMatrix'));
+      else axTraineeCbd(host, who, src, M, mine, lab);
+    }
+    // 晨會病例簡報（本人）：原獨立卡，v4.1 收入 EPA 證據明細
+    var moSec = null;
+    if (mo) {
+      var nm = axCol(mo.cols, /簡報者姓名/), dI = axCol(mo.cols, /簡報日期/), tI = axCol(mo.cols, /簡報主題/), kI = axCol(mo.cols, /簡報分類/), uI = axCol(mo.cols, /簡報檔|上傳/);
+      var mrows = mo.rows.filter(function (row) { return axSameSubj(row[nm], lab); });
+      if (mrows.length) {
+        try { var ms = mrows.slice().sort(function (a, b) { return (axDate(b[dI]) || 0) - (axDate(a[dI]) || 0); }); S.ck.morning = { n: mrows.length, last: ms[0] ? String(ms[0][dI] || '') : '', topic: ms[0] ? normGlyph(ms[0][tI] || '') : '' }; } catch (e) { /* 只影響駕駛艙（v4.2 re-plant） */ }
+        moSec = axEl('section', 'chart ax-card'); moSec.dataset.ax = 'morning'; moSec.appendChild(axEl('h3', 'ax-title', '晨會病例簡報（' + mrows.length + ' 場）'));
+        var tl = axEl('ol', 'ax-tl');
+        mrows.sort(function (a, b) { return (axDate(b[dI]) || 0) - (axDate(a[dI]) || 0); }).forEach(function (row) { var li = axEl('li'); li.appendChild(axEl('time', '', row[dI] || '')); li.appendChild(axEl('b', '', normGlyph(row[tI] || ''))); li.appendChild(axEl('small', '', row[kI] || '')); if (row[uI] && /^https?:/.test(row[uI])) li.appendChild(kanbanMedia(String(row[uI]).trim(), normGlyph(row[tI] || '簡報'))); tl.appendChild(li); });
+        moSec.appendChild(tl);
+      }
+    }
+    var box = host.parentNode || $('charts');
+    // 證據明細：後台「藥事照會紀錄」「藥品諮詢紀錄」看板與晨會卡收入 EPA 證據卡
+    if (plan && plan._evBody) {
+      var ev = Array.prototype.slice.call(box.querySelectorAll('section.chart')).filter(function (s) { return s.dataset && s.dataset.title && !s.dataset.ax && /^(藥事照會紀錄|藥品諮詢紀錄|病例導向討論（CbD）晨會簡報)/.test(s.dataset.title); });
+      var n = 0; ev.forEach(function (s) { if (/晨會簡報/.test(s.dataset.title)) { s.remove(); return; } plan._evBody.appendChild(s); n++; });
+      if (moSec) { plan._evBody.appendChild(moSec); n++; }
+      if (!n) plan._evBody.appendChild(axEl('p', 'ax-muted', '目前角色讀不到照會、諮詢與晨會明細。'));
+      plan._evSummary.textContent = '證據明細（' + n + ' 項：藥事照會紀錄、藥品諮詢紀錄、晨會病例簡報）';
+    } else if (moSec) host.appendChild(moSec);
+    var pres = ax41PresCard(box, d); if (pres) host.appendChild(pres);
+  });
+}
+AX.KEYS.pcne = '70335a7b1890a2a4';
+DASH_LAYOUT['PGY 學員個人成績'] = {
+  order: ['ax:growth', 'ax:ilp', 'ax:epaplan', 'ax:cbdMatrix', 'ax:feedback', 'ax:pres', 'ax:morning'],
+  hide: [/（CbD）五大面向/, /（CbD）晨會簡報/],
+  collapse: [/里程碑/, /可信賴專業活動|EPAs/, /^綜合分數/, /^CBME 教師質性回饋/, /（CbD）質性回饋/, /^臨床能力委員會/], collapseTitle: '後台原始圖表（已整併至上方：能力地圖、質性回饋；此處保留原始呈現供查核）'
+};
+
+/* ===================== v4.3（2026-11-04）：成效儀表板全面複審修正 =====================
+ * 依 2026-11-04 兩路審查（資料來源重讀＋全卡片程式審查）修正；本區段函式覆寫前面同名函式。
+ *  1. CBME 成效：期程字串正規化（PGY 12M／PGY12m → PGY12M；非公版期程列入資料品質）；總覽併入教師觀察 vs CCC 一致率（數值比對＋偏高方向）、
+ *     質性回饋覆蓋率、CCC 等級下降；移除重複的「教學評量指標（CBME）」卡（三處完成率重複）；CbD 指標移回 CbD 頁。
+ *  2. 首次 L4 中位期程改以「已到該期程的全部學員」為分母（含未達者），避免只計達標者的倖存者偏差。
+ *  3. EPA 正式信賴狀態：「教師觀察 L4、待 CCC」只看已到期列；「疑似中斷」不再被預建的未到期列抵銷。
+ *  4. PGY 個人：EPA「已到 L4 時機」改以到職月數判斷（有到職日期時）；駕駛艙照會筆數改用原始分頁累計數。
+ *  5. 看板卡片顯示前遮蔽病歷號／床號樣式（fail-closed；資料端仍須移除）。
+ *  6. 版面：每頁「先結論與正式判定 → 形成性證據 → 具名亮點」；群體頁具名亮點移到最後；後台原始圖與分析卡重複者折疊或隱藏。 */
+
+/* ---------- 共用：識別資料遮蔽（只用於看板與證據明細；資料查詢頁不遮蔽） ---------- */
+function kbMask(t) {
+  var s = String(t || ''); if (!s || /^https?:\/\/\S+$/.test(s)) return s;
+  return s.replace(/床號\s*[:：]?\s*[0-9A-Za-z]{1,6}(\s*[-－]\s*[0-9A-Za-z]{1,4})?/g, '床號〔已遮蔽〕')
+    .replace(/(^|[^0-9A-Za-z./:-])\d{1,2}\s*[A-Za-z]?\s*[-－]\s*\d{1,3}\s*床/g, '$1〔已遮蔽〕床')
+    .replace(/(^|[^0-9A-Za-z./:_-])([A-Za-z]{0,2}\d{7,10})(?![0-9])/g, '$1〔已遮蔽〕');
+}
+
+/* ---------- 駕駛艙：捲動到收在折疊內的區塊時先展開 ---------- */
+function ckScroll(sel) {
+  var el = document.querySelector('#charts [data-ax="' + sel + '"]'); if (!el) return;
+  var fold = el.closest('details'); if (fold) fold.open = true;
+  el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); el.classList.add('ck-flash'); setTimeout(function () { el.classList.remove('ck-flash'); }, 1600);
+}
+
+/* ---------- CBME：期程正規化 ---------- */
+var AX43_STD = { 0: 'PGY0', 3: 'PGY3M', 6: 'PGY6M', 12: 'PGY12M', 18: 'PGY18M', 24: 'PGY24M' };
+function ax4Rows(src) {
+  var P = axCbmeParse(src), cols = src.cols, yI = axCol(cols, /^年份$/), stI = axCol(cols, /^訓練狀態$/), today = ax4Today();
+  P.hasYear = yI >= 0; P.hasStatus = stI >= 0;
+  P.rows.forEach(function (r, i) {
+    var raw = src.rows[i];
+    r.year = yI >= 0 ? String(raw[yI] || '').trim() : '';
+    r.status = stI >= 0 ? String(raw[stI] || '').trim() : '';
+    r.excluded = /離訓|中止|退訓/.test(r.status);
+    r.stageRaw = r.stage;
+    if (r.mo !== null && r.mo !== undefined && AX43_STD[r.mo] !== undefined) r.stage = AX43_STD[r.mo];
+    else if (String(r.stage).trim()) r.nonstd = true;
+    var due = r.date ? r.date.getTime() <= today.getTime() : null;
+    r.state = r.mo === 0 ? 'baseline' : !r.date ? (r.any ? 'undated' : 'nodate') : r.ccc ? (due ? 'done' : 'prefill') : r.any ? (due ? 'obs' : 'obsEarly') : due ? 'overdue' : 'pending';
+    r.formal = r.state === 'done' && !r.nonstd;
+  });
+  P.years = axSortKeys(Object.keys(axGroup(P.rows.filter(function (r) { return r.year; }), 'year')), 'year');
+  return P;
+}
+function ax4Filtered(P) { return P.rows.filter(function (r) { return !r.excluded && !r.nonstd && (!AX4.year || r.year === AX4.year); }); }
+/* 教師觀察 vs CCC：以數值比對（2 與 2a 同值），並計方向 */
+function ax43Agree(P, R) {
+  var pairs = 0, same = 0, hi = 0, lo = 0;
+  R.filter(function (r) { return r.formal; }).forEach(function (x) { Object.keys(x.C).forEach(function (k) { var t = x.T[k], c = x.C[k]; if (!t) return; pairs++; if (Math.abs(t.v - c.v) < AX_EPS) same++; else if (t.v > c.v) hi++; else lo++; }); });
+  return { pairs: pairs, same: same, hi: hi, lo: lo };
+}
+/* CCC 等級下降：同一學員、同一項目、相鄰兩個已判定期程，後期 CCC 低於前期 */
+function ax43Drops(P) {
+  var by = {}, out = [];
+  P.rows.filter(function (r) { return r.formal && !r.excluded; }).forEach(function (r) { (by[r.key] = by[r.key] || []).push(r); });
+  Object.keys(by).forEach(function (k) {
+    var a = by[k].sort(function (x, y) { return x.mo - y.mo; });
+    for (var i = 1; i < a.length; i++) P.keys.forEach(function (it) { var x = a[i - 1].C[it], y = a[i].C[it]; if (x && y && y.v < x.v - AX_EPS) out.push({ key: k, from: a[i - 1].stage, to: a[i].stage, item: it, a: axLvText(x.v, P.kinds[it]), b: axLvText(y.v, P.kinds[it]), year: a[i].year }); });
+  });
+  return out;
+}
+
+/* ---------- 1. 總覽 KPI（併入原「教學評量指標（CBME）」） ---------- */
+function ax4Overview(host, P, redraw) {
+  var sec = axGroupSec(host, 'ov', 'CBME 成效總覽', '資料來源：後台「學員CBME」分頁（即時）｜正式判定只採 CCC 日期已到且有 CCC 等級之列',
+    '<b>資料流</b>：Google 試算表「學員CBME」→ 控制台分頁開放 → 後台 API → 本頁重算；試算表更新後，網頁下次載入即同步，無任何前端固定數字。<br><b>三態</b>：' + Object.keys(AX4_STATE).filter(function (k) { return AX4_STATE[k][1]; }).map(function (k) { return '<b>' + AX4_STATE[k][0] + '</b>＝' + AX4_STATE[k][1]; }).join('；') + '。<br><b>評量年份</b>＝學員CBME「年份」欄。套用：總覽、評核進度、G01、EPA 信賴、熱圖、綜合分數；G02 以「後期」年份為準；個人亮點以年份分頁切換；後台原始圖表不受影響。預設為全部年份（桌機與手機相同）。<br><b>期程</b>：「PGY 12M」「PGY12m」等寫法自動視為 PGY12M；非公版期程（例 PGY9M）不入分析，列於「資料品質與待辦」。<br><b>訓練狀態</b>：' + (P.hasStatus ? '已讀取「訓練狀態」欄，離訓／中止者不列入分母。' : '學員CBME 尚無「訓練狀態」欄，全部學員視為在訓（含已無後續期程者），分母可能偏大。') + '<br><b>教師觀察 vs CCC</b>：同一「學員×期程×項目」兩者皆有等級才比較；以數值比較（2 與 2a 視為相同），並列教師高於／低於 CCC 的比例。教師觀察系統性高於 CCC 屬評分寬鬆（leniency），宜於師培回饋，不代表學員退步。<br><b>平均</b>＝去除最高 25%、最低 25% 之中間 50% 平均，另列中位數與 n。');
+  var bar = axEl('div', 'ax-bar'); bar.appendChild(ax4Sel(P, redraw)); sec.appendChild(bar);
+  var R = ax4Filtered(P).filter(function (r) { return r.mo > 0; }), persons = {}; R.forEach(function (r) { persons[r.key] = 1; });
+  var st = {}; R.forEach(function (r) { st[r.state] = (st[r.state] || 0) + 1; });
+  var dueN = (st.done || 0) + (st.overdue || 0) + (st.obs || 0);
+  var formal = R.filter(function (r) { return r.formal; });
+  var req24 = formal.filter(function (r) { return r.mo >= 24; }), full24 = 0;
+  req24.forEach(function (r) { var ok = true; P.keys.forEach(function (k) { var t = axTgtApproved(P.kinds[k], r.stage, k); if (t === undefined) return; var c = r.C[k]; if (!c || c.v < t - AX_EPS) ok = false; }); if (ok) full24++; });
+  var A = ax43Agree(P, R), withLv = R.filter(function (r) { return r.state === 'done' || r.state === 'obs'; }), fb = withLv.filter(function (r) { return r.fb.length; }).length;
+  var drops = ax43Drops(P).filter(function (x) { return !AX4.year || x.year === AX4.year; }), dropP = {}; drops.forEach(function (x) { dropP[x.key] = 1; });
+  var g = axEl('div', 'ax-gtiles'); sec.appendChild(g);
+  g.appendChild(axTile('學員數（本篩選）', '<b>' + Object.keys(persons).length + '</b><small> 人</small>', '學員×期程 ' + R.length + ' 列（不含 PGY0 基線與非公版期程）'));
+  g.appendChild(axTile('CCC 判定完成率', dueN ? '<b>' + (st.done || 0) + '</b><small>／' + dueN + ' 已到期</small>' : '—', dueN ? ax4Pct(st.done || 0, dueN) + '｜逾期待補 ' + (st.overdue || 0) + '｜僅教師觀察 ' + (st.obs || 0) + '｜未到期 ' + ((st.pending || 0) + (st.obsEarly || 0)) : '尚無已到期的評核單位', (st.overdue || 0) ? 'warn' : ''));
+  /* 里程碑進展（人）：有 ≥2 個已判定期程者，最近一次 CCC 里程碑中位等級高於最早一次；不套年份（避免同半年內分母趨近 0） */
+  var byW = {}, pg = 0, pgD = 0; P.rows.filter(function (r) { return r.formal && !r.excluded; }).forEach(function (r) { (byW[r.key] = byW[r.key] || []).push(r); });
+  var cMed = function (row) { var a = []; Object.keys(row.C).forEach(function (k) { if (P.kinds[k] === 'ms') a.push(row.C[k].v); }); return a.length ? axMedian(a) : null; };
+  Object.keys(byW).forEach(function (w) { var a = byW[w].sort(function (x, y) { return x.mo - y.mo; }); if (a.length < 2) return; var m1 = cMed(a[a.length - 1]), m0 = cMed(a[0]); if (m1 === null || m0 === null) return; pgD++; if (m1 > m0 + AX_EPS) pg++; });
+  g.appendChild(axTile('里程碑進展（人）', pgD ? '<b>' + pg + '</b><small>／' + pgD + ' 人</small>' : '—', pgD ? ax4Pct(pg, pgD) + '｜最近 CCC 里程碑中位等級高於最早一次；不受年份篩選' : '尚無學員具 ≥2 個已判定期程'));
+  g.appendChild(axTile('PGY24M 公版完訓條件', req24.length ? '<b>' + full24 + '</b><small>／' + req24.length + ' 人</small>' : '—', req24.length ? '15 項里程碑 L4＋8 項公版 EPA L4，皆經 CCC 判定（已判定之 PGY24M）' : '尚無已判定之 PGY24M'));
+  g.appendChild(axTile('教師觀察 vs CCC', A.pairs ? '<b>' + ax4Pct(A.same, A.pairs) + '</b><small> 一致</small>' : '—', A.pairs ? '教師高於 CCC ' + ax4Pct(A.hi, A.pairs) + '｜低於 ' + ax4Pct(A.lo, A.pairs) + '｜比較 ' + A.pairs + ' 項次' : '尚無兩者皆有等級的項目', A.pairs && A.hi / A.pairs >= 0.15 ? 'warn' : ''));
+  g.appendChild(axTile('質性回饋覆蓋率', withLv.length ? '<b>' + ax4Pct(fb, withLv.length) + '</b>' : '—', withLv.length ? fb + '／' + withLv.length + ' 個已到期且有等級的「學員×期程」有回饋文字' : '尚無已到期且有等級之列', withLv.length && fb / withLv.length < 0.8 ? 'warn' : ''));
+  g.appendChild(axTile('CCC 等級下降', '<b>' + drops.length + '</b><small> 項次</small>', drops.length ? Object.keys(dropP).length + ' 人；明細見 G02 卡（建議列入 ILP 討論）' : '相鄰已判定期程無下降', drops.length ? 'warn' : ''));
+  var dq = (st.prefill || 0) + (st.undated || 0) + R.filter(function (r) { return !r.year && P.hasYear; }).length + P.rows.filter(function (r) { return r.nonstd && !r.excluded; }).length;
+  g.appendChild(axTile('資料品質待處理', '<b>' + dq + '</b><small> 筆</small>', dq ? '預填／無日期／年份空白／非公版期程，詳見頁尾「資料品質與待辦」' : '無異常', dq ? 'warn' : ''));
+  return sec;
+}
+
+/* ---------- 3. 團體 G01：首次 L4 中位期程改含未達者 ---------- */
+var ax4Team0 = ax4Team;
+ax4Team = function (host, P) {
+  var sec = ax4Team0(host, P), old = sec.querySelector('.ax-g2'); if (old) old.remove();
+  var R = ax4Filtered(P).filter(function (r) { return r.formal; }), byP = {}; R.forEach(function (r) { (byP[r.key] = byP[r.key] || []).push(r); });
+  var w = axEl('div', 'ax-g2'); w.appendChild(axEl('div', 'ax-ftitle', '公版 L4 時機 vs 院內首次 CCC L4 期程（含尚未達 L4 者；供教學負責人訂院內目標）'));
+  var t2 = axEl('table', 'ax-gtab ax-nowrap'); t2.innerHTML = '<thead><tr><th>EPA</th><th>公版 L4</th><th>已 L4／已到公版時機</th><th>首次 L4 期程分布</th><th>院內中位期程</th></tr></thead>'; var tb2 = document.createElement('tbody'), anyRow = false;
+  AX_EPA_REG.filter(function (e) { return !e.inhouse; }).forEach(function (e) {
+    var k = P.keys.filter(function (x) { return P.kinds[x] === 'epa' && axEpaId(x) === e; })[0]; if (!k) return;
+    var firsts = [], elig = 0;
+    Object.keys(byP).forEach(function (pk) {
+      var a = byP[pk].slice().sort(function (x, y) { return x.mo - y.mo; }), last = a[a.length - 1]; if (last.mo < e.l4) return; elig++;
+      for (var i = 0; i < a.length; i++) { var c = a[i].C[k]; if (c && c.v >= 4 - AX_EPS) { firsts.push(a[i].mo); break; } }
+    });
+    if (!elig) return; anyRow = true;
+    var cnt = {}; firsts.forEach(function (m) { cnt[m] = (cnt[m] || 0) + 1; });
+    var tr = document.createElement('tr'); tr.appendChild(axEl('th', '', 'EPA ' + e.no + ' ' + e.name)); tr.appendChild(axEl('td', 'c', e.l4 + ' 個月'));
+    tr.appendChild(ax4Num(document.createElement('td'), firsts.length, elig));
+    var td = document.createElement('td'); td.appendChild(axStackBar(AX4.stages.map(function (s, i) { return { n: cnt[axStageMonths(s)] || 0, c: 's' + (i + 1), t: s }; }).concat([{ n: elig - firsts.length, c: 'none', t: '尚未達 L4' }]), elig)); tr.appendChild(td);
+    // 中位期程：依期程累積達 L4 比率首次 ≥50% 的期程；未達半數者標示
+    var med = null, acc = 0; AX4.stages.forEach(function (s) { var m = axStageMonths(s); acc += cnt[m] || 0; if (med === null && acc / elig >= 0.5) med = m; });
+    var tm = axEl('td', 'num' + (med === null || med > e.l4 ? ' warn' : ''));
+    tm.innerHTML = med === null ? '<span>未達半數</span>' : '<b>PGY' + med + 'M</b>' + (med > e.l4 ? '　<span>晚於公版 ' + (med - e.l4) + ' 個月</span>' : '　<span>符合公版</span>');
+    tm.title = '分母＝最近已判定期程已到公版時機的學員（' + elig + ' 人），含尚未達 L4 者'; tr.appendChild(tm);
+    tb2.appendChild(tr);
+  });
+  if (anyRow) { t2.appendChild(tb2); var sw2 = axEl('div', 'ax-scroll'); sw2.appendChild(t2); w.appendChild(sw2); var lg2 = axEl('div', 'ax-legend'); lg2.innerHTML = AX4.stages.map(function (s, i) { return '<span><i class="ax-sw2 s' + (i + 1) + '"></i>' + s + '</span>'; }).join('') + '<span><i class="ax-sw2 none"></i>尚未達 L4</span><span>中位期程＝累積達 L4 首次過半的期程（院內實際，非目標）</span>'; w.appendChild(lg2); sec.appendChild(w); }
+  return sec;
+};
+
+/* ---------- 4. EPA 正式信賴狀態：觀察列限已到期；疑似中斷排除預建列 ---------- */
+function ax4Epa(host, P) {
+  var sec = axGroupSec(host, 'epa', '各 EPA 於公版 L4 時機的正式信賴狀態', '分母＝最近已判定期程已達該 EPA 公版時機的學員（人）',
+    '<b>CCC 正式 L4</b>＝最近一次 CCC 判定 ≥ L4，且未逾公版維持期限（EPA 1、2、3、5、7 一年；4、6、8 二年；以 CCC 日期近似最近執行日）。<br><b>教師觀察 L4、待 CCC</b>＝最近一個已到期期程（已判定或僅教師觀察）教師觀察 ≥ L4 但無 CCC 判定；未到期、預填、無日期列不計。<br><b>分母差異</b>：本表以「人」為單位，G01 以「學員×期程」為單位，故數值不可直接互相相除。<br>' + (P.hasStatus ? '離訓／中止者已排除。' : '學員CBME 無「訓練狀態」欄：已無後續期程的學員仍在分母（最近評核距今 ≥ 9 個月、且之後沒有任何已到期或已有等級的期程列者，以「疑似中斷」標示）。'));
+  var R = ax4Filtered(P).filter(function (r) { return r.formal; }), byP = {}; R.forEach(function (r) { (byP[r.key] = byP[r.key] || []).push(r); });
+  var obsR = ax4Filtered(P).filter(function (r) { return r.any && r.mo > 0 && (r.state === 'done' || r.state === 'obs'); }), byO = {}; obsR.forEach(function (r) { (byO[r.key] = byO[r.key] || []).push(r); });
+  var now = ax4Today().getTime(), et = axEl('table', 'ax-gtab ax-nowrap'); et.innerHTML = '<thead><tr><th>EPA（公版 L4 時機）</th><th>已到時機</th><th>CCC 正式 L4</th><th>逾維持期限</th><th>教師觀察 L4、待 CCC</th><th>低於 L4</th><th>疑似中斷</th></tr></thead>';
+  var etb = document.createElement('tbody'), anyE = false;
+  AX_EPA_REG.filter(function (e) { return !e.inhouse; }).forEach(function (e) {
+    var k = P.keys.filter(function (x) { return P.kinds[x] === 'epa' && axEpaId(x) === e; })[0]; if (!k) return; anyE = true;
+    var due = 0, formal = 0, exp = 0, obs = 0, low = 0, stale = 0;
+    Object.keys(byP).forEach(function (pk) {
+      var a = byP[pk].slice().sort(function (x, y) { return x.mo - y.mo; }), ao = (byO[pk] || []).slice().sort(function (x, y) { return x.mo - y.mo; }), lastO = ao.length ? ao[ao.length - 1] : null;
+      var last = a[a.length - 1]; if (!last || last.mo < e.l4) return; due++;
+      if (!P.hasStatus && last.date && (now - last.date.getTime()) / (30.44 * 864e5) >= 9 && last.mo < 24 && !P.rows.some(function (x) { return x.key === pk && x.mo > last.mo && !x.nonstd && (x.any || x.state === 'overdue'); })) stale++;
+      var lc = null; for (var i = a.length - 1; i >= 0; i--) if (a[i].C[k]) { lc = a[i]; break; }
+      var c = lc ? lc.C[k] : null;
+      if (c && c.v >= 4 - AX_EPS) { if (e.keep && lc.date && now - lc.date.getTime() > e.keep * 30.44 * 864e5) exp++; else formal++; }
+      else if (lastO && lastO.T[k] && lastO.T[k].v >= 4 - AX_EPS && !lastO.C[k]) obs++; else low++;
+    });
+    var tr = document.createElement('tr'); tr.appendChild(axEl('th', '', 'EPA ' + e.no + ' ' + e.name + '（到職 ' + e.l4 + ' 個月）'));
+    tr.appendChild(axEl('td', 'num', String(due))); tr.appendChild(ax4Num(document.createElement('td'), formal, due));
+    tr.appendChild(axEl('td', 'num' + (exp ? ' warn' : ''), String(exp))); tr.appendChild(axEl('td', 'num' + (obs ? ' warn' : ''), String(obs))); tr.appendChild(axEl('td', 'num', String(low)));
+    var ts = axEl('td', 'num draft', String(stale)); ts.title = '最近已判定期程距今 ≥ 9 個月、未達 PGY24M，且之後沒有任何已有等級或已逾期的期程列；屬推論，請以訓練狀態欄取代'; tr.appendChild(ts);
+    etb.appendChild(tr);
+  });
+  if (!anyE) { sec.appendChild(axEl('div', 'state', '學員CBME 找不到可對應公版 EPA 的欄位。')); return sec; }
+  et.appendChild(etb); var ew = axEl('div', 'ax-scroll'); ew.appendChild(et); sec.appendChild(ew);
+  return sec;
+}
+
+/* ---------- 6. G02：加列 CCC 等級下降明細（教師端，供 ILP） ---------- */
+var ax4G20 = ax4G2;
+ax4G2 = function (host, P) {
+  var sec = ax4G20(host, P), drops = ax43Drops(P).filter(function (x) { return !AX4.year || x.year === AX4.year; });
+  if (drops.length) {
+    var w = axEl('div', 'ax-g2'); w.appendChild(axEl('div', 'ax-ftitle', 'CCC 等級下降明細（' + drops.length + ' 項次；相鄰已判定期程）'));
+    w.appendChild(axChips(drops.map(function (x) { return { t: x.key + '｜' + x.from + '→' + x.to + '｜' + x.item.split(' ')[0] + ' ' + x.a + '→' + x.b, tip: '同一學員同一項目後期 CCC 低於前期：可能為能力退步、評核者標準不同或資料誤植；建議於 CCC 或 ILP 會談確認' }; }), 'warn'));
+    sec.appendChild(w);
+  }
+  return sec;
+};
+
+/* ---------- 10. 資料品質：加列非公版期程與期程寫法 ---------- */
+var ax4Dq0 = ax4Dq;
+ax4Dq = function (host, P) {
+  var sec = ax4Dq0(host, P), extra = [];
+  P.rows.forEach(function (r) {
+    if (r.excluded) return;
+    if (r.nonstd) extra.push({ t: '非公版期程', d: r.key + '｜「' + r.stageRaw + '」：不在 PGY0／3M／6M／12M／18M／24M 之列，本頁不計入任何分析；請確認期程欄。' });
+    else if (r.stageRaw && r.stageRaw !== r.stage && r.mo > 0) extra.push({ t: '期程寫法', d: r.key + '｜「' + r.stageRaw + '」已視為 ' + r.stage + '；建議統一寫法以利後台圖表。' });
+  });
+  if (!extra.length) return sec;
+  var st = sec.querySelector('.state'); if (st) st.remove();
+  var ul = sec.querySelector('.ax-dq'); if (!ul) { ul = axEl('div', 'ax-dq'); sec.appendChild(ul); }
+  extra.forEach(function (it) { var row = axEl('div', 'ax-dqrow'); row.appendChild(axEl('b', '', it.t)); row.appendChild(axEl('span', '', it.d)); ul.appendChild(row); });
+  return sec;
+};
+
+/* ---------- 組裝：移除重複的 CBME 指標卡；CbD 指標改在 CbD 頁 ---------- */
+function axCbmeGroup(host) {
+  return axLoad(AX.KEYS.cbme).then(function (cb) {
+    if (!cb.rows.length) throw { code: 'NO_PERMISSION' };
+    var P = ax4Rows(cb);
+    function build() { var tmp = axEl('div'); ax4Overview(tmp, P, redraw); ax4Progress(tmp, P); ax4Team(tmp, P); ax4Epa(tmp, P); ax4G2(tmp, P); ax4Heat(tmp, P); ax4Sum(tmp, P); ax4Highlights(tmp, P); ax4Dq(tmp, P); return Array.prototype.slice.call(tmp.children); }
+    function redraw() {
+      var root = $('charts') || document;
+      build().forEach(function (n) { var old = root.querySelector('section[data-ax="' + n.dataset.ax + '"]'); if (old) old.parentNode.replaceChild(n, old); else root.appendChild(n); });
+    }
+    build().forEach(function (n) { host.appendChild(n); });
+  });
+}
+DASH_LAYOUT['CBME 成效'] = { order: ['ax:ov', 'ax:prog', 'ax:team', 'ax:epa', 'ax:g2', 'ax:heat', 'ax:sum', 'ax:hl', 'ax:dq'], collapse: [/./], collapseTitle: '後台原始圖表（教師觀察填寫統計；判定來源與分母與上方不同，僅供核對）' };
+
+/* ---------- CbD 頁：加入 CbD 教學評量指標（原放在 CBME 頁） ---------- */
+function axCbdPage(host) {
+  return axCbdGroup(host).then(function () { return axTraineeIndicators(host).catch(function (e) { if (window.console) console.error(e); }); }).then(function () {
+    Array.prototype.forEach.call(host.querySelectorAll('section[data-ax=ind2]'), function (s) { s.remove(); });
+  });
+}
+AX_PANELS['病例導向討論(CbD)'] = axCbdPage; AX_PANELS['病例導向討論（CbD）整體成效'] = axCbdPage;
+
+/* ---------- PGY 個人：到職月數判斷 L4 時機；駕駛艙照會累計數 ---------- */
+var ax41Personal0 = ax41Personal;
+ax41Personal = function (cb, lab) { var X = ax41Personal0(cb, lab); S.ax41Start = X.start; return X; };
+var ax41EpaPlanCard0 = ax41EpaPlanCard;
+ax41EpaPlanCard = function (host, G, P, C, pc, d) {
+  if (S.ck) S.ck.pcN = pc && pc.ok ? pc.n : null;
+  var G2 = G, t = new Date(), now = t.getFullYear() * 12 + t.getMonth();
+  if (S.ax41Start !== null && S.ax41Start !== undefined && G && G.last) {
+    var tenure = now - S.ax41Start;
+    if (tenure > (G.last.mo || 0)) { G2 = Object.create(G); G2.last = Object.create(G.last); G2.last.mo = tenure; }
+  }
+  var sec = ax41EpaPlanCard0(host, G2, P, C, pc, d);
+  if (G2 !== G && sec && sec.querySelector) { var p = axEl('p', 'ax-muted', '「已到 L4 時機」依到職日期推算：目前到職 ' + G2.last.mo + ' 個月（最近有等級的期程為 ' + G.last.stage + '）。'); var tbl = sec.querySelector('.ax-scroll'); if (tbl && tbl.parentNode) tbl.parentNode.insertBefore(p, tbl.nextSibling); else sec.appendChild(p); }
+  return sec;
+};
+
+/* ---------- 版面（最終裁決）：先結論與正式判定 → 形成性證據 → 具名亮點 → 同期參照 ---------- */
+DASH_LAYOUT['PGY 學員個人成績'] = {
+  order: ['ax:growth', 'ax:epaplan', 'ax:ilp', 'ax:cbdMatrix', 'ax:feedback', 'ax:pres', 'ax:morning'],
+  hide: [/（CbD）五大面向/, /（CbD）晨會簡報/, /^CBME 教師質性回饋/, /（CbD）質性回饋/],
+  collapse: [/里程碑/, /可信賴專業活動|EPAs|EPA 信賴等級/, /^綜合分數/, /^臨床能力委員會/], collapseTitle: '後台原始圖表（已整併至上方：能力成長、EPA 規劃；此處保留原始呈現供查核）'
+};
+DASH_LAYOUT['UGY 學生個人成績'] = { order: ['ax:growth', 'ax:hours', 'ax:ilp', /^DOPS/, /^教師質性回饋/, /^簡報分數/, /^簡報各評核面向/, /^簡報文字回饋/, 'ax:hl', 'ax:cmp'], hide: [/^實習總成績組成/, /^個人整體實習分數/], collapse: [/^個人各面向分數/], collapseTitle: '後台原始圖表（已整併至上方學習成長；保留供查核）' };
+DASH_LAYOUT['教師個人成績'] = { order: ['ax:growth', /^教師評核等第一覽/, /^歷年教學評核等第/, 'ax:ilp', /^各評核來源等第/, /^各教學單位等第/, /^學員質性回饋/, 'ax:hl', 'ax:cmp'] };
+DASH_LAYOUT['學生學習成效'] = { order: ['ax:ind', 'ax:team', 'ax:matrix', 'ax:board'], hide: [/^實習總成績組成/], collapse: [/^全體學生各面向分數/, /^360 度評核/], collapseTitle: '後台原始圖表（與上方三向比較同一來源；保留供核對）' };
+DASH_LAYOUT['單位組別成效'] = { order: ['ax:env', /^各教學單位歷年等第/, 'ax:matrix', /^各組回饋意見/, 'ax:board'], collapse: [/^各教學單位評核項目分數/, /^各教學單位教師評核項目等第/], collapseTitle: '後台原始圖表（與上方三向比較同一來源；保留供核對）' };
+DASH_LAYOUT['教師教學成效'] = { order: ['ax:team', /^教師評核等第分布/, 'ax:matrix', 'ax:board'], collapse: [/^臨床教師資格分布/, /^各資格平均教學年資/], collapseTitle: '後台原始圖表（教師基本資料統計）' };
+DASH_LAYOUT['病例導向討論(CbD)'] = { order: ['ax:ind', 'ax:matrix', /^病例來源分布/, 'ax:board'], hide: [/每月晨會病例簡報場次/], collapse: [/^五大面向（依評核視角）/, /^各訓練期程五大面向/, /^晨會病例簡報類別/], collapseTitle: '後台原始圖表（與上方三向比較同一來源；保留供核對）' };
+DASH_LAYOUT['簡報評核'] = { order: ['ax:matrix', /^PGY／UGY 平均簡報分數/, /^簡報等第分布/, 'ax:board', 'ax:boardU', 'ax:boardO'], hide: [/每月晨會病例簡報場次/], collapse: [/^各評核面向平均分數/], collapseTitle: '後台原始圖表（與上方三向比較同一來源；保留供核對）' };
+(function () { // 臨床 4 頁：具名表揚移到分析之後、資料品質之前
+  [['衛教諮詢成效', 'ed'], ['諮詢服務', 'cs'], ['藥事照會介入成效', 'pc'], ['連貫照護整合成效', 'cc']].forEach(function (x) {
+    var L = DASH_LAYOUT[x[0]]; if (!L || !L.order) return; var kd = 'ax:' + x[1] + 'Kudos', dq = 'ax:' + x[1] + 'Dq', o = L.order.filter(function (k) { return k !== kd; }), i = o.indexOf(dq);
+    if (i < 0) o.push(kd); else o.splice(i, 0, kd); L.order = o;
+  });
+  if (DASH_LAYOUT['連貫照護整合成效']) DASH_LAYOUT['整合病房減藥成效'] = DASH_LAYOUT['連貫照護整合成效'];
+})();
+
+
+/* ===================== v4.3.1（2026-11-04）：施工計畫「下一階段」可由前端完成者 =====================
+ *  1. UGY／教師個人頁改以「代碼＋姓名」比對（axSameSubj），同名多人時停止計算（fail-closed）。
+ *  2. CbD 個人強項 ◆ 改與同期程同儕比較。
+ *  3. 等級類格子改用離散色階（L1–L5 各一色），與比率色階分開，跨卡可比。
+ *  4. PCNE 照會「補登」標示：填寫時間（時間戳記）晚於照會日期 30 天以上者計數，列於 EPA 規劃卡。 */
+function ax43Ambig(mine, host, who) {
+  var codes = {}; mine.forEach(function (x) { var k = axIdKey(x.subj), c = axCodeOf(k); codes[c || ('名:' + axName(k))] = 1; });
+  var ks = Object.keys(codes); if (ks.length <= 1 || ks.every(function (k) { return /^名:/.test(k); })) return false;
+  if (ks.filter(function (k) { return !/^名:/.test(k); }).length <= 1) return false;
+  host.appendChild(axTag(axEl('div', 'chart ax-card state', '「' + who + '」在資料中對應到多位不同代碼的人員（' + ks.length + ' 組），系統停止計算，以免把他人成績算進來；請在來源試算表以代碼區分。'), 'hl'));
+  return true;
+}
+var AX43_LV = ['#EAF1F2', '#CFE4E8', '#8FC1CA', '#3E8E9C', '#0F5E6E', '#0A3F4B'];
+function axLvColor(v, kind) { var i = Math.max(0, Math.min(5, Math.floor((+v || 0) + AX_EPS))); return { bg: AX43_LV[i], fg: i >= 3 ? '#FFFFFF' : '#10313B' }; }
+var ax41Pcne0 = ax41Pcne;
+ax41Pcne = function (src, lab) {
+  var o = ax41Pcne0(src, lab); if (!o || !o.ok) return o;
+  var cols = src.cols, nI = axCol(cols, /^我的姓名$/), tI = axCol(cols, /^照會日期$/), sI = axCol(cols, /^時間戳記$/), late = 0;
+  if (tI >= 0 && sI >= 0) src.rows.forEach(function (row) { if (!axSameSubj(row[nI], lab)) return; var a = axDate(row[tI]), b = axDate(row[sI]); if (a && b && (b - a) / 864e5 > 30) late++; });
+  o.late = late; o.lateKnown = tI >= 0 && sI >= 0; return o;
+};
+var ax41EpaPlanCard43 = ax41EpaPlanCard;
+ax41EpaPlanCard = function (host, G, P, C, pc, d) {
+  var sec = ax41EpaPlanCard43(host, G, P, C, pc, d);
+  if (sec && pc && pc.ok && pc.late) sec.appendChild(axEl('p', 'ax-muted', '補登提醒：本人照會紀錄中 ' + pc.late + ' 筆的填寫時間晚於照會日期 30 天以上；建議照會當週登錄，以利月別統計與回饋。'));
+  return sec;
+};
+
 </script>
 </body>
 </html>
