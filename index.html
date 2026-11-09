@@ -1112,6 +1112,7 @@ table.grid td{max-width:320px}
 .hc-tm{display:inline-block;margin-left:3px;font-size:.72rem;font-weight:700}.hc-tm.met{color:#1a7f37}.hc-tm.miss{color:#b35900}.hc-mx td.hc-hast{box-shadow:inset 0 -2px 0 #c9d3d9}
 .hc-mx td.hc-cov{text-align:center;white-space:nowrap}.hc-mx td.hc-cov b{font-variant-numeric:tabular-nums}.hc-mx td.hc-cov.none{color:#9aa7ae}.hc-st{display:inline-block;margin-left:4px;padding:0 5px;border-radius:8px;font-size:.68rem;line-height:1.5}.hc-st.dr{background:#fff4e0;color:#8a5a00}.hc-st.ok{background:#e6f4ea;color:#1a7f37}
 .hc-per,.hc-leg{margin:4px 0 8px;color:#5b6b75;font-size:.85rem}.hc-epi{padding:8px 0}.hc-epi ul{margin:4px 0 0;padding-left:18px}.hc-epi li{margin:4px 0;line-height:1.5}.hc-epi li small{display:block;color:#5b6b75}.hc-vd{display:inline-block;padding:0 6px;border-radius:8px;font-size:.7rem;line-height:1.6}.hc-vd.ok{background:#e6f4ea;color:#1a7f37}.hc-vd.cond{background:#e8f1f8;color:#1f5f7a}.hc-vd.fix{background:#fff4e0;color:#8a5a00}.hc-vd.unv{background:#fdecec;color:#a4262c}.hc-vd.na{background:#f0f2f3;color:#5b6b75}
+.hc-mx td.hc-vol{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.hc-mx td.hc-vol.none{color:#9aa7ae;text-align:center}.hc-mx tr.hc-tot th,.hc-mx tr.hc-tot td{border-top:2px solid #c9d3d9;font-weight:600}
 .hc-mx td.num{text-align:right;font-variant-numeric:tabular-nums}.hc-mx tr.hc-hist th,.hc-mx tr.hc-hist td{color:#7a8a93}.hc-det td{background:#f7f9fa;padding:8px 12px}.hc-def{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;padding:6px 0;border-bottom:1px solid #e6ebee}.hc-def small{flex-basis:100%;color:#5b6b75}.hc-defv{font-variant-numeric:tabular-nums}.hc-off{color:#9a6700}
 .hc-sub{margin:14px 0 6px;font-size:.92rem}.hc-wait{margin:8px 0 0;color:#5b6b75;font-size:.85rem}.hc-pks{margin:8px 0;color:#33444f;font-size:.88rem}.hc-epa{display:block;color:#1f5f7a;margin-top:4px}
 .hc-sup{display:flex;height:8px;border-radius:4px;overflow:hidden;background:#eef2f4;margin:6px 0}.hc-sup-sa{background:#1f5f7a}.hc-sup-sb{background:#7fb3c8}.hc-sup-sc{background:#c9dde5}
@@ -1389,7 +1390,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '4.8.0';
+var APP_VERSION = '4.8.1';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -9658,7 +9659,7 @@ function hcHasData(H, F, ids) { return ids.filter(function (k) { var ind = HC_IN
 function hcN(v) { if (v === '' || v === null || v === undefined) return null; var n = +v; return isFinite(n) ? n : null; }
 function hcKey(t) { return kdFindKey(t, HC.SRC); }
 /* v4.8.0 目標設定與流行病學參考（獨立試算表「全人用藥教育_目標設定」） */
-HC.TT = { tgt: ['照護目標設定'], epi: ['照護流行病學參考'] }; HC.TSRC = /全人用藥教育_?目標/;
+HC.TT = { tgt: ['照護目標設定'], epi: ['照護流行病學參考'] }; HC.TSRC = /全人用藥教育_?目標|疾病全人照護/;
 function hcTKey(t) { return kdFindKey(t, HC.TSRC); }
 function hcCols(src, map) { var c = src.cols || [], o = {}; Object.keys(map).forEach(function (k) { o[k] = axCol(c, map[k]); }); return o; }
 function hcParseT(src) {
@@ -9688,6 +9689,7 @@ function hcTgt(H, pk, k) {
   var d = H.D[pk + '-' + k]; if (d && d.tgt !== null && d.tgt !== undefined) return { v: d.tgt, dir: k === 'K5' ? '≤' : '≥', unit: '%', lv: '照護平台指標定義', st: d.ts || '照護平台', den: d.den || '', why: d.ext || '' };
   return null;
 }
+function hcF1(x) { return (Math.round(x * 10) / 10).toFixed(1); }
 function hcTgtTxt(t) { return t && t.v !== null ? t.dir + t.v + (t.unit === '%' ? '%' : ' ' + t.unit) + '（' + t.st + '）' : '未設定'; }
 function hcMet(t, v) { if (!t || t.v === null || v === null) return null; var x = v * 100; return t.dir === '≤' ? x <= t.v : x >= t.v; }
 /* 矩陣期間：跟隨本期總覽／近 N 個月／全期／單一年度 */
@@ -9766,7 +9768,7 @@ function hcKpiCard(host, H, F, st, re) {
 /* ---------- 卡片：疾病面向 × K1–K5 ---------- */
 function hcMatrixCard(host, H, F0) {
   var sec = pcCard(host, 'hcMx', '疾病面向 × 關鍵指標 K1–K5', 'K1–K2 過程、K3–K4 結果、K5 平衡（越低越好）｜可選期間；含院內目標與 ≥65 歲疾病負擔參考',
-    '<b>格子</b>：期間內分子分母各自加總後的比率；分母低於 10 顯示 n＋分母；無分母顯示「—」。顏色越深越好（K5 反向）。<br><b>目標</b>：取自「照護目標設定」（獨立試算表，狀態＝草案／核定）；未列者沿用照護平台「指標定義」目標值。✓＝期間比率達目標、↓＝未達；分母低於 10 不判定。草案目標未經藥劑部核定，只供討論。<br><b>涵蓋率目標</b>：分母是「符合衛教條件之人數」（例：心衰竭出院、藥物起始或調整個案），需院內就醫或出院資料；照護平台目前沒有此分母，所以只列目標、不計達成率。不以疾病盛行率換算衛教人次配額。<br><b>疾病負擔參考</b>：點面向名稱展開，逐筆標示指標類型（P 盛行率、I 發生率、M 死亡率、H 申報診斷比例、代理指標）、年份、來源與查核判定；不同類型不可互相換算。<br>橫向模組（特殊製劑、小兒科用藥等）量級與疾病面向不同，另表呈現、不共用色階。');
+    '<b>格子</b>：期間內分子分母各自加總後的比率；分母低於 10 顯示 n＋分母；無分母顯示「—」。顏色越深越好（K5 反向）。<br><b>目標</b>：取自「照護目標設定」（獨立試算表，狀態＝草案／核定）；未列者沿用照護平台「指標定義」目標值。✓＝期間比率達目標、↓＝未達；分母低於 10 不判定。草案目標未經藥劑部核定，只供討論。<br><b>每月人次目標</b>：取自「照護目標設定」指標 VOL（核定）；實際＝期間內該面向人次 ÷ 月數（含進行中月份時會偏低）；急性心肌梗塞含 ACS 面向。配置綜合考量高齡疾病負擔、藥物風險、衛教價值與收案情形，不是盛行率比例。<br><b>涵蓋率目標</b>：分母是「符合衛教條件之人數」（例：心衰竭出院、藥物起始或調整個案），需院內就醫或出院資料；照護平台目前沒有此分母，所以只列目標、不計達成率。不以疾病盛行率換算衛教人次配額。<br><b>疾病負擔參考</b>：點面向名稱展開，逐筆標示指標類型（P 盛行率、I 發生率、M 死亡率、H 申報診斷比例、代理指標）、年份、來源與查核判定；不同類型不可互相換算。<br>橫向模組（特殊製劑、小兒科用藥等）量級與疾病面向不同，另表呈現、不共用色階。');
   if (!HC.mxWin) HC.mxWin = 'g';
   var tb = axEl('div', 'cc-toolbar'); sec.appendChild(tb);
   var body = axEl('div', 'hc-mxb'); sec.appendChild(body);
@@ -9776,10 +9778,15 @@ function hcMatrixCard(host, H, F0) {
     var F = hcMxFrame(H, F0, HC.mxWin);
     body.appendChild(axEl('p', 'hc-per', '期間：' + pcPeriod(F) + '（' + F.win.length + ' 個月）' + (F.win.indexOf(F.now) >= 0 ? '；含進行中月份' : '')));
     var packs = HC_DIS.filter(function (pk) { return H.M[pk] || Object.keys(H.D).some(function (c) { return H.D[c].pk === pk; }) || (H.T && H.T.rows[pk + '|COV']); });
-    var rows = [], cnt = { met: 0, miss: 0 };
+    var rows = [], cnt = { met: 0, miss: 0 }, tot = { t: 0, a: 0 };
     packs.forEach(function (pk) {
       var tr = document.createElement('tr'), th = document.createElement('th'), b = axEl('button', 'linkbtn hc-pk', hcPackName(H, pk)); b.type = 'button'; b.setAttribute('aria-expanded', 'false'); th.appendChild(b); tr.appendChild(th);
-      var vol = hcPool(H, pk, 'C1', F), tbp = hcPool(H, pk, 'C3', F); tr.appendChild(axEl('td', 'num', String(vol.x || 0))); tr.appendChild(hcCell(tbp, false));
+      var vol = hcPool(H, pk, 'C1', F), tbp = hcPool(H, pk, 'C3', F); tr.appendChild(axEl('td', 'num', String(vol.x || 0)));
+      var vt = H.T && H.T.rows[pk + '|VOL'], vx = vol.x || 0; if (pk === 'AMI') vx += hcPool(H, 'ACS', 'C1', F).x || 0;
+      var mo = F.win.length || 1, avg = vx / mo, vtd = axEl('td', 'hc-vol');
+      if (vt && vt.v !== null) { var pc = vt.v ? Math.round(avg / vt.v * 100) : null; tot.t += vt.v; tot.a += avg; vtd.appendChild(axEl('b', '', hcF1(avg))); vtd.appendChild(document.createTextNode('／' + vt.v)); if (pc !== null) vtd.appendChild(axEl('span', 'hc-tm ' + (avg >= vt.v ? 'met' : 'miss'), pc + '%')); vtd.title = '期間每月平均人次 ' + hcF1(avg) + '（' + vx + ' 人次 ÷ ' + mo + ' 個月）｜每月目標 ' + vt.v + '（' + vt.st + '，' + (vt.note || '') + '）' + (pk === 'AMI' ? '｜含 ACS 面向' : ''); }
+      else { vtd.textContent = vt && vt.note ? '不納入' : '—'; vtd.className += ' none'; if (vt && vt.note) vtd.title = vt.note; }
+      tr.appendChild(vtd); tr.appendChild(hcCell(tbp, false));
       ['K1', 'K2', 'K3', 'K4', 'K5'].forEach(function (k) {
         var p = hcPool(H, pk, pk + '-' + k, F), td = hcCell(p, k === 'K5'), t = hcTgt(H, pk, k);
         if (t) { td.title += '｜目標 ' + hcTgtTxt(t); if (p.n >= hcMinN()) { var m = hcMet(t, p.x / p.n); if (m !== null) { td.appendChild(axEl('span', 'hc-tm ' + (m ? 'met' : 'miss'), m ? '✓' : '↓')); cnt[m ? 'met' : 'miss']++; } } else td.classList.add('hc-hast'); }
@@ -9789,7 +9796,7 @@ function hcMatrixCard(host, H, F0) {
       if (cv && cv.v !== null) { ctd.appendChild(axEl('b', '', cv.dir + cv.v + '%')); ctd.appendChild(axEl('small', 'hc-st ' + (cv.st === '核定' ? 'ok' : 'dr'), cv.st)); ctd.title = '分母：' + (cv.den || '未定義') + '｜達成率未計算（缺院內符合條件人數）'; }
       else ctd.textContent = cv && cv.note ? '另訂' : '未設定';
       tr.appendChild(ctd);
-      var det = document.createElement('tr'); det.className = 'hc-det'; det.hidden = true; var td0 = document.createElement('td'); td0.colSpan = 9; det.appendChild(td0);
+      var det = document.createElement('tr'); det.className = 'hc-det'; det.hidden = true; var td0 = document.createElement('td'); td0.colSpan = 10; det.appendChild(td0);
       ['K1', 'K2', 'K3', 'K4', 'K5'].forEach(function (k) {
         var code = pk + '-' + k, d = H.D[code] || {}, p = hcPool(H, pk, code, F), box = axEl('div', 'hc-def'), t = hcTgt(H, pk, k);
         box.appendChild(axEl('b', '', k + '　' + hcIndName(H, pk, code) + (k === 'K5' ? '（越低越好）' : '')));
@@ -9820,7 +9827,8 @@ function hcMatrixCard(host, H, F0) {
       b.addEventListener('click', function () { det.hidden = !det.hidden; b.setAttribute('aria-expanded', String(!det.hidden)); });
       rows.push(tr); rows.push(det);
     });
-    body.appendChild(pcTable(['疾病面向', '人次', '教回完全', 'K1', 'K2', 'K3', 'K4', 'K5', '涵蓋率目標'], rows, 'hc-mx'));
+    if (tot.t) { var tt = document.createElement('tr'); tt.className = 'hc-tot'; tt.appendChild(axEl('th', '', '合計（有每月目標者）')); tt.appendChild(axEl('td', 'num', '')); var t2 = axEl('td', 'hc-vol'); t2.appendChild(axEl('b', '', hcF1(tot.a))); t2.appendChild(document.createTextNode('／' + tot.t)); t2.appendChild(axEl('span', 'hc-tm ' + (tot.a >= tot.t ? 'met' : 'miss'), Math.round(tot.a / tot.t * 100) + '%')); tt.appendChild(t2); for (var z = 0; z < 7; z++) tt.appendChild(axEl('td', '', '')); rows.push(tt); }
+    body.appendChild(pcTable(['疾病面向', '人次', '每月人次 實際／目標', '教回完全', 'K1', 'K2', 'K3', 'K4', 'K5', '涵蓋率目標'], rows, 'hc-mx'));
     var tn = H.T && H.T.n ? H.T.n : { ok: 0, draft: 0 };
     body.appendChild(axEl('p', 'hc-leg', '✓ 達目標 ' + cnt.met + '　↓ 未達 ' + cnt.miss + '｜目標設定：核定 ' + tn.ok + '、草案 ' + tn.draft + (H.T && H.T.err ? '｜「照護目標設定」尚未開放，沿用照護平台指標定義目標值' : '') + (H.E && H.E.err ? '｜「照護流行病學參考」尚未開放' : '')));
     var hz = HC_HORIZ.concat(HC_HIST).filter(function (pk) { return H.M[pk]; });
