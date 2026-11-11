@@ -9776,7 +9776,7 @@ function hcTgtFromT1(H) {
 }
 /* D1 核對：三張月報核對碼必須相同（同一次彙總）；顯示給使用者與照護平台比對 */
 function hcCheck(H, mon, spc, lrn) {
-  var ck = function (src) { if (!src || src.err || !src.cols) return []; var i = axCol(src.cols, /^核對碼/); if (i < 0) return []; var o = {}; src.rows.forEach(function (r) { var v = String(r[i] || '').trim(); if (v) o[v] = 1; }); return Object.keys(o); };
+  var ck = function (src) { if (!src || src.err || !src.cols) return []; var i = axCol(src.cols, /^核對碼/); if (i < 0) return []; var o = {}; src.rows.forEach(function (r) { var v = String(r[i] || '').trim(); if (/^[0-9a-f]{12}$/.test(v)) o[v] = 1; }); return Object.keys(o); };
   var all = {}; ck(mon).concat(ck(spc), ck(lrn)).forEach(function (v) { all[v] = 1; });
   var ks = Object.keys(all); H.ck = { code: ks.length === 1 ? ks[0] : '', n: ks.length };
 }
