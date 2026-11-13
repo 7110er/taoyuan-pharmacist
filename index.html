@@ -1399,7 +1399,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '5.3.0';
+var APP_VERSION = '5.3.1';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -2717,7 +2717,7 @@ function loadDashboard(first) {
 function fillPeriods(years, hasTime, first) {
   var ys = $('yearSel'), ms = $('monthSel'), y = ys.value, m = ms.value;
   ys.innerHTML = '<option value="">全部年度</option>'; ms.innerHTML = '<option value="">全部月份</option>';
-  (years || []).forEach(function (yy) { var o = document.createElement('option'); o.value = yy; o.textContent = yy + ' 年（民國 ' + (yy - 1911) + '）'; ys.appendChild(o); });
+  (years || []).forEach(function (yy) { var o = document.createElement('option'); o.value = yy; o.textContent = /^\d{4}$/.test(String(yy)) ? yy + ' 年（民國 ' + (yy - 1911) + '）' : String(yy); ys.appendChild(o); });
   MONTHS.forEach(function (mm) { var o = document.createElement('option'); o.value = mm; o.textContent = Number(mm) + ' 月'; ms.appendChild(o); });
   if (!first) { ys.value = y; ms.value = m; }
   ys.hidden = ms.hidden = !hasTime;
@@ -6385,7 +6385,7 @@ function ccChart(host, R, opt) {
   var P = opt.mini ? R.pts.slice(-24) : R.pts, ind = R.ind, L = R.L;
   var svg = document.createElementNS(CC_NS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', '100%'); svg.setAttribute('class', 'cc-svg' + (opt.mini ? ' mini' : '')); svg.setAttribute('role', 'img');
   if (!P.length) return svg;
-  var vals = []; P.forEach(function (p) { if (p.v !== null) vals.push(p.v); if (p.ucl !== undefined) { vals.push(p.ucl); vals.push(p.lcl); } });
+  var vals = []; P.forEach(function (p) { if (p.v !== null) vals.push(p.v); if (p.ucl !== undefined && p.ucl !== null) { vals.push(p.ucl); vals.push(p.lcl); } if (p.cl !== undefined && p.cl !== null) vals.push(p.cl); });
   if (L) vals.push(L.cl);
   var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals); if (hi === lo) { hi += 1; lo -= 1; }
   var pad = (hi - lo) * .08; lo -= pad; hi += pad; if (ind.type !== 'i' && lo < 0) lo = 0; if (ind.type === 'p' && hi > 1) hi = 1;
@@ -6397,9 +6397,14 @@ function ccChart(host, R, opt) {
   }
   if (L) {
     var up = [], dn = [];
-    P.forEach(function (p, i) { if (p.ucl === undefined) return; var x0 = X(i) - (i ? xw / 2 : 0), x1 = X(i) + (i < P.length - 1 ? xw / 2 : 0); up.push(x0 + ',' + Y(p.ucl), x1 + ',' + Y(p.ucl)); dn.push(x0 + ',' + Y(p.lcl), x1 + ',' + Y(p.lcl)); });
+    P.forEach(function (p, i) { if (p.ucl === undefined || p.ucl === null) return; var x0 = X(i) - (i ? xw / 2 : 0), x1 = X(i) + (i < P.length - 1 ? xw / 2 : 0); up.push(x0 + ',' + Y(p.ucl), x1 + ',' + Y(p.ucl)); dn.push(x0 + ',' + Y(p.lcl), x1 + ',' + Y(p.lcl)); });
     if (up.length) { ccSvgEl(svg, 'polygon', { points: up.concat(dn.slice().reverse()).join(' '), class: 'cc-band' }); ccSvgEl(svg, 'polyline', { points: up.join(' '), class: 'cc-lim' }); ccSvgEl(svg, 'polyline', { points: dn.join(' '), class: 'cc-lim' }); }
-    ccSvgEl(svg, 'line', { x1: ml, x2: W - mr, y1: Y(L.cl), y2: Y(L.cl), class: 'cc-cl' });
+    /* v4.9：照護平台後端 SPC 依階段（新平台上線前後）各有中心線；有逐點中心線時分段畫 */
+    if (P.some(function (p) { return p.cl !== undefined && p.cl !== null; })) {
+      var cs = []; var fl = function () { if (cs.length > 1) ccSvgEl(svg, 'polyline', { points: cs.join(' '), class: 'cc-cl' }); cs = []; };
+      P.forEach(function (p, i) { if (p.cl === undefined || p.cl === null || (i && P[i - 1].phase !== p.phase)) fl(); if (p.cl === undefined || p.cl === null) return; var x0 = X(i) - (i ? xw / 2 : 0), x1 = X(i) + (i < P.length - 1 ? xw / 2 : 0); cs.push(x0 + ',' + Y(p.cl), x1 + ',' + Y(p.cl)); }); fl();
+      P.forEach(function (p, i) { if (i && P[i - 1].phase && p.phase && P[i - 1].phase !== p.phase && !opt.mini) { var xc = X(i) - xw / 2; ccSvgEl(svg, 'line', { x1: xc, x2: xc, y1: mt, y2: H - mb, class: 'cc-grid', 'stroke-dasharray': '3 3' }); ccSvgEl(svg, 'text', { x: xc + 4, y: mt + 10, class: 'cc-ax' }, p.phase); } });
+    } else ccSvgEl(svg, 'line', { x1: ml, x2: W - mr, y1: Y(L.cl), y2: Y(L.cl), class: 'cc-cl' });
   }
   var seg = [];
   function flush() { if (seg.length > 1) ccSvgEl(svg, 'polyline', { points: seg.join(' '), class: 'cc-line' }); seg = []; }
@@ -6412,7 +6417,7 @@ function ccChart(host, R, opt) {
     if (opt.mini && !sig && i < P.length - 1) return;
     var c = document.createElementNS(CC_NS, 'circle'); c.setAttribute('cx', cx); c.setAttribute('cy', Y(p.v)); c.setAttribute('r', opt.mini ? 2.6 : (sig ? 4.4 : 3.2)); c.setAttribute('class', cls);
     var tt = document.createElementNS(CC_NS, 'title');
-    tt.textContent = ccYmLab(p.ym) + '｜' + ccFmt(ind, p.v) + (p.n !== null && p.n !== undefined && ind.type !== 'i' ? '（' + p.x + '／' + (Math.round(p.n * 10) / 10) + '）' : '') + (L && p.ucl !== undefined ? '｜管制界限 ' + ccFmt(ind, p.lcl) + '–' + ccFmt(ind, p.ucl) : '') + (sig ? '｜訊號：' + p.sig.join('、') : '') + (p.part ? '｜' + p.part : '');
+    tt.textContent = ccYmLab(p.ym) + '｜' + ccFmt(ind, p.v) + (p.n !== null && p.n !== undefined && ind.type !== 'i' ? '（' + p.x + '／' + (Math.round(p.n * 10) / 10) + '）' : '') + (L && p.ucl !== undefined && p.ucl !== null ? '｜管制界限 ' + ccFmt(ind, p.lcl) + '–' + ccFmt(ind, p.ucl) : '') + (sig ? '｜訊號：' + p.sig.join('、') : '') + (p.part ? '｜' + p.part : '');
     c.appendChild(tt); svg.appendChild(c);
   });
   return svg;
@@ -7489,6 +7494,9 @@ function gxRun(ind, C, F, base) {
   if (L && ind.type === 'p') { var pb = L.cl; pts.forEach(function (p) { if (p.sig && p.n && p.n * Math.min(pb, 1 - pb) < 1) p.sig = p.sig.filter(function (x) { return !/^連續/.test(x); }); }); }
   return { ind: ind, pts: pts, L: L, st: ccStatus(ind, pts, L) };
 }
+/* v4.9 D1：照護平台指標的管制界限與訊號直接讀後端「儀表板_管制」，兩站不各自計算 */
+var gxRunLocal = gxRun;
+gxRun = function (ind, C, F, base) { if (ind.srv) { var R = ind.srv.call(ind, F, base); if (R) return R; } return gxRunLocal(ind, C, F, base); };
 function gxPool(ind, C, F) { var x = 0, n = 0; F.win.forEach(function (ym) { var g = ind.get(C.by[ym] || []); x += g.x; n += g.n; }); return { x: x, n: n, v: ind.type === 'u' ? (F.win.length ? x / F.win.length : null) : (n ? x / n : null), ci: ccWilson(x, n) }; }
 function gxSum(rows, fn) { var x = 0, n = 0; rows.forEach(function (r) { var g = fn(r.c, r.n); if (g) { x += g[0]; n += g[1]; } }); return { x: x, n: n }; }
 function gxWinRows(C, F) { var out = []; F.win.forEach(function (ym) { (C.by[ym] || []).forEach(function (r) { out.push(r); }); }); return out; }
@@ -8487,7 +8495,7 @@ function ckBuild(box, name, d) {
   }
   /* v4.7.1：病人用藥教育（疾病全人照護平台） */
   if (ck.pcn && ck.pcn.ok) { if (ck.pcn.due) add('now', { tag: 'PCNE', title: '補填問題狀態 O ' + ck.pcn.due + ' 筆', meta: '以表單「編輯回覆」補填介入後結局（O1–O3）', act: function () { ckScroll('pcnp'); }, go: '看紀錄' }); if (ck.pcn.pgy && ck.pcn.adr < 2) add('next', { tag: 'EPA 4', title: 'ADR 評估紀錄尚差 ' + (2 - ck.pcn.adr) + ' 例', meta: '公版 2023 ≥2 例（院內表單建議 ≥3）', act: function () { ckScroll('pcnp'); }, go: '看進度' }); if (ck.pcn.pgy && ck.pcn.tdm < 2) add('next', { tag: 'EPA 6', title: 'TDM 監測藥品尚差 ' + (2 - ck.pcn.tdm) + ' 種', meta: '公版 2023 ≥2 種（院內表單建議 ≥3）', act: function () { ckScroll('pcnp'); }, go: '看進度' }); }
-  if (ck.hc && ck.hc.ok) { if (ck.hc.n) add('done', { tag: '病人用藥教育', big: ck.hc.n + ' 人次', title: ck.hc.tbd ? '教回完全理解 ' + ck.hc.tb + '／' + ck.hc.tbd : '近 12 個月新版紀錄', meta: pgy ? 'EPA 3 門診病人藥品諮詢證據（門診／住院未分流）' : '疾病全人照護平台', act: function () { ckScroll('hcp'); }, go: '看紀錄' }); else add('next', { tag: '病人用藥教育', title: '尚無病人用藥教育紀錄', meta: '在疾病全人照護平台登錄指導後自動列入' }); }
+  if (ck.hc && ck.hc.ok) { if (ck.hc.n) add('done', { tag: '病人用藥教育', big: ck.hc.n + ' 人次', title: ck.hc.tbd ? '教回完全理解 ' + ck.hc.tb + '／' + ck.hc.tbd : '近 12 個月新版紀錄', meta: pgy ? 'EPA 3 門診病人藥品諮詢證據（以病人來源＝門診計）' : '疾病全人照護平台', act: function () { ckScroll('hcp'); }, go: '看紀錄' }); else add('next', { tag: '病人用藥教育', title: '尚無病人用藥教育紀錄', meta: '在疾病全人照護平台登錄指導後自動列入' }); }
   /* ---- 訓練課程快照（PGY，非同步） ---- */
   if (pgy && typeof planFetch === 'function' && typeof PLAN_ON !== 'undefined' && PLAN_ON && d.subject) {
     pending++;
@@ -9641,10 +9649,11 @@ function axDqGroup(host, role, label) {
  *   照護面向月報（儀表板_面向月報）、照護指標定義（指標定義）、照護個人月報（儀表板_個人月報，只看本人）。
  * 不讀原始照護紀錄；病歷號、藥品明細、自由文字不離開照護平台。
  * ===================================================================== */
-var HC = { T: { mon: ['照護面向月報', '儀表板_面向月報'], def: ['照護指標定義', '指標定義'], per: ['照護個人月報', '儀表板_個人月報'] }, SRC: /疾病全人照護/, st: { win: 12, base: 'r24', grp: 'out' } };
-var HC_DIS = ['CAD', 'AMI', 'HF', 'STROKE', 'TBI', 'DEMENTIA', 'ASTHMA', 'COPD', 'AKD', 'CKD', 'DM', 'HNC', 'LUNGCA', 'BREASTCA', 'CRC', 'TJR', 'DDH', 'NRDS', 'PAIN'];
+var HC = { T: { mon: ['照護面向月報', '儀表板_面向月報'], def: ['照護指標定義', '指標定義'], per: ['照護個人月報', '儀表板_個人月報'], spc: ['照護管制', '儀表板_管制'], lrn: ['照護學習者', '儀表板_學習者'] }, SRC: /疾病全人照護/, st: { win: 12, base: 'r24', grp: 'out', src: 'ALL' }, srcSeen: {} };
+var HC_SRC_TXT = { ALL: '全部來源', OPD: '門診', IPD: '住院', ER: '急診', BR: '分院', COMM: '社區', HOME: '居家', TEL: '電話／遠距', DC: '出院前（住院）', UNK: '未填（舊系統）' };
+var HC_DIS = ['CAD', 'AMI', 'HF', 'STROKE', 'TBI', 'DEMENTIA', 'ASTHMA', 'COPD', 'AKD', 'CKD', 'DM', 'HNC', 'LUNGCA', 'BREASTCA', 'CRC', 'TJR', 'DDH', 'NRDS', 'PAIN', 'INFECT'];
 var HC_HORIZ = ['XSPEC', 'XPED', 'XPERI', 'XLAB', 'XTX', 'MED', 'OTHER'], HC_HIST = ['ACS', 'KD_LEGACY'];
-var HC_PACKNAME = { CAD: '冠狀動脈疾病', AMI: '急性心肌梗塞', HF: '心衰竭', STROKE: '腦中風', TBI: '創傷性腦損傷', DEMENTIA: '失智症', ASTHMA: '氣喘', COPD: 'COPD', AKD: '急性腎臟病', CKD: '慢性腎臟病', DM: '糖尿病', HNC: '頭頸癌', LUNGCA: '肺癌', BREASTCA: '乳癌', CRC: '結直腸癌', TJR: '關節置換', DDH: '小兒髖關節發育不良', NRDS: '新生兒呼吸窘迫', PAIN: '疼痛照護',
+var HC_PACKNAME = { INFECT: '感染症（抗微生物藥品治療）', GERI: '高齡照護（≥65 歲）', CAD: '冠狀動脈疾病', AMI: '急性心肌梗塞', HF: '心衰竭', STROKE: '腦中風', TBI: '創傷性腦損傷', DEMENTIA: '失智症', ASTHMA: '氣喘', COPD: 'COPD', AKD: '急性腎損傷／急性腎臟病（AKI／AKD）', CKD: '慢性腎臟病', DM: '糖尿病', HNC: '頭頸癌', LUNGCA: '肺癌', BREASTCA: '乳癌', CRC: '結直腸癌', TJR: '關節置換', DDH: '小兒髖關節發育不良', NRDS: '新生兒呼吸窘迫', PAIN: '疼痛照護',
   XSPEC: '特殊製劑', XPED: '小兒科用藥', XPERI: '術前術後', XLAB: '檢驗值', XTX: '器官移植', MED: '用藥指導（未分面向）', OTHER: '其他（自由記錄）', ACS: '急性冠心病（已併入，僅歷史）', KD_LEGACY: '腎臟病（已併入，僅歷史）' };
 var HC_NEWFROM = '2026-11';
 function hcGet(code) { return function (R) { var x = 0, n = 0; R.forEach(function (r) { if (r.c.code === code) { x += r.c.num || 0; n += r.c.den || 0; } }); return { x: x, n: n }; }; }
@@ -9718,16 +9727,82 @@ function hcMxOpts(H, F) {
 function hcLoad() {
   var km = hcKey(HC.T.mon); if (!km) return Promise.reject({ code: 'NO_KEY', message: '尚未開放「照護面向月報」分頁（控制台「分頁開放」，來源：疾病全人照護紀錄）' });
   var opt = function (k) { return k ? axLoad(k).catch(function (e) { return { err: e }; }) : Promise.resolve({ err: { code: 'NO_KEY' } }); };
-  return Promise.all([axLoad(km), opt(hcKey(HC.T.def)), opt(hcKey(HC.T.per)), opt(hcTKey(HC.TT.tgt)), opt(hcTKey(HC.TT.epi))]).then(function (r) { var H = hcParse(r[0], r[1], r[2]); H.T = hcParseT(r[3]); H.E = hcParseE(r[4]); return H; });
+  return Promise.all([axLoad(km), opt(hcKey(HC.T.def)), opt(hcKey(HC.T.per)), opt(hcTKey(HC.TT.tgt)), opt(hcTKey(HC.TT.epi)), opt(hcKey(HC.T.spc)), opt(hcKey(HC.T.lrn))]).then(function (r) {
+    var H = hcParse(r[0], r[1], r[2]); H.T = hcParseT(r[3]); H.E = hcParseE(r[4]); hcParseS(H, r[5]); hcParseL(H, r[6]); hcTgtFromT1(H); hcCheck(H, r[0], r[5], r[6]); return H;
+  });
 }
+/* v4.9 D1：後端 SPC 列 → H.S['面向|指標|基線'] = 逐月點（照護平台唯一計算來源） */
+function hcParseS(H, src) {
+  H.S = {}; if (!src || src.err || !src.cols) { H.sErr = src && src.err; return; }
+  var c = src.cols, I = {}; [['ym', /^年月/], ['pk', /^面向代碼/], ['code', /^指標代碼/], ['name', /^指標名稱/], ['type', /^圖型/], ['dir', /^方向/], ['base', /^基線$/], ['ph', /^階段/], ['x', /^分子/], ['n', /^分母/], ['v', /^值$/], ['ex', /^排除/], ['part', /^當月未完/], ['cl', /^中心線/], ['ucl', /^上限/], ['lcl', /^下限/], ['from', /^基線起/], ['to', /^基線迄/], ['bn', /^基線月數/], ['sig', /^訊號/], ['st', /^狀態$/], ['cls', /^狀態類別/]].forEach(function (x) { I[x[0]] = axCol(c, x[1]); });
+  if (I.ym < 0 || I.pk < 0 || I.code < 0 || I.base < 0 || I.v < 0) { H.sErr = { message: '「照護管制」欄位與規格不符' }; return; }
+  var g = function (r, k) { return I[k] >= 0 && r[I[k]] !== null && r[I[k]] !== undefined ? String(r[I[k]]).trim() : ''; };
+  src.rows.forEach(function (r) {
+    var ym = g(r, 'ym'); if (!/^\d{4}-\d{2}$/.test(ym)) return;
+    var k = g(r, 'pk') + '|' + g(r, 'code') + '|' + g(r, 'base'), S0 = H.S[k] = H.S[k] || { name: g(r, 'name'), type: g(r, 'type'), dir: +g(r, 'dir') || 0, pts: [] };
+    var cl = hcN(r[I.cl]), sig = g(r, 'sig');
+    var o = { ym: ym, x: hcN(r[I.x]) || 0, n: S0.type === 'u' ? 1 : hcN(r[I.n]), v: hcN(r[I.v]), ex: g(r, 'ex') || null, part: g(r, 'part') === 'Y' ? '當月資料尚未完整' : '', phase: g(r, 'ph'),
+      cl: cl, sig: sig ? sig.split('、') : null, L: cl === null ? null : { cl: cl, from: g(r, 'from'), to: g(r, 'to'), n: hcN(r[I.bn]) || 0 } };
+    if (I.ucl >= 0 && hcN(r[I.ucl]) !== null) { o.ucl = hcN(r[I.ucl]); o.lcl = hcN(r[I.lcl]); }
+    if (o.v !== null && cl !== null) o.side = o.v > cl ? 1 : o.v < cl ? -1 : 0;
+    if (g(r, 'cls')) S0.st = { cls: g(r, 'cls'), txt: g(r, 'st'), note: '照護平台後端計算（儀表板_管制）' };
+    S0.pts.push(o);
+  });
+  Object.keys(H.S).forEach(function (k) { H.S[k].pts.sort(function (a, b) { return a.ym < b.ym ? -1 : 1; }); });
+}
+function hcSrv(H, pk, code) {
+  return function (F, base) {
+    var S0 = H.S && H.S[pk + '|' + code + '|' + base]; if (!S0 || !S0.pts.length) return null;
+    var ws = {}; F.seq.forEach(function (m) { ws[m] = 1; });
+    var pts = S0.pts.filter(function (p) { return ws[p.ym]; }); if (!pts.length) return null;
+    var L = null; for (var i = pts.length - 1; i >= 0; i--) if (pts[i].L) { L = pts[i].L; break; }
+    return { ind: this, pts: pts, L: L, st: S0.st || { cls: 'na', txt: '無資料' }, srv: true };
+  };
+}
+function hcAttachSrv(H) {
+  var on = !!(H.S && Object.keys(H.S).length), have = {};
+  HC_IND.forEach(function (ind) { have[ind.code] = 1; if (on) ind.srv = hcSrv(H, 'ALL', ind.code); else delete ind.srv; });
+  /* 後端新增之全平台 SPC 指標（首次教回、補強後轉完全、追蹤準時等）自動上架 */
+  Object.keys(H.S || {}).forEach(function (k) {
+    var a = k.split('|'); if (a[0] !== 'ALL' || a[2] !== 'r24' || have[a[1]]) return; have[a[1]] = 1;
+    var S0 = H.S[k], d = H.D[a[1]] || {};
+    HC_IND.push({ id: 'x' + a[1].toLowerCase(), code: a[1], grp: S0.dir < 0 ? 'bal' : S0.dir > 0 ? 'out' : 'proc', type: S0.type === 'u' ? 'u' : 'p', unit: '人次', perUnit: '人次／月', name: S0.name, short: S0.name.replace(/（.*$/, '').slice(0, 8), dir: S0.dir, get: S0.type === 'u' ? hcVol(a[1]) : hcGet(a[1]), def: [d.num ? '分子：' + d.num : '', d.den ? '分母：' + d.den : '', d.note].filter(Boolean).join('｜') || S0.name, srv: hcSrv(H, 'ALL', a[1]) });
+  });
+}
+/* 學習者月報（PGY／UGY；「只看本人」由桃e 控制台「分頁開放」控管） */
+function hcParseL(H, src) {
+  H.L = null; if (!src || src.err || !src.cols) { H.lErr = src && src.err; return; }
+  var c = src.cols, I = {}; [['ym', /^年月/], ['nm', /^姓名/], ['type', /^學習身分/], ['start', /^到職日/], ['n', /^件數/], ['f1', /^首次完全/], ['f1d', /^首次分母/], ['f2', /^最終完全/], ['f2d', /^最終分母/], ['pk', /^面向$/], ['ind', /^督導_?獨立/], ['pres', /^督導_?在場/], ['rev', /^督導_?覆核/], ['rp', /^覆核待辦/], ['rd', /^覆核完成/], ['beh', /^不當行為發現/], ['ep', /^人次$/], ['epO', /^門診人次/], ['epI', /^住院人次/]].forEach(function (x) { I[x[0]] = axCol(c, x[1]); });
+  if (I.ym < 0 || I.nm < 0) { H.lErr = { message: '「照護學習者」欄位與規格不符' }; return; }
+  var g = function (r, k) { return I[k] >= 0 && r[I[k]] !== null && r[I[k]] !== undefined ? String(r[I[k]]).trim() : ''; }, n = function (r, k) { return I[k] >= 0 ? (hcN(r[I[k]]) || 0) : 0; };
+  H.L = src.rows.map(function (r) { return { ym: g(r, 'ym'), who: g(r, 'nm'), type: g(r, 'type'), start: g(r, 'start').slice(0, 10), n: n(r, 'n'), f1: n(r, 'f1'), f1d: n(r, 'f1d'), f2: n(r, 'f2'), f2d: n(r, 'f2d'), pks: gxTok(g(r, 'pk')), ind: n(r, 'ind'), pres: n(r, 'pres'), rev: n(r, 'rev'), rp: n(r, 'rp'), rd: n(r, 'rd'), beh: n(r, 'beh'), ep: n(r, 'ep'), epO: n(r, 'epO'), epI: n(r, 'epI'), hasEp: I.epO >= 0 }; }).filter(function (x) { return /^\d{4}-\d{2}$/.test(x.ym) && x.who; });
+}
+/* D2：每月目標人次唯一來源＝照護平台「疾病包登錄」，經月報 T1 列目標值傳入（取代舊「照護目標設定」VOL） */
+function hcTgtFromT1(H) {
+  H.T = H.T || { rows: {}, n: { ok: 0, draft: 0 } };
+  Object.keys(H.M).forEach(function (pk) {
+    var s = (H.M[pk] || {}).T1; if (!s) return;
+    var yms = Object.keys(s).sort(), last = yms[yms.length - 1], t = last ? s[last].tgt : null;
+    if (t !== null && t !== undefined) H.T.rows[pk + '|VOL'] = { v: t, dir: '≥', unit: '人次', st: '核定', note: '照護平台疾病包登錄', lv: '疾病包登錄' };
+  });
+}
+/* D1 核對：三張月報核對碼必須相同（同一次彙總）；顯示給使用者與照護平台比對 */
+function hcCheck(H, mon, spc, lrn) {
+  var ck = function (src) { if (!src || src.err || !src.cols) return []; var i = axCol(src.cols, /^核對碼/); if (i < 0) return []; var o = {}; src.rows.forEach(function (r) { var v = String(r[i] || '').trim(); if (/^[0-9a-f]{12}$/.test(v)) o[v] = 1; }); return Object.keys(o); };
+  var all = {}; ck(mon).concat(ck(spc), ck(lrn)).forEach(function (v) { all[v] = 1; });
+  var ks = Object.keys(all); H.ck = { code: ks.length === 1 ? ks[0] : '', n: ks.length };
+}
+function hcCkTxt(H) { return !H.ck || !H.ck.n ? '' : H.ck.n === 1 ? '｜月報核對碼 ' + H.ck.code + '（與照護平台儀表板相同即代表同源一致）' : '｜⚠ 月報核對碼不一致（' + H.ck.n + ' 組），請稍後重新整理或通知管理者重新彙總'; }
 function hcParse(mon, def, per) {
   var c = mon.cols, ix = function (re) { return axCol(c, re); };
-  var I = { ym: ix(/^年月/), pk: ix(/^面向代碼/), pn: ix(/^面向名稱/), code: ix(/^指標代碼/), name: ix(/^指標名稱/), type: ix(/^類型/), num: ix(/^分子/), den: ix(/^分母/), tgt: ix(/^目標/), at: ix(/^計算時間/) };
+  var I = { ym: ix(/^年月/), pk: ix(/^面向代碼/), pn: ix(/^面向名稱/), code: ix(/^指標代碼/), name: ix(/^指標名稱/), type: ix(/^類型/), num: ix(/^分子/), den: ix(/^分母/), tgt: ix(/^目標/), at: ix(/^計算時間/), src: ix(/^來源/) };
   if (I.ym < 0 || I.pk < 0 || I.code < 0 || I.num < 0 || I.den < 0) throw { message: '「照護面向月報」欄位與規格不符（需年月、面向代碼、指標代碼、分子、分母）' };
   var M = {}, names = {}, yms = {}, last = '', inames = {};
   mon.rows.forEach(function (r) {
     var ym = String(r[I.ym] || '').trim(); if (!/^\d{4}-\d{2}$/.test(ym)) return;
     var pk = String(r[I.pk] || '').trim(), code = String(r[I.code] || '').trim(); if (!pk || !code) return;
+    /* v5.0（照護平台 v2.8 R4）：月報按病人來源切片；只讀所選來源（預設 ALL），避免重複加總 */
+    if (I.src >= 0) { var hcs = typeof HC === 'object' ? HC : { st: {}, srcSeen: {} }, sv = String(r[I.src] || '').trim() || 'ALL'; if (sv !== 'ALL') hcs.srcSeen[sv] = 1; if (sv !== (hcs.st.src || 'ALL')) return; }
     yms[ym] = 1; var o = { num: hcN(r[I.num]), den: hcN(r[I.den]), type: I.type >= 0 ? String(r[I.type] || '') : '', tgt: I.tgt >= 0 ? hcN(r[I.tgt]) : null };
     ((M[pk] = M[pk] || {})[code] = M[pk][code] || {})[ym] = o;
     if (I.pn >= 0 && r[I.pn]) names[pk] = String(r[I.pn]).trim();
@@ -9766,8 +9841,8 @@ function hcCell(p, k5) {
 }
 /* ---------- 卡片：本期總覽 ---------- */
 function hcKpiCard(host, H, F, st, re) {
-  var sec = gxKpiCard(host, 'hcKpi', '全人用藥教育｜本期總覽', pcPeriod(F) + '｜資料：疾病全人照護平台月報（最後彙總 ' + (H.last || '未知') + '）',
-    '<b>資料</b>：疾病全人照護平台每月彙總（面向＝ALL）。原始照護紀錄（病歷號、藥品、自由文字）不離開照護平台。<br><b>新舊紀錄</b>：指導人次與重複諮詢含 ' + HC_NEWFROM + ' 前舊系統歸檔紀錄；教回、不當用藥行為、追蹤、G1–G3 僅新版紀錄。<br><b>數字</b>：統計期間分子分母各自加總後相除，括號為 Wilson 95% 信賴區間。',
+  var sec = gxKpiCard(host, 'hcKpi', '全人用藥教育｜本期總覽', pcPeriod(F) + '｜資料：疾病全人照護平台月報（最後彙總 ' + (H.last || '未知') + '）' + hcCkTxt(H),
+    '<b>資料</b>：疾病全人照護平台每月彙總（面向＝ALL）。原始照護紀錄（病歷號、藥品、自由文字）不離開照護平台。<br><b>新舊紀錄</b>：指導人次與重複諮詢含 ' + HC_NEWFROM + ' 前舊系統歸檔紀錄；教回、不當用藥行為、追蹤、G1–G3 僅新版紀錄。<br><b>數字</b>：統計期間分子分母各自加總後相除，括號為 Wilson 95% 信賴區間。<br><b>管制界限與訊號</b>：直接讀照護平台後端「儀表板_管制」（唯一計算來源）；' + HC_NEWFROM + ' 新平台上線為已知特殊原因，前後各自計算界限。',
     HC_IND, hcHasData(H, F, HC_KPI), H.C, F, st, re);
   var fu = hcPool(H, 'ALL', 'C6', F), wait = HC_KPI.filter(function (k) { var ind = HC_IND.filter(function (x) { return x.id === k; })[0]; return ind && ind.type === 'p' && !hcPool(H, 'ALL', ind.code, F).n; });
   if (wait.length) {
@@ -9779,7 +9854,7 @@ function hcKpiCard(host, H, F, st, re) {
 /* ---------- 卡片：疾病面向 × K1–K5 ---------- */
 function hcMatrixCard(host, H, F0) {
   var sec = pcCard(host, 'hcMx', '疾病面向 × 關鍵指標 K1–K5', 'K1–K2 過程、K3–K4 結果、K5 平衡（越低越好）｜可選期間；含院內目標與 ≥65 歲疾病負擔參考',
-    '<b>格子</b>：期間內分子分母各自加總後的比率；分母低於 10 顯示 n＋分母；無分母顯示「—」。顏色越深越好（K5 反向）。<br><b>目標</b>：取自「照護目標設定」（獨立試算表，狀態＝草案／核定）；未列者沿用照護平台「指標定義」目標值。✓＝期間比率達目標、↓＝未達；分母低於 10 不判定。草案目標未經藥劑部核定，只供討論。<br><b>每月人次目標</b>：取自「照護目標設定」指標 VOL（核定）；實際＝期間內該面向人次 ÷ 月數（含進行中月份時會偏低）；急性心肌梗塞含 ACS 面向。配置綜合考量高齡疾病負擔、藥物風險、衛教價值與收案情形，不是盛行率比例。<br><b>涵蓋率目標</b>：分母是「符合衛教條件之人數」（例：心衰竭出院、藥物起始或調整個案），需院內就醫或出院資料；照護平台目前沒有此分母，所以只列目標、不計達成率。不以疾病盛行率換算衛教人次配額。<br><b>疾病負擔參考</b>：點面向名稱展開，逐筆標示指標類型（P 盛行率、I 發生率、M 死亡率、H 申報診斷比例、代理指標）、年份、來源與查核判定；不同類型不可互相換算。<br>橫向模組（特殊製劑、小兒科用藥等）量級與疾病面向不同，另表呈現、不共用色階。');
+    '<b>格子</b>：期間內分子分母各自加總後的比率；分母低於 10 顯示 n＋分母；無分母顯示「—」。顏色越深越好（K5 反向）。<br><b>目標</b>：取自「照護目標設定」（獨立試算表，狀態＝草案／核定）；未列者沿用照護平台「指標定義」目標值。✓＝期間比率達目標、↓＝未達；分母低於 10 不判定。草案目標未經藥劑部核定，只供討論。<br><b>每月人次目標</b>：唯一來源＝照護平台控制台「疾病包登錄」每月目標人次（經月報 T1 列傳入，兩站同一數字）；實際＝期間內該面向人次 ÷ 月數（含進行中月份時會偏低）；急性心肌梗塞含 ACS 面向。配置綜合考量高齡疾病負擔、藥物風險、衛教價值與收案情形，不是盛行率比例。<br>不以疾病盛行率換算衛教人次配額；應衛教人數分母無院內資料可算，已移除涵蓋率欄。<br><b>疾病負擔參考</b>：點面向名稱展開，逐筆標示指標類型（P 盛行率、I 發生率、M 死亡率、H 申報診斷比例、代理指標）、年份、來源與查核判定；不同類型不可互相換算。<br>橫向模組（特殊製劑、小兒科用藥等）量級與疾病面向不同，另表呈現、不共用色階。');
   if (!HC.mxWin) HC.mxWin = 'g';
   var tb = axEl('div', 'cc-toolbar'); sec.appendChild(tb);
   var body = axEl('div', 'hc-mxb'); sec.appendChild(body);
@@ -9788,7 +9863,7 @@ function hcMatrixCard(host, H, F0) {
     body.innerHTML = '';
     var F = hcMxFrame(H, F0, HC.mxWin);
     body.appendChild(axEl('p', 'hc-per', '期間：' + pcPeriod(F) + '（' + F.win.length + ' 個月）' + (F.win.indexOf(F.now) >= 0 ? '；含進行中月份' : '')));
-    var packs = HC_DIS.filter(function (pk) { return H.M[pk] || Object.keys(H.D).some(function (c) { return H.D[c].pk === pk; }) || (H.T && H.T.rows[pk + '|COV']); });
+    var packs = HC_DIS.filter(function (pk) { return H.M[pk] || Object.keys(H.D).some(function (c) { return H.D[c].pk === pk; }) || (H.T && H.T.rows[pk + '|VOL']); });
     var rows = [], cnt = { met: 0, miss: 0 }, tot = { t: 0, a: 0 };
     packs.forEach(function (pk) {
       var tr = document.createElement('tr'), th = document.createElement('th'), b = axEl('button', 'linkbtn hc-pk', hcPackName(H, pk)); b.type = 'button'; b.setAttribute('aria-expanded', 'false'); th.appendChild(b); tr.appendChild(th);
@@ -9803,11 +9878,7 @@ function hcMatrixCard(host, H, F0) {
         if (t) { td.title += '｜目標 ' + hcTgtTxt(t); if (p.n >= hcMinN()) { var m = hcMet(t, p.x / p.n); if (m !== null) { td.appendChild(axEl('span', 'hc-tm ' + (m ? 'met' : 'miss'), m ? '✓' : '↓')); cnt[m ? 'met' : 'miss']++; } } else td.classList.add('hc-hast'); }
         tr.appendChild(td);
       });
-      var cv = hcTgt(H, pk, 'COV'), ctd = axEl('td', 'hc-cov' + (cv && cv.v !== null ? '' : ' none'));
-      if (cv && cv.v !== null) { ctd.appendChild(axEl('b', '', cv.dir + cv.v + '%')); ctd.appendChild(axEl('small', 'hc-st ' + (cv.st === '核定' ? 'ok' : 'dr'), cv.st)); ctd.title = '分母：' + (cv.den || '未定義') + '｜達成率未計算（缺院內符合條件人數）'; }
-      else ctd.textContent = cv && cv.note ? '另訂' : '未設定';
-      tr.appendChild(ctd);
-      var det = document.createElement('tr'); det.className = 'hc-det'; det.hidden = true; var td0 = document.createElement('td'); td0.colSpan = 10; det.appendChild(td0);
+      var det = document.createElement('tr'); det.className = 'hc-det'; det.hidden = true; var td0 = document.createElement('td'); td0.colSpan = 9; det.appendChild(td0);
       ['K1', 'K2', 'K3', 'K4', 'K5'].forEach(function (k) {
         var code = pk + '-' + k, d = H.D[code] || {}, p = hcPool(H, pk, code, F), box = axEl('div', 'hc-def'), t = hcTgt(H, pk, k);
         box.appendChild(axEl('b', '', k + '　' + hcIndName(H, pk, code) + (k === 'K5' ? '（越低越好）' : '')));
@@ -9816,11 +9887,6 @@ function hcMatrixCard(host, H, F0) {
         box.appendChild(axEl('small', '', meta)); if (d.on === false) box.appendChild(axEl('small', 'hc-off', '此指標在照護平台目前停用'));
         td0.appendChild(box);
       });
-      var cbox = axEl('div', 'hc-def hc-covd');
-      cbox.appendChild(axEl('b', '', '衛教涵蓋率目標　' + (cv && cv.v !== null ? cv.dir + cv.v + '%' : cv && cv.note ? '另訂' : '未設定')));
-      if (cv) cbox.appendChild(axEl('small', '', ['分母：' + (cv.den || '未定義'), cv.lv ? '層級：' + cv.lv : '', '狀態：' + cv.st + (cv.by ? '（' + cv.by + ' ' + cv.dt + '）' : ''), cv.note ? '類別：' + cv.note : '', cv.why ? '依據：' + cv.why : ''].filter(Boolean).join('｜')));
-      cbox.appendChild(axEl('small', 'hc-wait', '達成率＝實際完成衛教之符合條件人數 ÷ 符合衛教條件之人數；分母需院內資料，目前未計算。'));
-      td0.appendChild(cbox);
       var ep = (H.E && H.E.by[pk]) || [];
       if (ep.length) {
         var eb = axEl('div', 'hc-epi'); eb.appendChild(axEl('b', '', '疾病負擔參考（≥65 歲；不可換算為衛教配額）'));
@@ -9838,10 +9904,10 @@ function hcMatrixCard(host, H, F0) {
       b.addEventListener('click', function () { det.hidden = !det.hidden; b.setAttribute('aria-expanded', String(!det.hidden)); });
       rows.push(tr); rows.push(det);
     });
-    if (tot.t) { var tt = document.createElement('tr'); tt.className = 'hc-tot'; tt.appendChild(axEl('th', '', '合計（有每月目標者）')); tt.appendChild(axEl('td', 'num', '')); var t2 = axEl('td', 'hc-vol'); t2.appendChild(axEl('b', '', hcF1(tot.a))); t2.appendChild(document.createTextNode('／' + tot.t)); t2.appendChild(axEl('span', 'hc-tm ' + (tot.a >= tot.t ? 'met' : 'miss'), Math.round(tot.a / tot.t * 100) + '%')); tt.appendChild(t2); for (var z = 0; z < 7; z++) tt.appendChild(axEl('td', '', '')); rows.push(tt); }
-    body.appendChild(pcTable(['疾病面向', '人次', '每月人次 實際／目標', '教回完全', 'K1', 'K2', 'K3', 'K4', 'K5', '涵蓋率目標'], rows, 'hc-mx'));
+    if (tot.t) { var tt = document.createElement('tr'); tt.className = 'hc-tot'; tt.appendChild(axEl('th', '', '合計（有每月目標者）')); tt.appendChild(axEl('td', 'num', '')); var t2 = axEl('td', 'hc-vol'); t2.appendChild(axEl('b', '', hcF1(tot.a))); t2.appendChild(document.createTextNode('／' + tot.t)); t2.appendChild(axEl('span', 'hc-tm ' + (tot.a >= tot.t ? 'met' : 'miss'), Math.round(tot.a / tot.t * 100) + '%')); tt.appendChild(t2); for (var z = 0; z < 6; z++) tt.appendChild(axEl('td', '', '')); rows.push(tt); }
+    body.appendChild(pcTable(['疾病面向', '人次', '每月人次 實際／目標', '教回完全', 'K1', 'K2', 'K3', 'K4', 'K5'], rows, 'hc-mx'));
     var tn = H.T && H.T.n ? H.T.n : { ok: 0, draft: 0 };
-    body.appendChild(axEl('p', 'hc-leg', '✓ 達目標 ' + cnt.met + '　↓ 未達 ' + cnt.miss + '｜目標設定：核定 ' + tn.ok + '、草案 ' + tn.draft + (H.T && H.T.err ? '｜「照護目標設定」尚未開放，沿用照護平台指標定義目標值' : '') + (H.E && H.E.err ? '｜「照護流行病學參考」尚未開放' : '')));
+    body.appendChild(axEl('p', 'hc-leg', '✓ 達目標 ' + cnt.met + '　↓ 未達 ' + cnt.miss + (H.T && H.T.rows && Object.keys(H.T.rows).some(function (k) { return /\|VOL$/.test(k) && H.T.rows[k].lv === '疾病包登錄'; }) ? '｜每月目標人次來自照護平台疾病包登錄' : '') + '｜其他目標設定：核定 ' + tn.ok + '、草案 ' + tn.draft + (H.T && H.T.err ? '｜「照護目標設定」尚未開放，沿用照護平台指標定義目標值' : '') + (H.E && H.E.err ? '｜「照護流行病學參考」尚未開放' : '')));
     var hz = HC_HORIZ.concat(HC_HIST).filter(function (pk) { return H.M[pk]; });
     if (hz.length) {
       var r2 = hz.map(function (pk) { var tr = document.createElement('tr'); tr.appendChild(axEl('th', '', hcPackName(H, pk))); var v = hcPool(H, pk, 'C1', F); tr.appendChild(axEl('td', 'num', String(v.x || 0))); tr.appendChild(hcCell(hcPool(H, pk, 'C3', F), false)); tr.appendChild(hcCell(hcPool(H, pk, 'C4', F), false)); if (HC_HIST.indexOf(pk) >= 0) tr.className = 'hc-hist'; return tr; });
@@ -9916,6 +9982,7 @@ function hcKudosCfg(H, err) {
 function axHcGroup(host, d) {
   return hcLoad().then(function (H) {
     var st = HC.st; function F() { return gxFrame(H.yms, st.win); }
+    hcAttachSrv(H);
     var people = H.P ? Object.keys(H.P.reduce(function (o, r) { o[r.who] = 1; return o; }, {})).length : 0;
     if (!KD.st.hcKudos) KD.st.hcKudos = { per: 'Q', off: 0 }; /* 新版紀錄自 2026-11 起：預設本季（進行中） */
     var kd = people >= 3 ? kdMount(host, hcKudosCfg(H)) : Promise.resolve();
@@ -9928,6 +9995,14 @@ function axHcGroup(host, d) {
         all: function (h) { return hcAllCard(h, H, F()); },
         dq: function (h) { return hcDqCard(h, H, F()); }
       };
+      var srcs = Object.keys(HC.srcSeen).sort();
+      if (srcs.length) {
+        var lb = axEl('label', 'cc-sel hc-src'); lb.appendChild(axEl('span', '', '病人來源'));
+        var sl = document.createElement('select'); ['ALL'].concat(srcs).forEach(function (v) { var o = new Option(HC_SRC_TXT[v] || v, v); if (v === (st.src || 'ALL')) o.selected = true; sl.appendChild(o); });
+        sl.addEventListener('change', function () { st.src = sl.value; host.innerHTML = ''; axHcGroup(host, d); });
+        lb.appendChild(sl); host.appendChild(lb);
+        if ((st.src || 'ALL') !== 'ALL') host.appendChild(axEl('p', 'ax-muted', '目前只顯示「' + (HC_SRC_TXT[st.src] || st.src) + '」來源；SPC 管制圖與核對碼一律為全部來源。'));
+      }
       gxGroup(host, B, ['kpi', 'spc', 'mx', 'yrs', 'all', 'dq'], { limits: ['kpi', 'spc'], spc: ['spc'], win: ['kpi', 'mx', 'all', 'dq'] });
     });
   }, function (e) { host.dataset.nofold = '1'; var rb = isRebuild(e); if (rb) axRebuildRetry(); host.appendChild(axEl('div', 'chart ax-card state', rb ? REBUILD_TEXT : '全人用藥教育資料暫時無法載入：' + ((e && e.message) || e) + '。下方保留後台圖表供核對。')); });
@@ -9939,7 +10014,7 @@ function axHcPersonal(host, d) {
   var name = dashName(S.dashId) || d.name, pgy = /PGY/.test(name), ugy = /UGY/.test(name);
   var sec = axEl('section', 'chart ax-card ax-gsec'); sec.dataset.ax = 'hcp'; host.appendChild(sec);
   axGrowthHead(sec, '病人用藥教育（疾病全人照護平台）', (self ? '本人' : '指派對象') + '近 12 個月｜不排名、不與他人比較',
-    '<b>資料</b>：疾病全人照護平台「個人月報」，依姓名對應本頁對象（同名時不顯示）。<br><b>新版紀錄</b>（' + HC_NEWFROM + ' 起）才有教回、不當用藥行為與追蹤欄位；舊系統紀錄只計人次。<br>' + (pgy ? '<b>EPA 對應</b>：門診病人用藥指導為 EPA 3（門診病人藥品諮詢）證據；住院病人為 EPA 5（住院病人用藥評估）佐證。照護平台月報尚未區分門診／住院，先列合計。' : ugy ? '實習期間的病人用藥指導經驗；不作為評分依據。' : '教師本人的病人用藥指導紀錄。'), false);
+    '<b>資料</b>：疾病全人照護平台「個人月報」，依姓名對應本頁對象（同名時不顯示）。<br><b>新版紀錄</b>（' + HC_NEWFROM + ' 起）才有教回、不當用藥行為與追蹤欄位；舊系統紀錄只計人次。<br>' + (pgy ? '<b>EPA 對應</b>：門診病人用藥指導為 EPA 3（門診病人藥品諮詢）證據；住院病人為 EPA 5（住院病人用藥評估）佐證。照護平台 v2.8 起學習者月報分列門診與住院人次（同病人同日同面向計 1）。' : ugy ? '實習期間的病人用藥指導經驗；不作為評分依據。' : '教師本人的病人用藥指導紀錄。'), false);
   var body = axEl('div'); sec.appendChild(body); body.appendChild(axEl('div', 'state', '載入中…'));
   return hcLoad().then(function (H) {
     body.innerHTML = '';
@@ -9960,13 +10035,23 @@ function axHcPersonal(host, d) {
     var pks = Object.keys(t.pk).filter(function (k) { return t.pk[k]; }).sort(function (a, b) { return t.pk[b] - t.pk[a]; });
     if (pks.length) body.appendChild(axEl('p', 'hc-pks', '指導面向：' + pks.map(function (k) { return hcPackName(H, k) + ' ' + t.pk[k]; }).join('、')));
     if (!mine.length) body.appendChild(axEl('p', 'ax-muted', nm ? '近 12 個月在照護平台沒有「' + nm + '」的紀錄。於疾病全人照護平台登錄病人用藥指導後，下次資料更新會出現在這裡。' : '無法判定本頁對象姓名。'));
+    /* v4.9：學習者月報（照護平台「儀表板_學習者」）—自到職日累計、首次教回、教師覆核 */
+    var lr = (H.L || []).filter(function (r) { return nm && axName(r.who) === nm; }), lst = lr.length ? (lr[lr.length - 1].start || '').slice(0, 7) : '', lc = lr.filter(function (r) { return !lst || r.ym >= lst; });
+    var LT = lc.reduce(function (o, r) { ['n', 'f1', 'f1d', 'f2', 'f2d', 'ind', 'pres', 'rev', 'rp', 'rd', 'beh', 'ep', 'epO', 'epI'].forEach(function (k) { o[k] += r[k] || 0; }); if (r.hasEp) o.hasEp = true; r.pks.forEach(function (k) { o.pk[k] = 1; }); return o; }, { n: 0, f1: 0, f1d: 0, f2: 0, f2d: 0, ind: 0, pres: 0, rev: 0, rp: 0, rd: 0, beh: 0, ep: 0, epO: 0, epI: 0, hasEp: false, pk: {} });
+    if (lc.length && (pgy || ugy)) {
+      var g2 = axEl('div', 'ax-gtiles'); body.appendChild(axEl('h4', 'hc-sub', '學習歷程（' + (lst ? '到職日 ' + lr[lr.length - 1].start + ' 起累計' : '全部月份') + '）')); body.appendChild(g2);
+      g2.appendChild(LT.hasEp ? axTile('累計衛教人次', '<b>' + LT.ep + '</b><small> 人次</small>', '門診 ' + LT.epO + '・住院 ' + LT.epI + '；紀錄 ' + LT.n + ' 筆；涵蓋 ' + Object.keys(LT.pk).length + ' 個面向') : axTile('累計衛教件數', '<b>' + LT.n + '</b><small> 件</small>', '涵蓋 ' + Object.keys(LT.pk).length + ' 個面向'));
+      g2.appendChild(axTile('首次教回完全理解', LT.f1d ? '<b>' + pct(LT.f1, LT.f1d) + '</b><small>%</small>' : '—', LT.f1d ? LT.f1 + '／' + LT.f1d + '；補強後最終 ' + LT.f2 + '／' + LT.f2d : '尚無教回紀錄'));
+      g2.appendChild(axTile('教師覆核', '<b>' + LT.rd + '</b><small>／' + (LT.rd + LT.rp) + '</small>', '待覆核 ' + LT.rp + '；督導 獨立 ' + LT.ind + '・在場 ' + LT.pres + '・覆核 ' + LT.rev));
+    } else if (H.lErr && (pgy || ugy)) body.appendChild(axEl('p', 'ax-muted', H.lErr.code === 'NO_KEY' ? '「照護學習者」設為「只看本人」：目前角色或檢視對象無法讀取，改以個人月報近 12 個月計。' : '學習者月報暫時無法讀取。'));
     if (pgy) {
-      var e3 = t.nn || 0, e3s = e3 >= 10 ? '已達公版 10 例' : '尚差 ' + (10 - e3) + ' 例';
-      var rows = [pcTr(['EPA 3 門診病人藥品諮詢', '病人衛教紀錄 ≥10 例（訓練期間）', e3 + ' 人次（新版）', e3s + '；門診／住院尚未分流，以合計計']), pcTr(['EPA 5 住院病人用藥評估', '住院用藥評估或建議紀錄 ≥10 例', '佐證', '主要證據為 PCNE 住院用藥評估紀錄；本表不計入'])];
+      var split = lc.length && LT.hasEp, e3 = split ? LT.epO : lc.length ? LT.n : (t.nn || 0), e3s = e3 >= 10 ? '已達公版 10 例' : '尚差 ' + (10 - e3) + ' 例';
+      var rows = [pcTr(['EPA 3 門診病人藥品諮詢', '病人衛教紀錄 ≥10 例（訓練期間）', e3 + ' 人次' + (lc.length ? '（自到職日累計' + (split ? '，病人來源＝門診' : '') + '）' : '（近 12 個月新版）'), e3s + (split ? '；人次＝同病人同日同面向計 1' : '；門診／住院尚未分流，以合計計')]),
+        pcTr(['EPA 5 住院病人用藥評估', '住院用藥評估或建議紀錄 ≥10 例', split ? LT.epI + ' 人次（住院／出院前衛教，佐證）' : '佐證', '主要證據為 PCNE 住院用藥評估紀錄；衛教人次僅作佐證'])];
       body.appendChild(pcTable(['EPA', '公版門檻', '病人用藥教育紀錄', '判讀'], rows));
-      body.appendChild(axEl('p', 'ax-muted', '門檻來源：社團法人臺灣臨床藥學會《台灣藥師可信賴專業活動 EPAs》2023 年第一版（2023-11-02），EPA 3、EPA 5「6.評估進展所需相關資訊（3）學習紀錄」。本表計近 12 個月新版紀錄，非完整訓練期間累積；職場直接觀察（每月 ≥3 次）不在此計算。'));
+      body.appendChild(axEl('p', 'ax-muted', '門檻來源：社團法人臺灣臨床藥學會《台灣藥師可信賴專業活動 EPAs》2023 年第一版（2023-11-02），EPA 3、EPA 5「6.評估進展所需相關資訊（3）學習紀錄」。本表優先以照護平台「學習者月報」自到職日累計（需授權名單填到職日），無學習者月報時才以近 12 個月新版紀錄計；職場直接觀察（每月 ≥3 次）不在此計算。'));
       var ep = document.querySelector('#charts [data-ax="epaplan"]');
-      if (ep) Array.prototype.forEach.call(ep.querySelectorAll('tr'), function (tr) { var h = tr.firstElementChild; if (!h || !/^EPA\s*3\b/.test(h.textContent.trim()) || tr.querySelector('.hc-epa')) return; var td = tr.children[3] || tr.lastElementChild; td.appendChild(axEl('small', 'hc-epa', '病人用藥教育（疾病全人照護平台）：近 12 個月 ' + (t.nn || 0) + ' 人次')); });
+      if (ep) Array.prototype.forEach.call(ep.querySelectorAll('tr'), function (tr) { var h = tr.firstElementChild; if (!h || !/^EPA\s*3\b/.test(h.textContent.trim()) || tr.querySelector('.hc-epa')) return; var td = tr.children[3] || tr.lastElementChild; td.appendChild(axEl('small', 'hc-epa', '病人用藥教育（疾病全人照護平台）：' + (lc.length ? '自到職日累計 ' + LT.n : '近 12 個月 ' + (t.nn || 0)) + ' 人次')); });
     }
     S.ck = S.ck || {}; S.ck.hc = { ok: true, n: t.nn || 0, old: (t.n || 0) - (t.nn || 0), tb: t.tb || 0, tbd: t.tbd || 0 };
   }).catch(function (e) { body.innerHTML = ''; body.appendChild(axEl('div', 'state', e && e.code === 'NO_KEY' ? '照護平台月報尚未開放。' : '病人用藥教育資料暫時無法載入：' + ((e && e.message) || e))); });
@@ -9975,7 +10060,7 @@ function axHcPersonal(host, d) {
   AX_PANELS['全人用藥教育'] = axHcGroup;
   DASH_LAYOUT['全人用藥教育'] = { order: ['ax:hcKudos', 'ax:hcKpi', 'ax:hcSpc', 'ax:hcMx', 'ax:hcYears', 'ax:hcAll', 'ax:hcDq'], collapse: [/./], collapseTitle: '後台原始圖表（核對用：月報是否已載入）' };
   DASH_CATS.forEach(function (c) { if (c.key !== 'clinic') return; var i = c.names.indexOf('衛教諮詢成效'); if (i >= 0) c.names.splice(i, 1, '全人用藥教育'); else if (c.names.indexOf('全人用藥教育') < 0) c.names.splice(1, 0, '全人用藥教育'); c.desc = '藥事照護介入、全人用藥教育、連貫照護與諮詢服務的產出與成效'; });
-  ['照護面向月報', '照護指標定義', '照護個人月報', '儀表板_面向月報', '儀表板_個人月報'].forEach(function (t) { QUERY_HIDDEN_KD[t] = 1; });
+  ['照護面向月報', '照護指標定義', '照護個人月報', '儀表板_面向月報', '儀表板_個人月報', '照護管制', '照護學習者', '儀表板_管制', '儀表板_學習者'].forEach(function (t) { QUERY_HIDDEN_KD[t] = 1; });
   if (typeof CK_NAV === 'object') CK_NAV.hcp = '用藥教育';
 })();
 
