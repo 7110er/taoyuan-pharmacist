@@ -1399,7 +1399,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '5.1.0';
+var APP_VERSION = '5.2.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -10414,7 +10414,7 @@ function pcSvcCard(host, M, F, re) {
     if (s.k === 'CON') { var TR = pcSum(M, F, '轉銜時點'), top = Object.keys(TR).filter(function (k) { return !/未填|上線前|無法/.test(k); }).sort(function (a, b) { return TR[b].n - TR[a].n; })[0]; dl.appendChild(axEl('dt', '', '最常見轉銜')); dl.appendChild(axEl('dd', '', top ? top + ' ' + TR[top].n : '新題累積中')); }
     art.appendChild(dl);
     art.appendChild(pcsSpark(pcsMonthly(M, F, s), s.name + ' 每月件數'));
-    var dr = axEl('p', 'pcs-diff'); dr.appendChild(document.createTextNode('vs 前期：件數 ')); dr.appendChild(pcsDelta(c.n, p ? p.n : null));
+    var dr = axEl('p', 'pcs-diff'); dr.appendChild(document.createTextNode('本期 ' + c.n + '｜前期 ' + (p ? p.n : '—') + '｜差 ')); dr.appendChild(pcsDelta(c.n, p ? p.n : null)); if (p && p.n < 5) dr.appendChild(document.createTextNode('（前期 <5 件，不宜解讀）'));
     if (c.ad >= 10 && p && p.ad >= 10) { dr.appendChild(document.createTextNode('｜接受 ')); dr.appendChild(pcsDelta(c.a1 / c.ad, p.a1 / p.ad, true)); }
     art.appendChild(dr);
     if (!c.n) art.appendChild(axEl('small', '', s.unit ? '照護單位為新題，2026-11-12 起累積' : '期間內無紀錄：確認是否無個案或服務線選錯'));
@@ -10731,7 +10731,7 @@ function pcxKpis(box, M, F, keys, extra) {
   return K;
 }
 function pcxDefs(box, txt) { var d = axEl('details', 'pcx-def'); d.appendChild(axEl('summary', '', '定義與資料來源')); var p = axEl('div', ''); p.innerHTML = txt; d.appendChild(p); box.appendChild(d); }
-var PCX_DEF = '<b>接受率</b>＝A1 ÷（A1＋A2），A3（不明、未提出）不入分母；<b>完全執行</b>＝A1.1 ÷（A1＋A2）；<b>問題解決</b>＝O1 ÷（O1–O3），O3.4 列入分母、不算解決；<b>結果評估完成</b>＝O1–O3 ÷ 新表單紀錄（O0.1、未填為未完成）。<br>'
+var PCX_DEF = '<b>接受率</b>＝A1 ÷（A1＋A2），僅計已知接受狀態者；A3（不明、未提出）與空值不入分母；<b>完全執行</b>＝A1.1 ÷（A1＋A2）；<b>問題解決</b>＝O1 ÷（O1–O3），O3.4（無需或無法解決）列入分母（保守口徑）、不算解決，O0.1 與未填另列；<b>結果評估完成</b>＝O1–O3 ÷ 新表單紀錄。<br><b>統計單位</b>為照會紀錄（一筆一個主要問題），不等於病人數、DRP 數或介入提案數；期間含進行中的本月，本月資料未完整。<br>'
   + '<b>小樣本</b>：分母 <5 只顯示分子／分母；5–19 附 95% 信賴區間（Wilson）。<br><b>來源</b>：病例導向討論紀錄 PCNE-DRPs（PCNE V9.1）經 PcneAgg 彙總；只代表藥師已介入、已登錄的問題，不代表全院用藥品質。不含病歷號、姓名、照會內容。';
 
 /* ---------- 服務線專屬 ---------- */
@@ -10811,11 +10811,11 @@ function pcxSvcDrill(box, M, F, s, close) {
 
 /* ---------- 疾病專屬 ---------- */
 var PCX_DISX = {
-  CAD: [['C1.5', 'C3.1'], '抗血小板與降血脂治療的遺漏與劑量'], AMI: [['C4.1', 'C4.2', 'C1.5'], '雙重抗血小板療程、出院必要用藥遺漏'], ACS: [['C3.2', 'C1.3'], '抗凝血劑腎功能劑量、出血風險併用'],
-  HF: [['C1.5', 'C3.1', 'C1.1'], '核心用藥遺漏與劑量調整、應避免藥品'], STROKE: [['C1.1', 'C2.1'], '抗栓藥選擇、吞嚥困難的劑型'], TBI: [['C4.2'], '預防性抗癲癇藥療程、鎮靜藥'], DEMENTIA: [['C1.1', 'C4.2'], '抗膽鹼負荷、抗精神病藥使用；與高齡看板連動'],
-  ASTHMA: [['C7.8', 'C7.10'], '吸入器操作與衛教介入'], COPD: [['C7.8', 'C4.2'], '吸入器操作、急性惡化類固醇與抗生素療程'], AKD: [['C3.2', 'C1.1'], '腎毒性藥品、腎功能變動期的劑量再調整'], CKD: [['C3.2', 'C3.4', 'C1.1'], '腎功能劑量調整、禁忌藥品'],
-  DM: [['C3.2', 'C1.1'], '低血糖風險藥品、腎功能相關劑量'], HNC: [['C3.1', 'C3.2', 'C1.3', 'C1.5'], '抗癌藥劑量、支持療法、交互作用、不良反應'], LUNGCA: [['C3.1', 'C3.2', 'C1.3', 'C1.5'], '口服標靶藥交互作用、劑量、支持療法'], BREASTCA: [['C3.1', 'C3.2', 'C1.3', 'C1.5'], '內分泌與標靶治療、交互作用、支持療法'], CRC: [['C3.1', 'C3.2', 'C1.3', 'C1.5'], '化療劑量、支持療法、不良反應'],
-  TJR: [['C4.1', 'C4.2'], '靜脈血栓預防與預防性抗生素療程、止痛'], DDH: [['C3.1', 'C3.2'], '依體重的兒科劑量、止痛'], NRDS: [['C3.', 'C6.'], '新生兒劑量與給藥過程'], PAIN: [['C3.2', 'C1.3', 'C1.4'], '鴉片類劑量與併用、NSAID 安全性'], INF: [['C3.', 'C4.', 'C9.1', 'C1.1'], '抗微生物藥劑量（腎功能）、療程、濃度監測、選藥']
+  CAD: [['C1.5', 'C3.1'], '已確診冠狀動脈疾病之抗栓與降脂治療遺漏與劑量；依 ACS／PCI 時間、口服抗凝與出血風險判定，不以單一藥名判定'], AMI: [['C4.1', 'C4.2', 'C1.5'], '本次 MI 與 PCI 後之個體化 DAPT 療程與出院二級預防用藥；非所有 AMI 皆固定 12 個月'], ACS: [['C1.1', 'C1.5', 'C3.2', 'C1.3'], 'ACS 急性期與出院抗栓選擇、DAPT、獨立抗凝適應症（如 AF、VTE）與出血風險；確定不當併用才記 C1.3'],
+  HF: [['C1.5', 'C3.1', 'C1.1'], '依 HFrEF／HFmrEF／HFpEF 表型、血壓、心率、鉀與腎功能核對 GDMT 遺漏與最大可耐受劑量；不假設各表型皆需四大基石'], STROKE: [['C1.1', 'C2.1'], '依缺血／出血、AF 與病程核對抗栓方案；吞嚥或管灌病人之劑型可處理性（臨床證實不適宜才記 C2.1）'], TBI: [['C4.2'], '預防性與治療性抗癲癇藥之目的與療程（不可混為癲癇治療而驟停）、鎮靜藥之意識與呼吸風險'], DEMENTIA: [['C1.1', 'C4.2'], '強抗膽鹼負荷與抗精神病藥使用候選；確認認知狀態、行為症狀與非藥物處置後才判定，不由藥名自動停藥；與高齡看板連動'],
+  ASTHMA: [['C7.8', 'C7.10'], '吸入器操作之觀察式檢查與含 ICS 控制方案核對；觀察到錯誤才記 C7.8，確有理解障礙才記 C7.10'], COPD: [['C7.8', 'C4.2'], '穩定期吸入器技術與維持處方；急性惡化之抗菌藥與全身性類固醇療程（確認不合理延長才記 C4.2）'], AKD: [['C3.2', 'C1.1'], '依 SCr 變動、尿量與給藥歷程檢視腎毒性藥品；非穩態腎功能下確實過高才記 C3.2；停藥與再啟用另列追蹤'], CKD: [['C3.2', 'C3.4', 'C1.1'], '依仿單與具時效之腎功能（必要時 CrCl）核對劑量、頻次與禁忌；以 C3.2、C3.4、C1.1 分別記錄被確認的不同原因'],
+  DM: [['C3.2', 'C1.1', 'C1.5', 'C9.1'], 'insulin、sulfonylurea 相關低血糖與個別化目標；符合適應症之 ASCVD、HF、CKD 心腎保護療法遺漏'], HNC: [['C3.1', 'C3.2', 'C1.3', 'C1.5', 'C2.1'], '化療劑量與腎肝功能、分級止吐預防、吞嚥與管灌劑型安全、黏膜炎與營養支持、交互作用'], LUNGCA: [['C3.1', 'C3.2', 'C1.3', 'C1.5'], '依癌別與分子檢測核對適應症；口服標靶藥之 CYP、胃酸抑制藥、QT 交互作用與仿單劑量（逐成分，不套用整類）'], BREASTCA: [['C3.1', 'C3.2', 'C1.3', 'C1.5'], '內分泌與標靶藥之適應症、劑量與支持照護；tamoxifen 併強 CYP2D6 抑制藥（如 paroxetine）列高優先審查'], CRC: [['C3.1', 'C3.2', 'C1.3', 'C9.1'], '依方案與體表面積、腎功能、毒性調整化療；capecitabine／5-FU 之 DPD 風險；capecitabine＋warfarin 之 INR 與出血監測'],
+  TJR: [['C4.1', 'C4.2', 'C1.5'], '靜脈血栓預防之藥物與機械預防及持續期間；手術預防性抗生素之選藥、時機與療程（通常不超過 24 小時）；術後鎮痛'], DDH: [['C3.1', 'C3.2'], '主軸為骨科評估與輔具照護；僅於實際使用鎮痛、麻醉或手術相關藥物時，依具版次之兒科藥物資料核對 mg/kg 劑量【參考資料版本待指定】'], NRDS: [['C3.1', 'C3.2', 'C6.1', 'C6.2', 'C6.3', 'C6.4', 'C6.6'], 'surfactant 適應條件、mg/kg 劑量、給藥時機與途徑、呼吸支持與安全監測；本項與台灣單位實務差異大'], PAIN: [['C1.3', 'C1.4', 'C1.5', 'C3.1', 'C3.2'], '區分癌痛與非癌痛；opioid 與 benzodiazepine 等特定併用、NSAID 之腎胃腸風險；兼顧過度鎮靜與治痛不足'], INF: [['C1.1', 'C1.5', 'C3.1', 'C3.2', 'C3.3', 'C3.4', 'C4.1', 'C4.2', 'C9.1'], '以感染症候群與病原證據評估選藥、劑量與頻次、腎功能調整、療程與必要監測（vancomycin 以 AUC 導向為嚴重 MRSA 情境）']
 };
 var PC_DIS_COLS = [['心血管疾病', ['CAD', ['ACS 群組', ['AMI', 'ACS']], 'HF']], ['腦神經與認知疾病', ['STROKE', 'TBI', 'DEMENTIA']], ['呼吸系統疾病', ['ASTHMA', 'COPD']], ['腎臟疾病', ['AKD', 'CKD']], ['內分泌與代謝疾病', ['DM']],
   ['腫瘤疾病', ['HNC', 'LUNGCA', 'BREASTCA', 'CRC']], ['骨科與肌肉骨骼疾病', ['TJR', 'DDH']], ['兒科與新生兒疾病', ['NRDS']], ['跨專科症狀與照護', ['PAIN', 'INF']], ['高齡照護', ['GER']]];
@@ -10825,7 +10825,7 @@ function pcxDisDrill(box, M, F, pk, close) {
   if (pk === 'GER') return pcxGerDrill(box, M, F, close);
   var X = PCX_DISX[pk] || [[], ''], km = 'dis:' + pk, kc = 'co:' + pk, ki = 'inf:' + pk, SL = pcSum(M, F, '切片');
   var nm = (SL[km] || pcsZero()).n, nc = (SL[kc] || pcsZero()).n, ni = (SL[ki] || pcsZero()).n;
-  pcxHead(box, PC_DIS_NAME[pk] + '｜專屬儀表板', pcPeriod(F) + '｜聚焦：' + X[1] + '【聚焦面向為院內初稿，待臨床藥學組確認】', close);
+  pcxHead(box, PC_DIS_NAME[pk] + '｜專屬儀表板', pcPeriod(F) + '｜聚焦：' + X[1] + '【聚焦面向已依指引覆核（Claude 代審；Sean 授權 2026-11-13），個案判定仍須臨床覆核；指引版本逐條查證未完成】', close);
   if (!nm && !nc && !ni) { box.appendChild(axEl('p', 'ax-muted', '期間內尚無紀錄。若有個案，請確認「主要影響疾病照護」與「此病人所有診斷」是否勾選此疾病；可切換較長統計期間。')); pcxDefs(box, PCX_DEF); return; }
   var main = pcxS(M, F, nm ? km : nc ? kc : ki), basis = nm ? '主要疾病' : nc ? '共病' : '推定（舊表單）';
   var ex = [axTile('口徑', '<b>' + nm + '</b><small> 主要</small>', '共病 ' + nc + '｜推定 ' + ni + '（舊表單依藥名，另列不相加）')];
@@ -10855,25 +10855,27 @@ function pcxGerDrill(box, M, F, close) {
   var e3 = D.n, e4d = D.G.A1 + D.G.A2, e5 = DS['O1.1'] ? DS['O1.1'].n : 0, e5d = pcxN(DS, /^O[123]/), e5p = pcxN(DS, /^O0|^未填/), e6 = (DR['刪除藥品'] ? DR['刪除藥品'].n : 0) + (DR['同成分劑量減'] ? DR['同成分劑量減'].n : 0), bal = BAL['治療不足（C1.5／C3.1）'] ? BAL['治療不足（C1.5／C3.1）'].n : 0;
   var st = axEl('p', 'pcx-status'); st.textContent = (ageInfo || '年齡題狀態未知') + '｜' + (pimInfo || 'PIM 規則狀態未知'); box.appendChild(st);
   var g = axEl('div', 'ax-gtiles pcx-kpi'); box.appendChild(g);
-  g.appendChild(pcxTile('E1 高齡照會占比', pcxR(g65, g65 + lt), null));
+  var AGE = pcSum(M, F, '年齡層'), ageUnk = (AGE['未填'] ? AGE['未填'].n : 0) + (AGE['無法辨識'] ? AGE['無法辨識'].n : 0);
+  g.appendChild(pcxTile('E1 高齡照會占比', pcxR(g65, g65 + lt), '年齡已知 ' + (g65 + lt) + ' 筆｜未填或無法辨識 ' + ageUnk + ' 筆（不入分母）'));
   var off = { v: '待授權', s: 'PIM 規則庫簽核並授權後啟用', ok: false };
-  g.appendChild(pcxTile('E2 PIM 候選命中', pimOff ? off : pcxR(hit, g65)));
-  g.appendChild(axTile('E3 PIM 相關 DRP', '<b>' + (pimOff ? '—' : e3) + '</b><small> 筆</small>', '候選命中且原因為 C1.1–C1.4、C3.2、C4.2'));
-  g.appendChild(pcxTile('E4 PIM 介入完全執行', pimOff ? off : pcxR(D.A['A1.1'] || 0, e4d)));
-  g.appendChild(pcxTile('E5 PIM-DRP 完全解決', pimOff ? off : pcxR(e5, e5d), pimOff ? null : '結果評估完成 ' + pcvTxt(e5d, e5d + e5p) + '｜O3.4 不算解決'));
-  g.appendChild(pcxTile('E6 減藥或減量落實', pimOff ? off : pcxR(e6, e3), pimOff ? null : '刪除藥品＋同成分劑量減 ÷ E3；需搭配 E7'));
+  var PT = pcSum(M, F, '高齡 PIM 層級'), PCd = pcSum(M, F, '高齡 PIM 條件'), pt = function (D, re) { return Object.keys(D).filter(function (k) { return re.test(k); }).reduce(function (a, k) { return a + D[k].n; }, 0); };
+  g.appendChild(pcxTile('E2 PIM 候選命中（藥名）', pimOff ? off : pcxR(hit, g65), pimOff ? null : 'T1 逐名 ' + pt(PT, /^T1/) + '｜T2 類別延伸 ' + pt(PT, /^T2/) + '｜T3 舊版移表 ' + pt(PT, /^T3/) + '｜需條件確認 ' + pt(PCd, /^需/) + '（命中不等於確認）'));
+  g.appendChild(axTile('E3 候選且原因碼相符', '<b>' + (pimOff ? '—' : e3) + '</b><small> 筆</small>', '候選命中且原因為 C1.1–C1.4、C3.2、C4.2；未經個案確認'));
+  g.appendChild(pcxTile('E4 候選基礎：介入完全執行', pimOff ? off : pcxR(D.A['A1.1'] || 0, e4d)));
+  g.appendChild(pcxTile('E5 候選基礎：完全解決', pimOff ? off : pcxR(e5, e5d), pimOff ? null : '結果評估完成 ' + pcvTxt(e5d, e5d + e5p) + '｜O3.4 不算解決'));
+  g.appendChild(pcxTile('E6 候選基礎：減藥或減量', pimOff ? off : pcxR(e6, e3), pimOff ? null : '刪除藥品＋同成分劑量減 ÷ E3（醫囑異動，不證明 PIM 已解除）；需搭配 E7'));
   g.appendChild(pcxTile('E7 治療不足（平衡）', pcxR(bal, g65), null));
   if (!g65 && !lt) box.appendChild(axEl('p', 'pcs-note', '「病人年齡」為 2026-11 新題，尚無填答；以下圖表於累積後顯示。舊紀錄不回溯（裁決 D3）。'));
   var r1 = axEl('div', 'pcx-row'); box.appendChild(r1);
   var A = pcSum(M, F, '年齡層'); pcxBars(pcxPanel(r1, '年齡層 × 接受率（全部紀錄）', '只呈現年齡層，不呈現個別年齡'), A, { acc: true, order: ['0–17 歲', '18–64 歲', '65–74 歲', '75–84 歲', '≥85 歲', '未填', '無法辨識'], empty: '年齡題上線後累積' });
   if (g65) { var o = pcxS(M, F, 'ger:65'); pcxBars(pcxPanel(r1, '高齡原因碼 Pareto', '醒目＝PIM 相關原因與治療不足（平衡）'), o['原因碼'], { focus: ['C1.1', 'C1.2', 'C1.3', 'C1.4', 'C3.2', 'C4.2', 'C1.5', 'C3.1'], acc: true, top: 8 }); pcxBars(pcxPanel(r1, '高齡藥品類別', ''), o['藥品類別'], { acc: true, top: 8, skip: /^未涉及字典藥品$/ }); }
   var r2 = axEl('div', 'pcx-row'); box.appendChild(r2);
-  var p = pcxPanel(r2, 'PIM 處理鏈：命中 → 相關 DRP → 完全執行 → 完全解決', '院內簡化指標；非 CMS156、PQA 原版規格'); var ch = axEl('ol', 'pcx-chain');
-  [['≥65 歲紀錄', g65], ['PIM 候選命中', pimOff ? '待授權' : hit], ['PIM 相關 DRP', pimOff ? '—' : e3], ['完全執行 A1.1', pimOff ? '—' : (D.A['A1.1'] || 0)], ['完全解決 O1.1', pimOff ? '—' : e5]].forEach(function (x) { var li = axEl('li', ''); li.appendChild(axEl('b', '', String(x[1]))); li.appendChild(axEl('small', '', x[0])); ch.appendChild(li); });
+  var p = pcxPanel(r2, '候選處理鏈：命中 → 原因碼相符 → 完全執行 → 完全解決', '院內簡化指標，以藥名命中為基礎，未經個案確認；非 CMS156、PQA 原版規格；命中不自動產生 PCNE 問題或結果'); var ch = axEl('ol', 'pcx-chain');
+  [['≥65 歲紀錄', g65], ['PIM 候選命中', pimOff ? '待授權' : hit], ['候選且原因碼相符', pimOff ? '—' : e3], ['完全執行 A1.1', pimOff ? '—' : (D.A['A1.1'] || 0)], ['完全解決 O1.1', pimOff ? '—' : e5]].forEach(function (x) { var li = axEl('li', ''); li.appendChild(axEl('b', '', String(x[1]))); li.appendChild(axEl('small', '', x[0])); ch.appendChild(li); });
   p.appendChild(ch);
-  if (!pimOff) pcxBars(pcxPanel(r2, 'PIM 候選類別', '依「PCNE_藥品規則」已授權條目'), pcSum(M, F, '高齡 PIM 類別'), { top: 10 });
-  else pcxPanel(r2, 'PIM 規則庫', '規則表：教學資源「PCNE_藥品規則」。條目需簽核 AI 逐條對照 Beers 2023、PIM-Taiwan 原文並填「簽核者」，再由 Sean 於「授權啟用」填「是」，才進入 E2–E6。未授權前不計算，避免以未查證名單判定。');
-  pcxDefs(box, PCX_DEF + '<br><b>E1</b>＝≥65 歲 ÷ 有年齡紀錄；<b>E2</b>＝影響藥物命中已授權 PIM 規則 ÷ ≥65 歲；<b>E3</b>＝E2 且原因含 C1.1–C1.4、C3.2、C4.2；<b>E4</b>＝E3 中 A1.1 ÷（A1＋A2）；<b>E5</b>＝E3 中 O1.1 ÷ O1–O3；<b>E6</b>＝E3 中刪除藥品或同成分劑量減 ÷ E3；<b>E7</b>＝≥65 歲中原因含 C1.5 或 C3.1 ÷ ≥65 歲。<br>統計單位為照會紀錄，非病人或住院事件；需入出院處方比對的指標（候選處方淨減少率等）本平台無資料，未納入。');
+  if (!pimOff) pcxBars(pcxPanel(r2, 'PIM 候選規則（命中）', '依「PCNE_藥品規則」已授權條目；層級見 E2'), pcSum(M, F, '高齡 PIM 類別'), { top: 10 });
+  else pcxPanel(r2, 'PIM 規則庫', '規則表：教學資源「PCNE_藥品規則」。目前無已簽核並授權之 PIM 條目，E2–E6 不計算。');
+  pcxDefs(box, PCX_DEF + '<b>E1</b>＝≥65 歲 ÷ 年齡已知之照會（年齡題上線前、未填者不入分母並另列）；<b>E2</b>＝影響藥物名稱命中已授權 PIM 規則 ÷ ≥65 歲（T1 逐名＝Beers 2023 Table 2；T2 類別延伸＝Table 2 腳註 a；T3 舊版移表＝Table 8，逐名待原文逐字覆核；「需條件確認」＝規則含劑量、劑型、途徑、適應症或療程條件，表單無此資料）；<b>E3</b>＝E2 且原因含 C1.1–C1.4、C3.2、C4.2；<b>E4</b>＝E3 中 A1.1 ÷（A1＋A2）；<b>E5</b>＝E3 中 O1.1 ÷ O1–O3；<b>E6</b>＝E3 中刪除藥品或同成分劑量減 ÷ E3；<b>E7</b>＝≥65 歲中原因含 C1.5 或 C3.1 ÷ ≥65 歲（候選，不等於 START 確認）。<br>E2–E6 皆以藥名命中為基礎，不是確認的 PIM，也不是停藥指令；benzodiazepines、barbiturates 須安全漸減。PIM-Taiwan 條目尚未納入；條件式規則（aspirin、warfarin、抗精神病藥、PPI、NSAID 等）因表單無必要欄位，未啟用。統計單位為照會紀錄；需入出院處方比對之指標本平台無資料，未納入。');
 }
 
 /* ---------- 開關與歷史 ---------- */
@@ -10923,7 +10925,7 @@ function pcSvcCard(host, M, F, re) {
     if (s.k === 'CON') { var TR = pcSum(M, F, '轉銜時點'), top = Object.keys(TR).filter(function (k) { return !/未填|上線前|無法/.test(k); }).sort(function (a, b) { return TR[b].n - TR[a].n; })[0]; dl.appendChild(axEl('dt', '', '最常見轉銜')); dl.appendChild(axEl('dd', '', top ? top + ' ' + TR[top].n : '新題累積中')); }
     art.appendChild(dl);
     art.appendChild(pcsSpark(pcsMonthly(M, F, s), s.name + ' 每月件數'));
-    var dr = axEl('p', 'pcs-diff'); dr.appendChild(document.createTextNode('vs 前期：件數 ')); dr.appendChild(pcsDelta(c.n, p ? p.n : null));
+    var dr = axEl('p', 'pcs-diff'); dr.appendChild(document.createTextNode('本期 ' + c.n + '｜前期 ' + (p ? p.n : '—') + '｜差 ')); dr.appendChild(pcsDelta(c.n, p ? p.n : null)); if (p && p.n < 5) dr.appendChild(document.createTextNode('（前期 <5 件，不宜解讀）'));
     if (c.ad >= 20 && p && p.ad >= 20) { dr.appendChild(document.createTextNode('｜接受 ')); dr.appendChild(pcsDelta(c.a1 / c.ad, p.a1 / p.ad, true)); }
     art.appendChild(dr);
     if (!c.n) art.appendChild(axEl('small', '', s.unit ? '照護單位為新題，2026-11 起累積' : '期間內無紀錄'));
@@ -10950,19 +10952,20 @@ function pcDisCard(host, M, F, re) {
   var bar = axEl('div', 'pcv-disbar');
   bar.appendChild(axEl('span', '', '新表單 ' + nNew + ' 筆｜疾病可歸屬 ' + attr + '（' + (nNew ? Math.round(attr / nNew * 100) : 0) + '%）：主要 ' + at('主要疾病已歸屬') + '、僅共病 ' + at('僅共病可歸屬') + '、未歸屬 ' + at('未歸屬')));
   bar.appendChild(axEl('span', 'pcs-thr' + (nNew && attr / nNew < 0.7 ? ' low' : ''), '院內試行門檻 70%'));
-  if (PCX.dis === 'inf') { var IT = Object.keys(IF).reduce(function (s, k) { return s + IF[k].n; }, 0), IOK = Object.keys(IF).filter(function (k) { return !/^無法/.test(k); }).reduce(function (s, k) { return s + IF[k].n; }, 0); bar.appendChild(axEl('span', 'pcx-pn', '｜舊表單 ' + IT + ' 筆中推定 ' + IOK + ' 筆')); }
+  if (PCX.dis === 'inf') { var IT = Object.keys(IF).reduce(function (s, k) { return s + IF[k].n; }, 0), IOK = Object.keys(IF).filter(function (k) { return !/^無法/.test(k); }).reduce(function (s, k) { return s + IF[k].n; }, 0); bar.appendChild(axEl('span', 'pcx-pn', '｜舊表單 ' + IT + ' 筆中依藥名推定 ' + IOK + ' 筆（非診斷，可能含預防性或非典型用途）')); }
   sec.appendChild(bar);
   var key = function (map, pk) { return Object.keys(map).filter(function (k) { return k.indexOf(pk + ' ') === 0; })[0] || ''; };
   var holder = axEl('div', 'pcx-drill'), board = axEl('div', 'pcv-board pcx-board'); sec.appendChild(board);
-  var G = pcSum(M, F, '高齡'), gN = G['≥65 歲'] ? G['≥65 歲'].n : 0;
+  var G = pcSum(M, F, '高齡'), gN = G['≥65 歲'] ? G['≥65 歲'].n : 0, SLc = pcSum(M, F, '切片');
   var card = function (pk) {
-    var k = key(D, pk), o = k ? D[k] : null, n = o ? o.n : 0, ik = PCX.dis === 'inf' ? key(IF, pk) : '', ni = ik ? IF[ik].n : 0, c = axEl('article', 'pcv-dcard pcx-card' + (n || ni || (pk === 'GER' && gN) ? '' : ' empty'));
+    var k = key(D, pk), o = k ? D[k] : null, n = o ? o.n : 0, ik = PCX.dis === 'inf' ? key(IF, pk) : '', ni = ik ? IF[ik].n : 0, nco = (SLc['co:' + pk] || { n: 0 }).n, c = axEl('article', 'pcv-dcard pcx-card' + (n || ni || nco || (pk === 'GER' && gN) ? '' : ' empty'));
     c.appendChild(axEl('h5', '', PC_DIS_NAME[pk]));
     if (pk === 'GER') {
       c.appendChild(axEl('p', 'pcv-dn', gN + ' 筆')); c.appendChild(axEl('small', '', gN ? '≥65 歲（依病人年齡）｜PIM 指標需規則庫授權' : '年齡題 2026-11 上線後累積'));
-    } else if (!n && !ni) { c.appendChild(axEl('p', 'pcv-dn', '尚無紀錄')); c.appendChild(axEl('small', '', '確認是否無個案或漏選疾病')); }
+    } else if (!n && !ni && nco) { c.appendChild(axEl('p', 'pcv-dn', '主要 0 筆')); c.appendChild(axEl('small', '', '共病 ' + nco + ' 筆（此病人所有診斷含該疾病）')); }
+    else if (!n && !ni) { c.appendChild(axEl('p', 'pcv-dn', '尚無紀錄')); c.appendChild(axEl('small', '', '確認是否無個案或漏選疾病')); }
     else {
-      c.appendChild(axEl('p', 'pcv-dn', (n + ni) + ' 筆' + (ni ? '' : ''))); if (ni) c.appendChild(axEl('small', 'pcx-inftag', '勾選 ' + n + '＋推 ' + ni));
+      c.appendChild(axEl('p', 'pcv-dn', (n + ni) + ' 筆' + (ni ? '' : ''))); if (ni) c.appendChild(axEl('small', 'pcx-inftag', '勾選 ' + n + '＋依藥名推定 ' + ni + '（非診斷）'));
       if (o) {
         var p2 = DP[k + '｜P2'] ? DP[k + '｜P2'].n : 0, pt = ['P1', 'P2', 'P3'].reduce(function (s, z) { return s + (DP[k + '｜' + z] ? DP[k + '｜' + z].n : 0); }, 0);
         var d = o.G.A1 + o.G.A2, s1 = DS[k + '｜O1'] ? DS[k + '｜O1'].n : 0, sk = ['O1', 'O2', 'O3'].reduce(function (s, z) { return s + (DS[k + '｜' + z] ? DS[k + '｜' + z].n : 0); }, 0);
@@ -10996,14 +10999,14 @@ function pcDq22(sec, M) {
   var fixed = [['照護單位未填', '提醒', '新題上線後送出卻未填；請以「編輯回覆」補填'], ['建議時效未填', '提醒', '同上'], ['病人年齡未填', '提醒', '年齡題上線後送出卻未填'], ['病人年齡無法辨識（需 0–120 整數）', '紀錄問題', '請以「編輯回覆」改為足歲整數'],
     ['TDM 抽血時間未填', '提醒', 'TDM 服務線應填'], ['ADR 通報未填', '提醒', 'ADR 服務線應填'], ['轉銜時點未填', '提醒', '用藥連貫性服務線應填'],
     ['分支題填於非對應服務線', '紀錄問題', '服務線與分支題不一致，確認服務線是否選錯'], ['ADR 評估記為潛在問題（請確認）', '提醒', '已發生之不良反應通常為明顯問題；過敏史或預防性攔截可為潛在'],
-    ['照會日期早於 2024-01（請核對）', '紀錄問題', '年份疑似誤植；統計改以時間戳記歸月，請以「編輯回覆」更正'], ['照會日期晚於今天', '紀錄問題', '同上']];
+    ['照會日期早於 2024-01（請核對）', '紀錄問題', '日期早於表單最早填答日前一年（資料驅動下界）；暫以時間戳記歸月並於此列示，請以「編輯回覆」更正，更正後自動移除'], ['照會日期晚於今天', '紀錄問題', '同上']];
   fixed.forEach(function (f) { var n = Q[f[0]] ? Q[f[0]].n : 0; add(n ? f[1] : '通過', f[0], n ? n + ' 筆' : '無', f[2]); });
   var guard = Object.keys(Q).filter(function (k) { return /^選項無法辨識|^未辨識題目/.test(k); });
   add(guard.length ? '紀錄問題' : '通過', '未辨識題目／選項防護', guard.length ? guard.map(function (k) { return k + ' ' + Q[k].n; }).join('、') : '表單題目與選項皆在字典內', '表單改題或改選項後須同步更新 PcneAgg 字典，否則不納入統計');
   var pick = function (re) { return Object.keys(I).filter(function (k) { return re.test(k); })[0] || ''; };
   add('通過', '分母起算點', [pick(/新題首筆|新題尚無/), pick(/問題性質上線日/), pick(/^年齡題/)].filter(Boolean).join('；') || '—', '上線前送出的紀錄列「上線前未收集」，不列入新題分母');
   var pim = pick(/^PIM 規則/), inf = pick(/^疾病推定規則/);
-  add(/啟用 0 條|未建立/.test(pim) ? '提醒' : '通過', 'PIM 規則庫', pim || '—', '簽核 AI 逐條對照原文並填簽核者，Sean 授權啟用後才計算高齡 E2–E6');
+  add(/啟用 0 條|未建立/.test(pim) ? '提醒' : '通過', 'PIM 規則庫', pim || '—', 'T1／T2／T3＝Beers 2023 Table 2 逐名、腳註 a 類別延伸、Table 8 舊版移表；條件式規則與 PIM-Taiwan 條目未啟用；命中僅為候選，不等於確認 PIM');
   add(/未建立|啟用 0 條/.test(inf) ? '提醒' : '通過', '疾病推定規則', inf || '—', '僅用於舊表單；推定結果與勾選分開呈現');
   var h = axEl('h4', 'pc-h4', 'v2.2／v2.3 新題與防護檢查'), sc = sec.querySelector('.ax-scroll');
   sec.insertBefore(h, sc); sec.insertBefore(pcTable(['檢查項目', '判定', '結果', '說明'], rows, 'pc-dq'), sc);
