@@ -1399,7 +1399,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '5.2.0';
+var APP_VERSION = '5.3.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -10859,7 +10859,7 @@ function pcxGerDrill(box, M, F, close) {
   g.appendChild(pcxTile('E1 高齡照會占比', pcxR(g65, g65 + lt), '年齡已知 ' + (g65 + lt) + ' 筆｜未填或無法辨識 ' + ageUnk + ' 筆（不入分母）'));
   var off = { v: '待授權', s: 'PIM 規則庫簽核並授權後啟用', ok: false };
   var PT = pcSum(M, F, '高齡 PIM 層級'), PCd = pcSum(M, F, '高齡 PIM 條件'), pt = function (D, re) { return Object.keys(D).filter(function (k) { return re.test(k); }).reduce(function (a, k) { return a + D[k].n; }, 0); };
-  g.appendChild(pcxTile('E2 PIM 候選命中（藥名）', pimOff ? off : pcxR(hit, g65), pimOff ? null : 'T1 逐名 ' + pt(PT, /^T1/) + '｜T2 類別延伸 ' + pt(PT, /^T2/) + '｜T3 舊版移表 ' + pt(PT, /^T3/) + '｜需條件確認 ' + pt(PCd, /^需/) + '（命中不等於確認）'));
+  g.appendChild(pcxTile('E2 PIM 候選命中（藥名）', pimOff ? off : pcxR(hit, g65), pimOff ? null : 'T1 逐名 ' + pt(PT, /^T1/) + '｜T2 類別延伸 ' + pt(PT, /^T2/) + '｜T3 舊版移表 ' + pt(PT, /^T3/) + '｜T4 PIM-Taiwan ' + pt(PT, /^T4/) + '｜需條件確認 ' + pt(PCd, /^需/) + '（命中不等於確認）'));
   g.appendChild(axTile('E3 候選且原因碼相符', '<b>' + (pimOff ? '—' : e3) + '</b><small> 筆</small>', '候選命中且原因為 C1.1–C1.4、C3.2、C4.2；未經個案確認'));
   g.appendChild(pcxTile('E4 候選基礎：介入完全執行', pimOff ? off : pcxR(D.A['A1.1'] || 0, e4d)));
   g.appendChild(pcxTile('E5 候選基礎：完全解決', pimOff ? off : pcxR(e5, e5d), pimOff ? null : '結果評估完成 ' + pcvTxt(e5d, e5d + e5p) + '｜O3.4 不算解決'));
@@ -10875,7 +10875,7 @@ function pcxGerDrill(box, M, F, close) {
   p.appendChild(ch);
   if (!pimOff) pcxBars(pcxPanel(r2, 'PIM 候選規則（命中）', '依「PCNE_藥品規則」已授權條目；層級見 E2'), pcSum(M, F, '高齡 PIM 類別'), { top: 10 });
   else pcxPanel(r2, 'PIM 規則庫', '規則表：教學資源「PCNE_藥品規則」。目前無已簽核並授權之 PIM 條目，E2–E6 不計算。');
-  pcxDefs(box, PCX_DEF + '<b>E1</b>＝≥65 歲 ÷ 年齡已知之照會（年齡題上線前、未填者不入分母並另列）；<b>E2</b>＝影響藥物名稱命中已授權 PIM 規則 ÷ ≥65 歲（T1 逐名＝Beers 2023 Table 2；T2 類別延伸＝Table 2 腳註 a；T3 舊版移表＝Table 8，逐名待原文逐字覆核；「需條件確認」＝規則含劑量、劑型、途徑、適應症或療程條件，表單無此資料）；<b>E3</b>＝E2 且原因含 C1.1–C1.4、C3.2、C4.2；<b>E4</b>＝E3 中 A1.1 ÷（A1＋A2）；<b>E5</b>＝E3 中 O1.1 ÷ O1–O3；<b>E6</b>＝E3 中刪除藥品或同成分劑量減 ÷ E3；<b>E7</b>＝≥65 歲中原因含 C1.5 或 C3.1 ÷ ≥65 歲（候選，不等於 START 確認）。<br>E2–E6 皆以藥名命中為基礎，不是確認的 PIM，也不是停藥指令；benzodiazepines、barbiturates 須安全漸減。PIM-Taiwan 條目尚未納入；條件式規則（aspirin、warfarin、抗精神病藥、PPI、NSAID 等）因表單無必要欄位，未啟用。統計單位為照會紀錄；需入出院處方比對之指標本平台無資料，未納入。');
+  pcxDefs(box, PCX_DEF + '<b>E1</b>＝≥65 歲 ÷ 年齡已知之照會（年齡題上線前、未填者不入分母並另列）；<b>E2</b>＝影響藥物名稱命中已授權 PIM 規則 ÷ ≥65 歲（T1 逐名＝Beers 2023 Table 2；T2 類別延伸＝Table 2 腳註 a；T3 舊版移表＝Table 8（Sean 2026-11-13 陳述逐名已逐字核對）；T4＝PIM-Taiwan 2018 Table 1 逐名（全文已核對）；「需條件確認」＝規則含劑量、劑型、途徑、適應症或療程條件，表單無此資料）；<b>E3</b>＝E2 且原因含 C1.1–C1.4、C3.2、C4.2；<b>E4</b>＝E3 中 A1.1 ÷（A1＋A2）；<b>E5</b>＝E3 中 O1.1 ÷ O1–O3；<b>E6</b>＝E3 中刪除藥品或同成分劑量減 ÷ E3；<b>E7</b>＝≥65 歲中原因含 C1.5 或 C3.1 ÷ ≥65 歲（候選，不等於 START 確認）。<br>E2–E6 皆以藥名命中為基礎，不是確認的 PIM，也不是停藥指令；benzodiazepines、barbiturates 須安全漸減。PIM-Taiwan Table 2 疾病條件需診斷，未啟用；條件式規則（aspirin、warfarin、抗精神病藥、PPI、NSAID 等）因表單無必要欄位，未啟用。統計單位為照會紀錄；需入出院處方比對之指標本平台無資料，未納入。');
 }
 
 /* ---------- 開關與歷史 ---------- */
@@ -11006,7 +11006,7 @@ function pcDq22(sec, M) {
   var pick = function (re) { return Object.keys(I).filter(function (k) { return re.test(k); })[0] || ''; };
   add('通過', '分母起算點', [pick(/新題首筆|新題尚無/), pick(/問題性質上線日/), pick(/^年齡題/)].filter(Boolean).join('；') || '—', '上線前送出的紀錄列「上線前未收集」，不列入新題分母');
   var pim = pick(/^PIM 規則/), inf = pick(/^疾病推定規則/);
-  add(/啟用 0 條|未建立/.test(pim) ? '提醒' : '通過', 'PIM 規則庫', pim || '—', 'T1／T2／T3＝Beers 2023 Table 2 逐名、腳註 a 類別延伸、Table 8 舊版移表；條件式規則與 PIM-Taiwan 條目未啟用；命中僅為候選，不等於確認 PIM');
+  add(/啟用 0 條|未建立/.test(pim) ? '提醒' : '通過', 'PIM 規則庫', pim || '—', 'T1／T2／T3＝Beers 2023 Table 2 逐名、腳註 a 類別延伸、Table 8 舊版移表；T4＝PIM-Taiwan 2018 Table 1 逐名；條件式規則（含 PIM-Taiwan Table 2 疾病條件）未啟用；命中僅為候選，不等於確認 PIM');
   add(/未建立|啟用 0 條/.test(inf) ? '提醒' : '通過', '疾病推定規則', inf || '—', '僅用於舊表單；推定結果與勾選分開呈現');
   var h = axEl('h4', 'pc-h4', 'v2.2／v2.3 新題與防護檢查'), sc = sec.querySelector('.ax-scroll');
   sec.insertBefore(h, sc); sec.insertBefore(pcTable(['檢查項目', '判定', '結果', '說明'], rows, 'pc-dq'), sc);
