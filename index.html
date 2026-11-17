@@ -1234,6 +1234,7 @@ button.ck-card:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 .mq-sw .btn.on{background:#1e5e82;color:#fff;border-color:#1e5e82}
 .mq-box{order:-1;grid-column:1/-1;min-width:0}
 .mq-on>.ax-card,.mq-on>section.chart{display:none!important}
+body.mq-hide :has(> .mq-sw)>.ax-card,body.mq-hide :has(> .mq-sw)>section.chart{display:none!important}
 .mq-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
 .mq-status{font-size:.82rem;color:#33444f;background:#f4f6f7;border-radius:8px;padding:6px 10px;margin:6px 0 10px}
 .mq-status.warn{background:#fff4e0;color:#8a5a00}
@@ -1444,7 +1445,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '5.5.1';
+var APP_VERSION = '5.5.2';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -11600,6 +11601,7 @@ var MQ_HOST = null, MQ_BOX = null, MQ_M = null;
 function mqHosts() { return Array.prototype.filter.call(document.querySelectorAll('.mq-sw'), function (s) { return s.isConnected && s.parentElement; }).map(function (s) { return s.parentElement; }); }
 function mqSetView(v) {
   MQ.view = v;
+  document.body.classList.toggle('mq-hide', v !== 'analysis');
   mqHosts().forEach(function (h) { h.classList.toggle('mq-on', v !== 'analysis'); Array.prototype.forEach.call(h.querySelectorAll('.mq-sw button'), function (b) { var on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); }); });
   mqRender();
 }
