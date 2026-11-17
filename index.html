@@ -1475,7 +1475,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '6.0.0';
+var APP_VERSION = '6.0.1';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -2940,7 +2940,7 @@ function renderDashboard() {
   if (maxSubj !== null && !axPersonal) kp.appendChild(metaTile('受評人數', maxSubj.toLocaleString('zh-TW'), '本頁人數最多之群體圖表（不同人）'));
   if (personal && subjLabel) kp.appendChild(metaTile('檢視對象', subjLabel, '', true));
   if (typeof PLAN_ON !== 'undefined' && PLAN_ON && personal && d.subject && planIsPage(d)) kp.appendChild(planTile(d.subject, subjLabel));
-  var pcPage = /^(藥事照會介入成效|臨床藥學服務)$/.test(dashName(S.dashId) || d.name || ''); document.body.classList.toggle('pcg-page', pcPage);
+  var pcPage = /^(藥事照會介入成效|臨床藥學服務)$/.test(dashName(S.dashId) || d.name || ''); document.body.classList.toggle('pcg-page', pcPage); if (!pcPage) document.body.classList.remove('mq-hide');
   if (pcPage) { kp.innerHTML = ''; kp.appendChild(metaTile('臨床藥學服務件數', '載入中…', 'PCNE 彙總「全院」')); setChips([chip('lock', '只顯示彙總；不含病歷號、姓名與照會內容')]); }
   d.charts.forEach(function (c) { if (!(c.type === '數字卡' && c.status === 'OK')) box.appendChild(chartCard(c)); });
   try { enhanceDashboard(d, box); } catch (e) { if (window.console) console.error(e); }
