@@ -1445,7 +1445,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '5.5.2';
+var APP_VERSION = '5.5.3';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -3782,7 +3782,7 @@ function loadImprovement() {
   }).catch(function (e) { $('impStatus').textContent = e.code === 'NO_PERMISSION' ? EMPTY_TEXT.NO_PERMISSION : e.message; });
 }
 var rsTimer = null;
-window.addEventListener('resize', function () { clearTimeout(rsTimer); rsTimer = setTimeout(function () { if (!$('dashPanel').hidden && S.dash && !/^overview/.test(S.dashId || '') && !/^metrics:/.test(S.dashId || '') && !document.querySelector('.chart.focused')) renderDashboard(); }, 250); });
+window.addEventListener('resize', function () { clearTimeout(rsTimer); rsTimer = setTimeout(function () { if ($('dashPanel') && !$('dashPanel').hidden && S.dash && !/^overview/.test(S.dashId || '') && !/^metrics:/.test(S.dashId || '') && !document.querySelector('.chart.focused')) renderDashboard(); }, 250); });
 
 /* 測試用介面（不含任何資料或憑證） */
 window.__taoe = { sanitizeHtml: sanitizeHtml, renderCell: renderCell, plainText: plainText, hasHtml: hasHtml, isFullDoc: isFullDoc,
@@ -11607,7 +11607,7 @@ function mqSetView(v) {
 }
 function mqRender() {
   mqHosts().forEach(function (h) {
-    var box = h.querySelector(':scope > .mq-box'), M = h.__mqM; if (!box || !M) return; MQ_BOX = box; MQ_M = M; MQ_HOST = h; box.innerHTML = ''; if (MQ.view === 'analysis') return;
+    var sw0 = h.querySelector(':scope > .mq-sw'), box = h.querySelector(':scope > .mq-box'), M = (sw0 && sw0.__mqM) || h.__mqM || MQ_M; if (!box || !M) return; MQ_BOX = box; MQ_M = M; MQ_HOST = h; box.innerHTML = ''; if (MQ.view === 'analysis') return;
     if (!M.dims['切片'] || !pcSum(M, { ws: {}, win: [] }, '切片', { allTime: true })['all:全院']) { box.appendChild(axEl('p', 'pcs-note', '每月監測與每季檢討需 PcneAgg v2.6.0 彙總（後台重算後自動啟用）；目前可使用「分析」檢視。')); return; }
     var y = window.pageYOffset || 0;
     try { if (MQ.view === 'month') mqMonth(box, M, mqRender); else mqQuarter(box, M, mqRender); } catch (e) { box.appendChild(axEl('p', 'pcs-note', '頁面產生失敗：' + (e && e.message))); if (window.console) console.warn(e); }
@@ -11618,7 +11618,7 @@ function mqMount(host, M) {
   Array.prototype.forEach.call(host.querySelectorAll(':scope > .mq-sw, :scope > .mq-box'), function (x) { x.remove(); });
   host.__mqM = M; MQ_HOST = host; MQ_M = M; var sw = axEl('div', 'mq-sw'); sw.setAttribute('role', 'group'); sw.setAttribute('aria-label', '檢視');
   [['month', '每月成效監測'], ['quarter', '每季品質檢討'], ['analysis', '分析（全部圖卡與專屬儀表板）']].forEach(function (z) { var b = axEl('button', 'btn', z[1]); b.type = 'button'; b.dataset.v = z[0]; b.onclick = function () { mqSetView(z[0]); }; sw.appendChild(b); });
-  MQ_BOX = axEl('div', 'mq-box'); host.insertBefore(MQ_BOX, host.firstChild); host.insertBefore(sw, host.firstChild);
+  sw.__mqM = M; MQ_BOX = axEl('div', 'mq-box'); MQ_BOX.__mqM = M; host.insertBefore(MQ_BOX, host.firstChild); host.insertBefore(sw, host.firstChild);
   mqSetView(MQ.view); mqLoadPh().then(function () { if (MQ.view !== 'analysis') mqRender(); });
 }
 
