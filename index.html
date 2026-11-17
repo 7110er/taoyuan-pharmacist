@@ -1229,6 +1229,35 @@ button.ck-card:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 .pcu-fcol{border-left:3px solid #d5e3ea;padding-left:8px;min-width:0}
 .pcu-fcol h6{margin:0 0 4px;font-size:.78rem;color:#1e5e82}
 .pcu-board .pcv-dcard svg{width:100%;height:26px;margin-top:4px}
+.mq-sw{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.mq-sw .btn{border-radius:18px;padding:6px 14px}
+.mq-sw .btn.on{background:#1e5e82;color:#fff;border-color:#1e5e82}
+.mq-box{grid-column:1/-1;min-width:0}
+.mq-on>.ax-card,.mq-on>section.chart{display:none!important}
+.mq-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.mq-status{font-size:.82rem;color:#33444f;background:#f4f6f7;border-radius:8px;padding:6px 10px;margin:6px 0 10px}
+.mq-status.warn{background:#fff4e0;color:#8a5a00}
+.mq-kpi{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.mq-kpi .ax-gt svg{width:100%;height:26px;margin-top:4px}
+.mq-foot{display:flex;flex-direction:column;gap:2px;font-size:.72rem;color:#5b6b75;margin-top:4px}
+.mq-sig{display:inline-block;margin:4px 4px 0 0;padding:1px 8px;border-radius:10px;border:1px solid #5b6b75;color:#33444f;font-size:.72rem;background:#fff}
+.mq-proxy{font-size:.7rem;color:#8a5a00;margin-top:2px}
+.mq-why{margin-top:4px;font-size:.72rem}
+.mq-why summary{cursor:pointer;color:#1e5e82}
+.mq-why dl{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;margin:4px 0 0}
+.mq-why dt{color:#5b6b75}.mq-why dd{margin:0}
+.mq-tb{border-collapse:collapse;width:100%;font-size:.78rem;font-variant-numeric:tabular-nums}
+.mq-tb th,.mq-tb td{border-bottom:1px solid #e3e8eb;padding:5px 6px;text-align:left;vertical-align:top}
+.mq-tb tr:first-child th{background:#f4f6f7;font-size:.74rem}
+.mq-tb tr.mq-link{cursor:pointer}.mq-tb tr.mq-link:hover,.mq-tb tr.mq-link:focus{background:#eef4f7;outline:none}
+.mq-mini span{display:block;font-size:.7rem;color:#5b6b75}
+.mq-cl{stroke:#5b6b75;stroke-width:1}.mq-ucl{stroke:#b04a4a;stroke-width:1;stroke-dasharray:3 2;fill:none}
+.mq-line{fill:none;stroke:#1e5e82;stroke-width:1.6}.mq-qline{stroke:#8aa6b6;stroke-dasharray:3 3}
+.mq-pt{fill:#1e5e82}.mq-pt.part{fill:#fff;stroke:#1e5e82;stroke-width:1.4}.mq-pt.out{fill:#b04a4a}.mq-pt.sel{stroke:#10232c;stroke-width:2}
+.mq-sigs,.mq-lim{margin:4px 0 0;padding-left:18px;font-size:.8rem;line-height:1.6}
+.mq-dict{display:grid;grid-template-columns:minmax(160px,auto) 1fr;gap:4px 10px;font-size:.76rem}.mq-dict dd{margin:0;color:#33444f}
+.mq-ph{display:none}
+@media print{body.mq-printing *{visibility:hidden}body.mq-printing .mq-ptarget,body.mq-printing .mq-ptarget *{visibility:visible}body.mq-printing .mq-ptarget{position:absolute;left:0;top:0;width:100%}body.mq-printing .mq-ptarget .mq-bar,body.mq-printing .mq-ptarget .mq-why summary{display:none}body.mq-printing .mq-ph{display:block}body.mq-printing .pcx-row{display:block}body.mq-printing .pcx-panel{break-inside:avoid;margin-bottom:8px}}
 </style>
 </head>
 <body>
@@ -1415,7 +1444,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '5.4.0';
+var APP_VERSION = '5.5.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -10592,6 +10621,7 @@ function pcsPrintQuarter(M) {
         if (kind !== 'spc') window.scrollTo(0, y);
       }
       ORDER.forEach(function (k) { try { cards[k] = B[k](host); } catch (e) { if (window.console) console.warn('PCNE 卡片 ' + k + ' 失敗', e); } });
+      if (M.mode === 'full') { try { mqMount(host, M); } catch (e) { if (window.console) console.warn('每月／每季檢視失敗', e); } }
       if (typeof kdPcCfg === 'function' && typeof kdMount === 'function') return kdMount(host, kdPcCfg(M));
     });
   };
@@ -11157,6 +11187,349 @@ function pcUnitCard(host, M, F, re) {
   };
 })();
 
+/* =====================================================================
+ * v5.5.0 每月成效監測｜每季正式品質檢討（需 PcneAgg v2.6.0）
+ * 範圍：全院、服務線、PCNE 分類、疾病、病房、科別、高齡、藥師（依權限）。
+ * 本階段止於提供定期評估、檢討所需之數據與視覺化證據；不含改善流程管理。訊號只標示，不下結論。
+ * ===================================================================== */
+var MQ = { view: 'month', ym: '', q: '', cq: '', scope: 'all:全院', ph: null, phM: {}, rows: [] };
+var PCK = {
+  V1: { name: '臨床藥學服務件數（DRP 照會）', cnt: 1, num: '照會筆數', den: '—', src: '全部紀錄；依照會日期歸月（日期異常者以時間戳記歸月）', get: function (K) { return [K.n, null]; } },
+  D2: { name: '安全性問題占比', num: 'P2', den: 'P1＋P2＋P3', src: '問題類別（舊表單依「PCNE代碼對照」轉換）', get: function (K) { return [K.p2, K.pt]; } },
+  D3: { name: '潛在問題占比', num: '潛在', den: '潛在＋明顯', src: '問題性質（2026-11-10 起收集）', get: function (K) { return [K.pot, K.natD]; } },
+  A1: { name: '接受率', num: 'A1', den: 'A1＋A2', src: '介入方案的接受類別-1；A3 與空值不入分母', get: function (K) { return [K.a1, K.ad]; } },
+  A2: { name: '實際執行率', num: 'A1.1', den: 'A1＋A2', src: '介入方案的接受類別-1', get: function (K) { return [K.a11, K.ad]; } },
+  O1: { name: '問題解決率', num: 'O1', den: 'O1＋O2＋O3（含 O3.4，不算解決）', src: 'DRP 問題狀態（新表單）；O0.1 與未填不入分母', get: function (K) { return [K.o1, K.ok]; } },
+  O2: { name: '結果評估完成率', num: 'O1＋O2＋O3', den: '新表單紀錄', src: 'DRP 問題狀態（新表單）', get: function (K) { return [K.ok, K.nNew]; } },
+  O3: { name: '未解決件數', cnt: 1, num: 'O3.x', den: '—', src: 'DRP 問題狀態', get: function (K) { return [K.o3, null]; } },
+  O4: { name: '待追蹤件數', cnt: 1, num: 'O0.1 或未填（新表單）', den: '—', src: 'DRP 問題狀態；請以「編輯回覆」補填', get: function (K) { return [K.pend, null]; } },
+  R1: { name: '臨床重要性（替代）：P2 且明顯問題', num: 'P2 且問題性質為明顯', den: '問題性質已填', src: '替代指標：表單無臨床重要性欄（D20）', get: function (K) { return [K.imp, K.impD]; } }
+};
+var MQ_MAIN = ['V1', 'A1', 'A2', 'O1', 'O2', 'O3', 'O4', 'R1'], MQ_QCMP = ['V1', 'D2', 'D3', 'A1', 'A2', 'O1', 'O2', 'R1'];
+
+/* ---------- 期間 ---------- */
+function mqMonths(M) {
+  var now = ccNowYm(), ks = Object.keys(M.yms).filter(function (y) { return y <= now; }).sort();
+  if (!ks.length) return { all: [], done: [], now: now };
+  var all = pcSeq(ks[0], now); return { all: all, done: all.filter(function (y) { return y < now; }), now: now };
+}
+function mqQ(ym) { return ym.slice(0, 4) + '-Q' + Math.ceil(+ym.slice(5, 7) / 3); }
+function mqQMonths(q) { var y = q.slice(0, 4), k = +q.slice(-1); return [1, 2, 3].map(function (i) { return y + '-' + ('0' + ((k - 1) * 3 + i)).slice(-2); }); }
+function mqQLab(q) { var k = +q.slice(-1); return (+q.slice(0, 4) - 1911) + ' 年第 ' + k + ' 季（' + ((k - 1) * 3 + 1) + '–' + (k * 3) + ' 月）'; }
+function mqPrevQ(q) { var y = +q.slice(0, 4), k = +q.slice(-1) - 1; if (!k) { k = 4; y--; } return y + '-Q' + k; }
+function mqPrevYm(ym) { var y = +ym.slice(0, 4), m = +ym.slice(5, 7) - 1; if (!m) { m = 12; y--; } return y + '-' + ('0' + m).slice(-2); }
+function mqBack(ym, n) { var o = [], y = ym; for (var i = 0; i < n; i++) { y = mqPrevYm(y); o.unshift(y); } return o; }
+
+/* ---------- 切片讀取 ---------- */
+function mqModel(M) { return MQ.scope.indexOf('ph:') === 0 ? MQ.phM[MQ.scope.slice(3)] || null : M; }
+function mqKey() { return MQ.scope.indexOf('ph:') === 0 ? 'me' : MQ.scope; }
+function mqD(M, yms, k, dim) {
+  var out = {}, pre = k + '｜';
+  yms.forEach(function (ym) { var D = pcMon(M, ym, '切片×' + dim); Object.keys(D).forEach(function (c) { if (c.indexOf(pre) !== 0) return; var v = c.slice(pre.length); out[v] = pcMerge([out[v], D[c]]); }); });
+  return out;
+}
+function mqC(m, re) { return Object.keys(m || {}).filter(function (x) { return re.test(x); }).reduce(function (s, x) { return s + m[x].n; }, 0); }
+function mqK(M, yms, k) {
+  var g = pcMerge(yms.map(function (ym) { return pcMon(M, ym, '切片')[k]; })), st = mqD(M, yms, k, '狀態'), P = mqD(M, yms, k, '問題面向'), N = mqD(M, yms, k, '問題性質'), I = mqD(M, yms, k, '重要性替代'), V = mqD(M, yms, k, '表單版本');
+  var o1 = mqC(st, /^O1/), o2 = mqC(st, /^O2/), o3 = mqC(st, /^O3/), pend = mqC(st, /^O0|^未填/), nNew = V['新表單 V9.1'] ? V['新表單 V9.1'].n : o1 + o2 + o3 + pend;
+  return { n: g.n, a1: g.G.A1, ad: g.G.A1 + g.G.A2, a11: g.A['A1.1'] || 0, o1: o1, ok: o1 + o2 + o3, o3: o3, pend: pend, nNew: nNew, p2: mqC(P, /^P2/), pt: mqC(P, /^P[123]$/),
+    pot: N['潛在問題'] ? N['潛在問題'].n : 0, natD: mqC(N, /^(潛在|明顯)問題$/), imp: I['P2 且明顯'] ? I['P2 且明顯'].n : 0, impD: mqC(I, /./), newShare: g.n ? nNew / g.n : null };
+}
+function mqScopeLab(s) {
+  var p = s.indexOf(':'), t = s.slice(0, p), v = s.slice(p + 1);
+  return t === 'all' ? '全院' : t === 'svc' ? '服務線：' + v : t === 'p' ? 'PCNE ' + v + ({ P1: ' 療效', P2: ' 安全', P3: ' 其他' }[v] || '') : t === 'dis' ? '疾病：' + (PC_DIS_NAME[v] || v) : t === 'ward' ? '病房：' + v : t === 'dept' ? '科別：' + v : t === 'ger' ? '高齡（≥65 歲）' : t === 'ph' ? '藥師：' + v : s;
+}
+
+/* ---------- 基準與訊號 ---------- */
+function mqStat(code, M, yms, k) { var r = PCK[code].get(mqK(M, yms, k)); return { x: r[0], d: r[1] }; }
+function mqBase(code, M, k, ym, done) {
+  var b = mqBack(ym, 12).filter(function (y) { return done.indexOf(y) >= 0; }), xs = b.map(function (y) { return mqStat(code, M, [y], k); });
+  if (PCK[code].cnt) { var v = xs.map(function (s) { return s.x; }).sort(function (a, c) { return a - c; }), n = v.length, mean = n ? v.reduce(function (a, c) { return a + c; }, 0) / n : null;
+    return { months: b, n: n, med: n ? (n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2) : null, c: mean }; }
+  var X = 0, D = 0; xs.forEach(function (s) { X += s.x; D += s.d || 0; }); return { months: b, n: b.length, X: X, D: D, c: D ? X / D : null };
+}
+function mqLim(code, base, d) {
+  if (base.c === null || base.n < 6) return null;
+  if (PCK[code].cnt) { var s = Math.sqrt(base.c); return [Math.max(0, base.c - 3 * s), base.c + 3 * s]; }
+  if (!d || d < 5) return null; var e = 3 * Math.sqrt(base.c * (1 - base.c) / d); return [Math.max(0, base.c - e), Math.min(1, base.c + e)];
+}
+function mqVal(code, s) { return PCK[code].cnt ? s.x : (s.d ? s.x / s.d : null); }
+function mqRun(code, M, k, ym, done, base) {
+  if (base.c === null || base.n < 6) return 0; var seq = mqBack(ym, 7).concat([ym]).filter(function (y) { return done.indexOf(y) >= 0; }); if (seq.length < 8) return 0;
+  var sg = seq.map(function (y) { var s = mqStat(code, M, [y], k), v = mqVal(code, s); if (v === null || (!PCK[code].cnt && s.d < 5)) return 0; return v > base.c ? 1 : v < base.c ? -1 : 0; });
+  return sg.every(function (z) { return z === 1; }) ? 1 : sg.every(function (z) { return z === -1; }) ? -1 : 0;
+}
+function mqRecur(M, k, endYm) { var ms = mqBack(endYm, 2).concat([endYm]), maps = ms.map(function (y) { return mqD(M, [y], k, '原因碼'); }); return Object.keys(maps[2]).filter(function (c) { return maps.every(function (m) { return m[c] && m[c].n >= 2; }); }); }
+function mqDiffCI(x1, n1, x2, n2) { if (n1 < 20 || n2 < 20) return null; var p1 = x1 / n1, p2 = x2 / n2, se = Math.sqrt(p1 * (1 - p1) / n1 + p2 * (1 - p2) / n2), d = p1 - p2; return [d, d - 1.96 * se, d + 1.96 * se]; }
+
+/* ---------- 共用視覺元件 ---------- */
+function mqFmt(code, s) { if (PCK[code].cnt) return { v: String(s.x), s: '' }; return pcxR(s.x, s.d); }
+function mqWhy(host, code, period, s, extra) {
+  var d = axEl('details', 'mq-why'); d.appendChild(axEl('summary', '', '依據')); var K = PCK[code], dl = axEl('dl', '');
+  [['指標', code + ' ' + K.name], ['期間', period], ['範圍', mqScopeLab(MQ.scope)], ['分子', K.num + '＝' + s.x], ['分母', K.den + (s.d === null ? '' : '＝' + s.d)], ['來源', K.src], ['資料', MQ.upd || '—']].concat(extra || []).forEach(function (r) { dl.appendChild(axEl('dt', '', r[0])); dl.appendChild(axEl('dd', '', String(r[1]))); });
+  d.appendChild(dl); host.appendChild(d);
+}
+function mqRow(period, code, s) {
+  var ci = !PCK[code].cnt && s.d ? ccWilson(s.x, s.d) : [null, null];
+  MQ.rows.push([period, mqScopeLab(MQ.scope), code, PCK[code].name, s.x, s.d === null ? '' : s.d, !PCK[code].cnt && s.d >= 5 ? (s.x / s.d * 100).toFixed(1) + '%' : '', ci[0] !== null && s.d >= 5 ? (ci[0] * 100).toFixed(1) : '', ci[1] !== null && s.d >= 5 ? (ci[1] * 100).toFixed(1) : '', MQ.upd || '']);
+}
+function mqBadge(host, txt, cls) { host.appendChild(axEl('span', 'mq-sig' + (cls ? ' ' + cls : ''), txt)); }
+/* SPC：c 圖（件數）或 p 圖（比率）；基準＝選定月前 12 個完整月；未完整月空心、分母 <5 不畫點 */
+function mqSpc(host, M, k, code, endYm, done, title, qMarks) {
+  var ms = mqBack(endYm, 12).concat([endYm]), base = mqBase(code, M, k, endYm, done), cnt = PCK[code].cnt;
+  var pts = ms.map(function (y) { var s = mqStat(code, M, [y], k); return { ym: y, s: s, v: mqVal(code, s), part: done.indexOf(y) < 0, lim: mqLim(code, base, s.d) }; });
+  var W = 400, H = 170, L = 34, R = 10, B = 24, T = 12, vals = pts.filter(function (p) { return p.v !== null && (cnt || p.s.d >= 5); }).map(function (p) { return p.v; });
+  var mx = cnt ? Math.max.apply(null, vals.concat([base.c ? base.c + 3 * Math.sqrt(base.c) : 1, 1])) * 1.1 : 1, mn = 0;
+  var x = function (i) { return L + i * (W - L - R) / (ms.length - 1); }, y = function (v) { return H - B - (v - mn) / (mx - mn) * (H - B - T); }, sv = pcvSvg(W, H, title);
+  [0, 0.5, 1].forEach(function (f) { var v = mn + (mx - mn) * f; sv.appendChild(pcvEl('line', { x1: L, x2: W - R, y1: y(v), y2: y(v), 'class': 'pcx-grid' })); sv.appendChild(pcvEl('text', { x: L - 4, y: y(v) + 3, 'text-anchor': 'end', 'class': 'pcv-ax' }, cnt ? String(Math.round(v)) : Math.round(v * 100) + '%')); });
+  (qMarks || []).forEach(function (q) { var i = ms.indexOf(q); if (i > 0) sv.appendChild(pcvEl('line', { x1: x(i) - (W - L - R) / (ms.length - 1) / 2, x2: x(i) - (W - L - R) / (ms.length - 1) / 2, y1: T, y2: H - B, 'class': 'mq-qline' })); });
+  if (base.c !== null && base.n >= 6) {
+    sv.appendChild(pcvEl('line', { x1: L, x2: W - R, y1: y(base.c), y2: y(base.c), 'class': 'mq-cl' }));
+    var up = '', lo = ''; pts.forEach(function (p, i) { var l = cnt ? mqLim(code, base, 0) : p.lim; if (!l) return; var a = x(i) - 6, b = x(i) + 6; up += 'M' + a.toFixed(1) + ',' + y(Math.min(mx, l[1])).toFixed(1) + 'H' + b.toFixed(1); lo += 'M' + a.toFixed(1) + ',' + y(l[0]).toFixed(1) + 'H' + b.toFixed(1); });
+    if (up) { sv.appendChild(pcvEl('path', { d: up, 'class': 'mq-ucl' })); sv.appendChild(pcvEl('path', { d: lo, 'class': 'mq-ucl' })); }
+  }
+  var path = ''; pts.forEach(function (p, i) { if (p.v === null || (!cnt && p.s.d < 5)) { path += ' '; return; } path += (/[\d]$/.test(path) ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(p.v).toFixed(1); });
+  if (path.trim()) sv.appendChild(pcvEl('path', { d: path.replace(/\s+/g, ''), 'class': 'mq-line' }));
+  pts.forEach(function (p, i) {
+    if (p.v === null || (!cnt && p.s.d < 5)) return; var l = cnt ? mqLim(code, base, 0) : p.lim, out = l && (p.v > l[1] || p.v < l[0]);
+    var c = pcvEl('circle', { cx: x(i), cy: y(p.v), r: p.ym === endYm ? 5 : 3.2, 'class': 'mq-pt' + (p.part ? ' part' : '') + (out ? ' out' : '') + (p.ym === endYm ? ' sel' : '') });
+    c.appendChild(pcvEl('title', {}, ccYmLab(p.ym) + '：' + (cnt ? p.s.x + ' 件' : Math.round(p.v * 100) + '%（' + p.s.x + '／' + p.s.d + '）') + (p.part ? '（未完整）' : '') + (out ? '｜超出管制界限' : ''))); sv.appendChild(c);
+  });
+  pts.forEach(function (p, i) { if (i % 2 === 0 || i === pts.length - 1) sv.appendChild(pcvEl('text', { x: x(i), y: H - 7, 'text-anchor': 'middle', 'class': 'pcv-ax' }, ccYmShort(p.ym))); });
+  host.appendChild(sv);
+  host.appendChild(axEl('p', 'pcx-pn', base.n >= 6 ? '中心線＝前 ' + base.n + ' 個完整月' + (cnt ? '平均（c 圖，ū±3√ū）' : '合併比率（p 圖，界限隨分母變動）') + '；空心＝未完整月；分母 <5 不畫點' : '基準完整月不足 6 個，不畫管制界限'));
+}
+function mqBars(host, title, note, map, opt) { pcxBars(pcxPanel(host, title, note), map, opt); }
+function mqFlow(host, M, yms, k, title) {
+  var fl = pcxPanel(host, title, '每段為件數分布；C 可有 2 個原因、I 可有 3 項介入，故可多於件數', true), gr = axEl('div', 'pcu-flow'); fl.appendChild(gr);
+  var st = mqD(M, yms, k, '狀態'), g = pcMerge(yms.map(function (ym) { return pcMon(M, ym, '切片')[k]; })), col = function (t, m, o) { var c = axEl('div', 'pcu-fcol'); c.appendChild(axEl('h6', '', t)); pcxBars(c, m, o); gr.appendChild(c); };
+  col('P 問題面向', mqD(M, yms, k, '問題面向'), { order: ['P1', 'P2', 'P3', '未對應'], top: 4 });
+  col('C 原因（前 5）', mqD(M, yms, k, '原因碼'), { top: 5 });
+  col('I 介入（前 5）', mqD(M, yms, k, '介入碼'), { top: 5 });
+  col('A 接受', { 'A1 接受': { n: g.G.A1 }, 'A2 不接受': { n: g.G.A2 }, 'A3／未知': { n: Math.max(0, g.n - g.G.A1 - g.G.A2) } }, { skip: /^$/, order: ['A1 接受', 'A2 不接受', 'A3／未知'] });
+  var pend = mqC(st, /^O0|^未填/);
+  col('O 結局', { 'O1 解決': { n: mqC(st, /^O1/) }, 'O2 部分解決': { n: mqC(st, /^O2/) }, 'O3 未解決': { n: mqC(st, /^O3/) }, '待追蹤': { n: pend }, '舊表單未收集': { n: Math.max(0, g.n - mqC(st, /^O[0-3]|^未填/)) } }, { skip: /^$/, order: ['O1 解決', 'O2 部分解決', 'O3 未解決', '待追蹤', '舊表單未收集'], focus: ['待追蹤'] });
+  var AO = mqD(M, yms, k, '接受×結局'), a1o = mqC(AO, /^A1｜O1/), a1d = mqC(AO, /^A1｜O[123]/);
+  fl.appendChild(axEl('p', 'pcx-pn', '接受後解決（A1 中 O1 ÷ A1 中 O1–O3）：' + pcvTxt(a1o, a1d) + (a1d ? '（' + a1o + '／' + a1d + '）' : '') + '；新表單起計'));
+}
+/* 分層表：dis/ward/dept 切片，前 8；點列跳到分析頁對應專屬儀表板 */
+function mqStrat(host, M, yms, pre, title, lab, jump) {
+  var p = pcxPanel(host, title, '前 8（依件數）；點列開啟專屬儀表板'), SL = {}; yms.forEach(function (ym) { var D = pcMon(M, ym, '切片'); Object.keys(D).forEach(function (k) { if (k.indexOf(pre) === 0) SL[k] = pcMerge([SL[k], D[k]]); }); });
+  var keys = Object.keys(SL).sort(function (a, b) { return SL[b].n - SL[a].n; }).slice(0, 8); if (!keys.length) { p.appendChild(axEl('p', 'ax-muted', '期間內無資料')); return; }
+  var tb = document.createElement('table'); tb.className = 'mq-tb'; var hr = document.createElement('tr'); ['', '件數', '接受', '解決'].forEach(function (h) { hr.appendChild(axEl('th', '', h)); }); tb.appendChild(hr);
+  keys.forEach(function (k) { var K = mqK(M, yms, k), tr = document.createElement('tr'); tr.appendChild(axEl('th', '', lab(k.slice(pre.length)))); [String(K.n), pcvTxt(K.a1, K.ad), pcvTxt(K.o1, K.ok)].forEach(function (v) { tr.appendChild(axEl('td', '', v)); });
+    if (jump) { tr.className = 'mq-link'; tr.tabIndex = 0; tr.title = '開啟專屬儀表板'; var go = function () { jump(k.slice(pre.length)); }; tr.addEventListener('click', go); tr.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); }); }
+    tb.appendChild(tr); });
+  p.appendChild(tb);
+}
+function mqJump(id) {
+  mqSetView('analysis'); setTimeout(function () { var el = document.querySelector('[data-pcx="' + id + '"]'); if (!el) return; if (el.getAttribute('aria-expanded') !== 'true') el.click(); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 60);
+}
+
+/* ---------- 控制列 ---------- */
+function mqScopeSel(M, onPick) {
+  var SL = pcSum(M, { ws: {}, win: [] }, '切片', { allTime: true }), ks = Object.keys(SL), w = axEl('label', 'cc-sel'); w.appendChild(axEl('span', '', '範圍'));
+  var s = document.createElement('select'), grp = function (lab, pre, sort) { var g = document.createElement('optgroup'); g.label = lab; var L = ks.filter(function (k) { return k.indexOf(pre) === 0; }); (sort ? L.sort(function (a, b) { return pcuNat(a, b); }) : L).forEach(function (k) { var o = new Option(mqScopeLab(k) + '（' + SL[k].n + '）', k); if (k === MQ.scope) o.selected = true; g.appendChild(o); }); if (L.length) s.appendChild(g); };
+  var o0 = new Option('全院', 'all:全院'); if (MQ.scope === 'all:全院') o0.selected = true; s.appendChild(o0);
+  grp('服務線', 'svc:'); grp('PCNE 問題分類', 'p:', 1); grp('疾病（主要）', 'dis:'); grp('高齡', 'ger:'); grp('病房', 'ward:', 1); grp('科別', 'dept:', 1);
+  if (MQ.ph && MQ.ph.length) { var g = document.createElement('optgroup'); g.label = '藥師（依權限）'; MQ.ph.forEach(function (n) { var o = new Option('藥師：' + n, 'ph:' + n); if (MQ.scope === 'ph:' + n) o.selected = true; g.appendChild(o); }); s.appendChild(g); }
+  s.addEventListener('change', function () { onPick(s.value); }); w.appendChild(s); return w;
+}
+function mqLoadPh() {
+  if (MQ.ph !== null) return Promise.resolve();
+  var key = typeof kdFindKey === 'function' ? kdFindKey(['藥事照會 PCNE 個人彙總', '儀表板用_PCNE_人員'], /教學資源/) : ''; if (!key) { MQ.ph = []; return Promise.resolve(); }
+  return axLoad(key).then(function (src) {
+    var c = src.cols, iN = c.indexOf('姓名'), by = {}; if (iN < 0) { MQ.ph = []; return; }
+    src.rows.forEach(function (r) { var n = String(r[iN] || '').trim(); if (n) (by[n] = by[n] || []).push(r); });
+    MQ.ph = Object.keys(by).filter(function (n) { return by[n].some(function (r) { return r[c.indexOf('維度')] === '切片'; }); }).sort(pcuNat);
+    MQ.ph.forEach(function (n) { try { MQ.phM[n] = pcIndex(pcParseAgg({ cols: c, rows: by[n] })); } catch (e) { /* 略 */ } });
+  }, function () { MQ.ph = []; });
+}
+function mqCsv() {
+  if (!MQ.rows.length) return; var head = ['期間', '範圍', '指標代碼', '指標', '分子', '分母', '比率', 'CI下限%', 'CI上限%', '資料更新'];
+  var esc = function (v) { v = String(v === null || v === undefined ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  var txt = '﻿' + [head].concat(MQ.rows).map(function (r) { return r.map(esc).join(','); }).join('\r\n'), a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' })); a.download = '臨床藥學服務_' + (MQ.view === 'month' ? MQ.ym : MQ.q) + '_' + mqScopeLab(MQ.scope).replace(/[：:\/\\\s]/g, '_') + '.csv';
+  document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function mqPrint(box) { document.body.classList.add('mq-printing'); box.classList.add('mq-ptarget'); var done = function () { document.body.classList.remove('mq-printing'); box.classList.remove('mq-ptarget'); window.removeEventListener('afterprint', done); }; window.addEventListener('afterprint', done); setTimeout(function () { window.print(); setTimeout(done, 800); }, 50); }
+function mqFresh(M0) {
+  var I = pcSum(M0, { ws: {}, win: [] }, '彙總資訊', { allTime: true }), k = Object.keys(I).filter(function (x) { return /^PcneAgg v/.test(x); })[0] || '', m = /(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/.exec(k);
+  MQ.upd = k.split('｜').slice(0, 2).join('｜'); if (!m) return { txt: '資料更新時間未知', stale: true };
+  var t = new Date(m[1].replace(' ', 'T') + ':00+08:00'), h = (Date.now() - t.getTime()) / 3600000; return { txt: '資料更新 ' + m[1] + '（' + k.split('｜')[0] + '）', stale: h > 2, ver: k };
+}
+
+/* ---------- 每月成效監測 ---------- */
+function mqMonth(box, M0, re) {
+  MQ.rows = []; var M = mqModel(M0), k = mqKey(), MS = mqMonths(M0), done = MS.done; if (!M || !MS.all.length) { box.appendChild(axEl('p', 'ax-muted', '尚無資料')); return; }
+  if (!MQ.ym || MS.all.indexOf(MQ.ym) < 0) MQ.ym = done.length ? done[done.length - 1] : MS.all[MS.all.length - 1];
+  var ym = MQ.ym, prev = mqPrevYm(ym), part = done.indexOf(ym) < 0, per = ccYmLab(ym) + (part ? '（進行中，未完整）' : '');
+  var fr = mqFresh(M0), bar = axEl('div', 'cc-toolbar mq-bar');
+  var ms = pcSel('月份', MS.all.slice().reverse().map(function (y) { return [y, ccYmLab(y) + (done.indexOf(y) < 0 ? '（進行中）' : '')]; }), ym, function (v) { MQ.ym = v; re(); }); bar.appendChild(ms);
+  bar.appendChild(mqScopeSel(M0, function (v) { MQ.scope = v; re(); }));
+  var bx = axEl('button', 'btn', '匯出 CSV'); bx.type = 'button'; bx.onclick = mqCsv; bar.appendChild(bx);
+  var bp = axEl('button', 'btn', '列印本頁'); bp.type = 'button'; bp.onclick = function () { mqPrint(box); }; bar.appendChild(bp);
+  box.appendChild(bar);
+  var st = axEl('p', 'mq-status' + (fr.stale ? ' warn' : ''), fr.txt + (fr.stale ? '｜資料可能未更新（超過 2 小時）' : '') + '｜範圍：' + mqScopeLab(MQ.scope) + '｜' + per + (part ? '：本月資料未完整，不判定訊號' : ''));
+  box.appendChild(st);
+  if (MQ.scope !== 'all:全院' && !pcMon(M, ym, '切片')[k] && !(pcSum(M, { ws: {}, win: [] }, '切片', { allTime: true })[k])) { box.appendChild(axEl('p', 'pcs-note', '此範圍無資料；需 PcneAgg v2.6.0 重算。')); return; }
+  /* M1 核心數字 */
+  var sigs = [], g = axEl('div', 'ax-gtiles mq-kpi'); box.appendChild(g);
+  MQ_MAIN.forEach(function (code) {
+    var s = mqStat(code, M, [ym], k), sp = mqStat(code, M, [prev], k), b = mqBase(code, M, k, ym, done), f = mqFmt(code, s), cnt = PCK[code].cnt, foot = axEl('div', 'mq-foot');
+    var pv = done.indexOf(prev) >= 0 || prev < ym ? (cnt ? sp.x + ' 件' : pcvTxt(sp.x, sp.d)) : '—', bt = b.n ? (cnt ? '中位數 ' + b.med + ' 件' : (b.D ? pcvTxt(b.X, b.D) : '—')) : '不足';
+    var dtxt = cnt ? (s.x - sp.x >= 0 ? '+' : '') + (s.x - sp.x) + ' 件' : (s.d >= 5 && sp.d >= 5 ? ((s.x / s.d - sp.x / sp.d) * 100 >= 0 ? '+' : '') + Math.round((s.x / s.d - sp.x / sp.d) * 100) + ' 百分點' : '分母 <5，不比較');
+    foot.appendChild(axEl('span', '', '上月 ' + pv + '｜差 ' + dtxt)); foot.appendChild(axEl('span', '', '12 個月基準 ' + bt + (b.n ? '（' + b.n + ' 個月）' : '')));
+    var t = axTile(code + ' ' + PCK[code].name, '<b>' + f.v + '</b>' + (cnt ? '<small> 件</small>' : ''), f.s, 'mq-t', foot);
+    t.appendChild(pcsSpark(mqBack(ym, 12).concat([ym]).map(function (y) { return mqVal(code, mqStat(code, M, [y], k)) || 0; }), PCK[code].name + ' 13 個月'));
+    if (!part && (code === 'V1' || code === 'A1' || code === 'A2' || code === 'O1' || code === 'O2')) {
+      var l = mqLim(code, b, s.d), v = mqVal(code, s); if (l && v !== null && (v > l[1] || v < l[0])) { mqBadge(t, '超出管制界限，需檢視'); sigs.push({ t: '超出管制界限', m: code, v: f.v, d: s.d }); }
+      var rn = mqRun(code, M, k, ym, done, b); if (rn) { mqBadge(t, '連續 8 個月偏向' + (rn > 0 ? '高' : '低') + '側'); sigs.push({ t: '連續 8 個月偏向一側', m: code, v: f.v, d: s.d }); }
+    }
+    if (code === 'R1') t.appendChild(axEl('div', 'mq-proxy', '替代指標：表單無臨床重要性欄'));
+    mqWhy(t, code, per, s, [['上月', ccYmLab(prev) + '：' + sp.x + (sp.d === null ? '' : '／' + sp.d)], ['基準月', b.months.length ? ccYmLab(b.months[0]) + '－' + ccYmLab(b.months[b.months.length - 1]) : '—']]);
+    g.appendChild(t); mqRow(per, code, s);
+  });
+  /* M2 服務組成、M3 DRP 輪廓 */
+  var r2 = axEl('div', 'pcx-row'); box.appendChild(r2);
+  var SV = mqD(M, [ym], k, '服務線'), SVp = mqD(M, [prev], k, '服務線'); mqBars(r2, '服務組成（本月）', '括號為占比；標籤後為上月件數', SV, { top: 8, label: function (x) { return x + '（上月 ' + (SVp[x] ? SVp[x].n : 0) + '）'; }, empty: '本月無紀錄' });
+  mqBars(r2, 'PCNE 問題面向', 'P1 療效、P2 安全、P3 其他', mqD(M, [ym], k, '問題面向'), { order: ['P1', 'P2', 'P3', '未對應'] });
+  var rc = done.indexOf(ym) >= 0 ? mqRecur(M, k, ym) : []; rc.forEach(function (c) { sigs.push({ t: '近 3 個月反覆出現', m: c, v: '每月 ≥2 筆', d: null }); });
+  mqBars(r2, '主要原因（PCNE C，前 5）', rc.length ? '醒目＝連續 3 個完整月每月 ≥2 筆（反覆出現）' : '近 3 個月無反覆出現之原因', mqD(M, [ym], k, '原因碼'), { top: 5, acc: true, focus: rc });
+  /* M4 全程 */
+  mqFlow(box, M, [ym], k, 'DRP 全程：問題 P → 原因 C → 介入 I → 接受 A → 結局 O（本月）');
+  /* M5 分層（全院範圍） */
+  if (MQ.scope === 'all:全院') {
+    var r5 = axEl('div', 'pcx-row'); box.appendChild(r5);
+    mqStrat(r5, M, [ym], 'dis:', '疾病（主要）', function (c) { return PC_DIS_NAME[c] || c; }, function (c) { mqJump('dis:' + c); });
+    mqStrat(r5, M, [ym], 'ward:', '病房', function (c) { return c; }, function (c) { PCX.unit = 'ward'; mqJump('unit:ward:' + c); });
+    mqStrat(r5, M, [ym], 'dept:', '科別', function (c) { return c; }, function (c) { PCX.unit = 'dept'; mqJump('unit:dept:' + c); });
+  } else { var r5b = axEl('div', 'pcx-row'); box.appendChild(r5b); mqBars(r5b, '疾病組成', '主要疾病（新表單）', mqD(M, [ym], k, '主要疾病'), { top: 6, acc: true, label: function (x) { var c = x.split(' ')[0]; return PC_DIS_NAME[c] || x; }, empty: '無疾病資料' }); mqBars(r5b, '病房組成', '', mqD(M, [ym], k, '病房'), { top: 6, acc: true, empty: '無病房資料' }); mqBars(r5b, '科別組成', '', mqD(M, [ym], k, '科別'), { top: 6, acc: true, empty: '無科別資料' }); }
+  /* M6 趨勢 */
+  var r6 = axEl('div', 'pcx-row'); box.appendChild(r6);
+  [['V1', '件數（c 圖）'], ['A1', '接受率（p 圖）'], ['O1', '問題解決率（p 圖）']].forEach(function (z) { mqSpc(pcxPanel(r6, z[0] + ' ' + z[1], '近 13 個月，選定月放大'), M, k, z[0], ym, done, z[1]); });
+  /* M7 待辦存量 */
+  var r7 = axEl('div', 'pcx-row'); box.appendChild(r7); var PD = mqD(M, MS.all, k, '待追蹤鍊期'), o3 = {}, ST = mqD(M, mqBack(ym, 11).concat([ym]), k, '狀態'); Object.keys(ST).forEach(function (x) { if (/^O3/.test(x)) o3[x] = ST[x]; });
+  var gt90 = PD['>90 天'] ? PD['>90 天'].n : 0; if (gt90) sigs.push({ t: '有逾 90 天未追蹤結局', m: 'O4', v: gt90 + ' 筆', d: null });
+  mqBars(r7, '待追蹤結局（全期存量，依照會日距今）', '新表單 O0.1 或未填；請以「編輯回覆」補問題狀態', PD, { order: ['≤30 天', '31–90 天', '>90 天'], focus: ['>90 天'], empty: '無待追蹤' });
+  mqBars(r7, '未解決原因（近 12 個月，O3）', 'O3.4＝無需或無法解決，列入解決率分母', o3, { empty: '近 12 個月無未解決紀錄' });
+  /* 訊號清單 */
+  var sp0 = pcxPanel(box, '本月訊號（只標示，不下結論）', '超出管制界限、連續偏移、反覆原因、逾期未追蹤；解讀需同時看分母、個案組成與追蹤完整性', true);
+  if (part) sp0.appendChild(axEl('p', 'ax-muted', '進行中月份不判定管制圖訊號。'));
+  if (!sigs.length) sp0.appendChild(axEl('p', 'ax-muted', '本月無訊號。')); else { var ul = axEl('ul', 'mq-sigs'); sigs.forEach(function (x) { ul.appendChild(axEl('li', '', x.t + '｜' + (PCK[x.m] ? x.m + ' ' + PCK[x.m].name : '原因 ' + x.m) + '｜' + x.v + (x.d !== null && x.d !== undefined ? '｜分母 ' + x.d + (x.d < 20 ? '（<20，穩定性有限）' : '') : ''))); }); sp0.appendChild(ul); }
+  /* M8 資料限制 */
+  var DQ = pcMon(M0, ym, '資料品質'), fill = (pcMon(M0, ym, '填表人數')['人數'] || { n: 0 }).n, lim = axEl('ul', 'mq-lim');
+  [['本月填表人數', fill + ' 人'], ['本月資料品質提醒', Object.keys(DQ).length ? Object.keys(DQ).map(function (x) { return x + ' ' + DQ[x].n; }).join('、') : '無'], ['新題分母起算', [pcxInfo(M0, /^新題首筆|^新題尚無/), pcxInfo(M0, /^問題性質上線日/), pcxInfo(M0, /^年齡題/)].filter(Boolean).join('；') || '—'], ['小樣本', '分母 <5 只顯示分子／分母；5–19 附 95% CI'], ['統計單位', '照會紀錄；不等於病人數或 DRP 總數'], ['藥品諮詢', '本階段未納入']].forEach(function (r) { var li = axEl('li', ''); li.appendChild(axEl('b', '', r[0] + '：')); li.appendChild(document.createTextNode(r[1])); lim.appendChild(li); });
+  var lp = pcxPanel(box, '資料完整性與統計限制', '', true); lp.appendChild(lim);
+}
+
+/* ---------- 每季正式品質檢討 ---------- */
+function mqQuarter(box, M0, re) {
+  MQ.rows = []; var M = mqModel(M0), k = mqKey(), MS = mqMonths(M0), done = MS.done; if (!M || !MS.all.length) { box.appendChild(axEl('p', 'ax-muted', '尚無資料')); return; }
+  var qs = []; MS.all.forEach(function (y) { var q = mqQ(y); if (qs.indexOf(q) < 0) qs.push(q); });
+  var qDone = function (q) { return mqQMonths(q).every(function (y) { return done.indexOf(y) >= 0; }); };
+  if (!MQ.q || qs.indexOf(MQ.q) < 0) { var cq0 = qs.filter(qDone); MQ.q = cq0.length ? cq0[cq0.length - 1] : qs[qs.length - 1]; MQ.cq = ''; }
+  if (!MQ.cq || MQ.cq === MQ.q) MQ.cq = mqPrevQ(MQ.q);
+  var q = MQ.q, cq = MQ.cq, qm = mqQMonths(q).filter(function (y) { return MS.all.indexOf(y) >= 0; }), cm = mqQMonths(cq).filter(function (y) { return MS.all.indexOf(y) >= 0; }), part = !qDone(q), per = mqQLab(q) + (part ? '（未完整）' : ''), cper = mqQLab(cq);
+  var fr = mqFresh(M0), bar = axEl('div', 'cc-toolbar mq-bar');
+  bar.appendChild(pcSel('季度', qs.slice().reverse().map(function (x) { return [x, mqQLab(x) + (qDone(x) ? '' : '（未完整）')]; }), q, function (v) { MQ.q = v; MQ.cq = ''; re(); }));
+  bar.appendChild(pcSel('對照', qs.filter(function (x) { return x !== q; }).reverse().map(function (x) { return [x, mqQLab(x)]; }), cq, function (v) { MQ.cq = v; re(); }));
+  bar.appendChild(mqScopeSel(M0, function (v) { MQ.scope = v; re(); }));
+  var bx = axEl('button', 'btn', '匯出 CSV'); bx.type = 'button'; bx.onclick = mqCsv; bar.appendChild(bx);
+  var bp = axEl('button', 'btn', '列印季報'); bp.type = 'button'; bp.onclick = function () { mqPrint(box); }; bar.appendChild(bp); box.appendChild(bar);
+  box.appendChild(axEl('p', 'mq-status' + (fr.stale ? ' warn' : ''), fr.txt + (fr.stale ? '｜資料可能未更新' : '') + '｜範圍：' + mqScopeLab(MQ.scope) + '｜' + per + ' 對照 ' + cper));
+  box.appendChild(axEl('h3', 'mq-ph', '臨床藥學服務每季品質檢討｜' + mqScopeLab(MQ.scope) + '｜' + per));
+  /* Q1 核心比較 */
+  var sigs = [], K1 = mqK(M, qm, k), K2 = mqK(M, cm, k), tb = document.createElement('table'); tb.className = 'mq-tb mq-cmp';
+  var hr = document.createElement('tr'); ['指標', '本季', '對照季', '差異', '差異 95% CI', '季內逐月'].forEach(function (h) { hr.appendChild(axEl('th', '', h)); }); tb.appendChild(hr);
+  MQ_QCMP.forEach(function (code) {
+    var a = PCK[code].get(K1), b = PCK[code].get(K2), s1 = { x: a[0], d: a[1] }, s2 = { x: b[0], d: b[1] }, cnt = PCK[code].cnt, tr = document.createElement('tr');
+    var nm = axEl('th', '', code + ' ' + PCK[code].name); mqWhy(nm, code, per, s1, [['對照', cper + '：' + s2.x + (s2.d === null ? '' : '／' + s2.d)]]); tr.appendChild(nm);
+    tr.appendChild(axEl('td', '', cnt ? String(s1.x) : pcvTxt(s1.x, s1.d) + '（' + s1.x + '／' + s1.d + '）')); tr.appendChild(axEl('td', '', cnt ? String(s2.x) : pcvTxt(s2.x, s2.d) + '（' + s2.x + '／' + s2.d + '）'));
+    var ci = cnt ? null : mqDiffCI(s1.x, s1.d, s2.x, s2.d), dif = cnt ? (s1.x - s2.x >= 0 ? '+' : '') + (s1.x - s2.x) + ' 件' : (s1.d >= 5 && s2.d >= 5 ? ((s1.x / s1.d - s2.x / s2.d) * 100 >= 0 ? '+' : '') + Math.round((s1.x / s1.d - s2.x / s2.d) * 100) + ' 百分點' : '分母 <5');
+    tr.appendChild(axEl('td', '', dif)); var ct = axEl('td', '', ci ? Math.round(ci[1] * 100) + ' 至 ' + Math.round(ci[2] * 100) : cnt ? '—' : '兩季分母需 ≥20'); tr.appendChild(ct);
+    if (ci && (ci[1] > 0 || ci[2] < 0)) { mqBadge(ct, '差異超出隨機變異'); sigs.push({ t: '與對照季差異超出隨機變異', m: code, v: dif, d: Math.min(s1.d, s2.d) }); }
+    var mt = axEl('td', 'mq-mini'); qm.forEach(function (y) { var s = mqStat(code, M, [y], k); mt.appendChild(axEl('span', '', ccYmShort(y) + ' ' + (cnt ? s.x : pcvTxt(s.x, s.d)))); }); tr.appendChild(mt);
+    tb.appendChild(tr); mqRow(per, code, s1); mqRow(cper, code, s2);
+  });
+  var p1 = pcxPanel(box, 'Q1 本季與對照季核心比較', '差異 95% CI 僅在兩季分母皆 ≥20 時計算（比率差，常態近似）；R1 為替代指標', true); p1.appendChild(tb);
+  /* Q2 趨勢 */
+  var end = qm[qm.length - 1], marks = mqBack(end, 12).concat([end]).filter(function (y) { return /-(01|04|07|10)$/.test(y); });
+  var r2 = axEl('div', 'pcx-row'); box.appendChild(r2);
+  [['V1', '件數（c 圖）'], ['A1', '接受率（p 圖）'], ['A2', '實際執行率（p 圖）'], ['O1', '問題解決率（p 圖）']].forEach(function (z) {
+    var host = pcxPanel(r2, 'Q2 ' + z[0] + ' ' + z[1], '近 13 個月；縱虛線＝季界'); mqSpc(host, M, k, z[0], end, done, z[1], marks);
+    qm.forEach(function (y) { if (done.indexOf(y) < 0) return; var b = mqBase(z[0], M, k, y, done), s = mqStat(z[0], M, [y], k), l = mqLim(z[0], b, s.d), v = mqVal(z[0], s); if (l && v !== null && (v > l[1] || v < l[0])) sigs.push({ t: '超出管制界限（' + ccYmLab(y) + '）', m: z[0], v: PCK[z[0]].cnt ? s.x + ' 件' : pcvTxt(s.x, s.d), d: s.d }); });
+  });
+  /* Q3 服務線 */
+  if (MQ.scope === 'all:全院' || MQ.scope.indexOf('ph:') === 0) {
+    var t3 = document.createElement('table'); t3.className = 'mq-tb'; var h3 = document.createElement('tr'); ['服務線', '本季件數', '對照季', 'P2 占比', '前 3 原因', '接受', '解決'].forEach(function (h) { h3.appendChild(axEl('th', '', h)); }); t3.appendChild(h3);
+    PCS_SVC.filter(function (s) { return s.svc; }).forEach(function (s) {
+      var sk = 'svc:' + s.svc, Ka = MQ.scope === 'all:全院' ? mqK(M, qm, sk) : null, Kb = MQ.scope === 'all:全院' ? mqK(M, cm, sk) : null;
+      if (!Ka) { var SVc = mqD(M, qm, k, '服務線'), SVd = mqD(M, cm, k, '服務線'), tr0 = document.createElement('tr'); tr0.appendChild(axEl('th', '', s.name)); [SVc[s.svc] ? SVc[s.svc].n : 0, SVd[s.svc] ? SVd[s.svc].n : 0, '—', '—', SVc[s.svc] ? pcvTxt(SVc[s.svc].G.A1, SVc[s.svc].G.A1 + SVc[s.svc].G.A2) : '—', '—'].forEach(function (v) { tr0.appendChild(axEl('td', '', String(v))); }); t3.appendChild(tr0); return; }
+      var C = mqD(M, qm, sk, '原因碼'), top = Object.keys(C).sort(function (a, b) { return C[b].n - C[a].n; }).slice(0, 3).map(function (c) { return c.split(' ')[0] + '（' + C[c].n + '）'; }).join('、') || '—', tr = document.createElement('tr');
+      tr.appendChild(axEl('th', '', s.name)); [String(Ka.n), String(Kb.n), pcvTxt(Ka.p2, Ka.pt), top, pcvTxt(Ka.a1, Ka.ad), pcvTxt(Ka.o1, Ka.ok)].forEach(function (v) { tr.appendChild(axEl('td', '', v)); }); t3.appendChild(tr);
+    });
+    var p3 = pcxPanel(box, 'Q3 服務線', '藥師範圍只顯示件數與接受', true); p3.appendChild(t3);
+  }
+  /* Q4 疾病與單位 */
+  if (MQ.scope === 'all:全院') {
+    var r4 = axEl('div', 'pcx-row'); box.appendChild(r4);
+    mqStrat(r4, M, qm, 'dis:', 'Q4 疾病（主要）', function (c) { return PC_DIS_NAME[c] || c; }, function (c) { mqJump('dis:' + c); });
+    mqStrat(r4, M, qm, 'ward:', 'Q4 病房', function (c) { return c; }, function (c) { PCX.unit = 'ward'; mqJump('unit:ward:' + c); });
+    mqStrat(r4, M, qm, 'dept:', 'Q4 科別', function (c) { return c; }, function (c) { PCX.unit = 'dept'; mqJump('unit:dept:' + c); });
+    if (typeof pcuFunnel === 'function') { var Fq = { ws: {}, win: qm }; qm.forEach(function (y) { Fq.ws[y] = 1; }); var Wn = Object.keys(pcSum(M, Fq, '病房')).filter(function (n) { return !PCU_EXCL.test(n); }); pcuFunnel(pcxPanel(r4, 'Q4 病房接受率漏斗圖', '不排名'), M, Fq, 'ward', Wn); }
+  }
+  /* Q5 全程 */
+  mqFlow(box, M, qm, k, 'Q5 DRP 全程（本季）');
+  /* Q6 未解決與反覆 */
+  var r6 = axEl('div', 'pcx-row'); box.appendChild(r6); var ST = mqD(M, qm, k, '狀態'), o3 = {}; Object.keys(ST).forEach(function (x) { if (/^O3/.test(x)) o3[x] = ST[x]; });
+  mqBars(r6, 'Q6 未解決原因（O3）', '本季', o3, { empty: '本季無未解決紀錄' });
+  var PD = mqD(M, MS.all, k, '待追蹤鍊期'), gt = PD['>90 天'] ? PD['>90 天'].n : 0; if (gt) sigs.push({ t: '有逾 90 天未追蹤結局', m: 'O4', v: gt + ' 筆', d: null });
+  mqBars(r6, 'Q6 待追蹤結局（全期存量）', '依照會日距今', PD, { order: ['≤30 天', '31–90 天', '>90 天'], focus: ['>90 天'], empty: '無待追蹤' });
+  var rc = qDone(q) ? mqRecur(M, k, end) : []; rc.forEach(function (c) { sigs.push({ t: '反覆出現（季末連續 3 個月每月 ≥2 筆）', m: c, v: '', d: null }); });
+  var A = pcMerge(qm.map(function (y) { return pcMon(M, y, '切片')[k]; })).A; mqBars(r6, 'Q6 不接受理由（A2）', '流程原因，不歸因個人', { 'A2.1 不可行': { n: A['A2.1'] || 0 }, 'A2.2 不同意': { n: A['A2.2'] || 0 }, 'A2.3 其他原因': { n: A['A2.3'] || 0 }, 'A2.4 原因不明': { n: A['A2.4'] || 0 } }, { skip: /^$/, empty: '本季無不接受紀錄' });
+  mqBars(r6, 'Q6 原因 Pareto（本季）', rc.length ? '醒目＝反覆出現' : '', mqD(M, qm, k, '原因碼'), { top: 8, acc: true, focus: rc });
+  /* Q8 判讀限制（干擾因素） */
+  var SVa = mqD(M, qm, k, '服務線'), SVb = mqD(M, cm, k, '服務線'), ta = mqC(SVa, /./), tbb = mqC(SVb, /./), shift = Object.keys(SVa).concat(Object.keys(SVb)).filter(function (x, i, a) { return a.indexOf(x) === i; }).filter(function (x) { return ta && tbb && Math.abs((SVa[x] ? SVa[x].n : 0) / ta - (SVb[x] ? SVb[x].n : 0) / tbb) > 0.1; });
+  var o2a = K1.nNew ? K1.ok / K1.nNew : null, o2b = K2.nNew ? K2.ok / K2.nNew : null, fa = qm.reduce(function (s, y) { return Math.max(s, (pcMon(M0, y, '填表人數')['人數'] || { n: 0 }).n); }, 0), fb = cm.reduce(function (s, y) { return Math.max(s, (pcMon(M0, y, '填表人數')['人數'] || { n: 0 }).n); }, 0);
+  var HG = function (ms) { var H = mqD(M, ms, k, '高齡'), a = H['≥65 歲'] ? H['≥65 歲'].n : 0, b = H['<65 歲'] ? H['<65 歲'].n : 0; return a + b ? pcvTxt(a, a + b) : '—'; };
+  var conf = [['分母 <20 的比率指標', ['A1', 'A2', 'O1', 'O2'].filter(function (c) { var a = PCK[c].get(K1); return a[1] !== null && a[1] < 20; }).join('、') || '無'],
+    ['服務線組成改變（占比差 >10 百分點）', shift.join('、') || '無'], ['結果評估完成率', (o2a === null ? '—' : Math.round(o2a * 100) + '%') + ' 對 ' + (o2b === null ? '—' : Math.round(o2b * 100) + '%') + (o2a !== null && o2b !== null && Math.abs(o2a - o2b) > 0.1 ? '（差 >10 百分點，解決率不宜直接比較）' : '')],
+    ['新表單占比', (K1.newShare === null ? '—' : Math.round(K1.newShare * 100) + '%') + ' 對 ' + (K2.newShare === null ? '—' : Math.round(K2.newShare * 100) + '%') + (K1.newShare !== null && K2.newShare !== null && Math.abs(K1.newShare - K2.newShare) > 0.2 ? '（跨表單改版，O、P 性質指標組成不同）' : '')],
+    ['≥65 歲占比（年齡已知）', HG(qm) + ' 對 ' + HG(cm)], ['單月最多填表人數', fa + ' 對 ' + fb + (fa !== fb ? '（人力或學員梯次改變）' : '')]];
+  /* Q7 優先討論清單 */
+  var p7 = pcxPanel(box, 'Q7 值得優先討論的項目（訊號清單）', '系統只列可檢查的事實，原因與臨床意義由檢討會議判斷', true);
+  if (!sigs.length) p7.appendChild(axEl('p', 'ax-muted', '本季無訊號。')); else {
+    var t7 = document.createElement('table'); t7.className = 'mq-tb'; var h7 = document.createElement('tr'); ['訊號', '指標或原因', '數值', '分母', '需同時檢視'].forEach(function (h) { h7.appendChild(axEl('th', '', h)); }); t7.appendChild(h7);
+    sigs.forEach(function (x) { var tr = document.createElement('tr'); [x.t, PCK[x.m] ? x.m + ' ' + PCK[x.m].name : '原因 ' + x.m, x.v || '—', x.d === null || x.d === undefined ? '—' : String(x.d), (x.d !== null && x.d !== undefined && x.d < 20 ? '分母 <20；' : '') + (shift.length ? '服務線組成改變；' : '') + '結果評估完成率'].forEach(function (v) { tr.appendChild(axEl('td', '', v)); }); t7.appendChild(tr); });
+    p7.appendChild(t7);
+  }
+  var p8 = pcxPanel(box, 'Q8 可能影響指標變動的因素（本季對照季）', '數值上升或下降不等於品質改善或惡化', true), ul = axEl('ul', 'mq-lim'); conf.forEach(function (r) { var li = axEl('li', ''); li.appendChild(axEl('b', '', r[0] + '：')); li.appendChild(document.createTextNode(r[1])); ul.appendChild(li); }); p8.appendChild(ul);
+  var p9 = pcxPanel(box, '指標定義', '', true), dl = axEl('dl', 'mq-dict'); Object.keys(PCK).forEach(function (c) { dl.appendChild(axEl('dt', '', c + ' ' + PCK[c].name)); dl.appendChild(axEl('dd', '', '分子：' + PCK[c].num + '｜分母：' + PCK[c].den + '｜來源：' + PCK[c].src)); }); p9.appendChild(dl);
+  p9.appendChild(axEl('p', 'pcx-pn', '統計單位為照會紀錄；小樣本：分母 <5 只顯示分子／分母，5–19 附 95% CI。管制界限基準為前 12 個完整月。本報表為院內品質監測，不含個人姓名；藥品諮詢本階段未納入。'));
+}
+
+/* ---------- 檢視切換 ---------- */
+var MQ_HOST = null, MQ_BOX = null, MQ_M = null;
+function mqSetView(v) {
+  MQ.view = v; if (!MQ_HOST) return; MQ_HOST.classList.toggle('mq-on', v !== 'analysis');
+  Array.prototype.forEach.call(MQ_HOST.querySelectorAll('.mq-sw button'), function (b) { var on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+  mqRender();
+}
+function mqRender() {
+  if (!MQ_BOX || !MQ_M) return; MQ_BOX.innerHTML = ''; if (MQ.view === 'analysis') return;
+  if (!MQ_M.dims['切片'] || !pcSum(MQ_M, { ws: {}, win: [] }, '切片', { allTime: true })['all:全院']) { MQ_BOX.appendChild(axEl('p', 'pcs-note', '每月監測與每季檢討需 PcneAgg v2.6.0 彙總（後台重算後自動啟用）；目前可使用「分析」檢視。')); return; }
+  var y = window.pageYOffset || 0;
+  try { if (MQ.view === 'month') mqMonth(MQ_BOX, MQ_M, mqRender); else mqQuarter(MQ_BOX, MQ_M, mqRender); } catch (e) { MQ_BOX.appendChild(axEl('p', 'pcs-note', '頁面產生失敗：' + (e && e.message))); if (window.console) console.warn(e); }
+  window.scrollTo(0, y);
+}
+function mqMount(host, M) {
+  MQ_HOST = host; MQ_M = M; var sw = axEl('div', 'mq-sw'); sw.setAttribute('role', 'group'); sw.setAttribute('aria-label', '檢視');
+  [['month', '每月成效監測'], ['quarter', '每季品質檢討'], ['analysis', '分析（全部圖卡與專屬儀表板）']].forEach(function (z) { var b = axEl('button', 'btn', z[1]); b.type = 'button'; b.dataset.v = z[0]; b.onclick = function () { mqSetView(z[0]); }; sw.appendChild(b); });
+  MQ_BOX = axEl('div', 'mq-box'); host.insertBefore(MQ_BOX, host.firstChild); host.insertBefore(sw, host.firstChild);
+  mqSetView(MQ.view); mqLoadPh().then(function () { if (MQ.view !== 'analysis') mqRender(); });
+}
+
 /* ---------- 資料品質：v2.2＋v2.3 ---------- */
 function pcDq22(sec, M) {
   if (!sec || !M.dims['照護單位']) return;
@@ -11206,7 +11579,12 @@ function axPcneSvcPersonal(host, d) {
     g.appendChild(axTile('服務線涵蓋', '<b>' + have.length + '</b><small>／6 服務線</small>', have.length < 6 ? '尚未接觸：' + svcs.filter(function (s) { return have.indexOf(s) < 0; }).map(function (s) { return s.name; }).join('、') : '六類服務線皆有紀錄'));
     g.appendChild(axTile('疾病廣度', '<b>' + dHave.length + '</b><small>／' + allDis.length + ' 疾病</small>', dHave.length ? '尚未接觸：' + dMiss.slice(0, 8).map(function (k) { return PC_DIS_NAME[k]; }).join('、') + (dMiss.length > 8 ? ' 等 ' + dMiss.length + ' 項' : '') : '新表單起依「主要影響疾病照護」計'));
     g.appendChild(axTile('高齡個案', '<b>' + ger + '</b><small> 筆</small>', '≥65 歲；病人年齡題 2026-11 起'));
-    var WD = Object.keys(cats('病房')), DP = Object.keys(cats('科別'));
+    var WD = Object.keys(cats('病房')), DP = Object.keys(cats('科別')), PDm = cats('待追蹤鍊期'), byM = {};
+    rows.filter(function (r) { return String(r[iD]) === '全部' && /^\d{4}-\d{2}$/.test(String(r[iY])); }).forEach(function (r) { byM[String(r[iY])] = (byM[String(r[iY])] || 0) + (+r[iV] || 0); });
+    var mk = Object.keys(byM).sort(), mseq = mk.length ? pcSeq(mk[0], ccNowYm()).slice(-13) : [], mt = axTile('每月件數（近 13 個月）', '<b>' + (mseq.length ? (byM[mseq[mseq.length - 1]] || 0) : 0) + '</b><small> 筆（本月）</small>', mseq.length ? ccYmLab(mseq[0]) + '起' : '尚無紀錄');
+    if (mseq.length > 1) mt.appendChild(pcsSpark(mseq.map(function (y) { return byM[y] || 0; }), '本人每月件數'));
+    var pdT = ['≤30 天', '31–90 天', '>90 天'].map(function (b) { return b + ' ' + (PDm[b] || 0); }).join('｜'), pdN = ['≤30 天', '31–90 天', '>90 天'].reduce(function (s, b) { return s + (PDm[b] || 0); }, 0);
+    g.appendChild(mt); g.appendChild(axTile('本人待追蹤結局', '<b>' + pdN + '</b><small> 筆</small>', pdN ? pdT + '｜請以「編輯回覆」補問題狀態' : '無待追蹤（新表單 O0.1 或未填）'));
     g.appendChild(axTile('接觸單位廣度', '<b>' + WD.length + '</b><small> 病房｜</small><b>' + DP.length + '</b><small> 科別</small>', WD.length || DP.length ? '病房：' + WD.sort(pcuNat).slice(0, 10).join('、') + (WD.length > 10 ? ' 等' : '') : '依表單「病房/科別」；需 PcneAgg v2.5.0'));
     g.appendChild(axTile('結果評估完成', '<b>' + (evT ? pcvTxt(ev, evT) : '—') + '</b>', evT ? ev + '／' + evT + '（新表單 O1–O3）' : '尚無新表單紀錄'));
     g.appendChild(axTile('TDM 追蹤完成', '<b>' + (tdmAll ? pcvTxt(tdmOk, tdmAll) : '—') + '</b>', (tdmAll ? tdmOk + '／' + tdmAll + '（服務線＝治療監測，O1–O3）' : '尚無新表單 TDM 紀錄') + (tdmOld ? '｜舊表單 ' + tdmOld + ' 筆無結局欄，不計' : '')));
