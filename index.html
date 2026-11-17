@@ -1234,7 +1234,7 @@ button.ck-card:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 .mq-sw .btn.on{background:#1e5e82;color:#fff;border-color:#1e5e82}
 .mq-box{order:-1;grid-column:1/-1;min-width:0}
 .mq-on>.ax-card,.mq-on>section.chart{display:none!important}
-body.mq-hide :has(> .mq-sw)>.ax-card,body.mq-hide :has(> .mq-sw)>section.chart{display:none!important}
+body.mq-hide :has(> .mq-sw)>:not(.mq-sw):not(.mq-box){display:none!important}
 .mq-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
 .mq-status{font-size:.82rem;color:#33444f;background:#f4f6f7;border-radius:8px;padding:6px 10px;margin:6px 0 10px}
 .mq-status.warn{background:#fff4e0;color:#8a5a00}
@@ -1445,7 +1445,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '5.5.3';
+var APP_VERSION = '5.5.4';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -11336,7 +11336,8 @@ function mqBase(code, M, k, ym, done) {
 }
 function mqLim(code, base, d) {
   if (base.c === null || base.n < 6) return null;
-  if (PCK[code].cnt) { var s = Math.sqrt(base.c); return [Math.max(0, base.c - 3 * s), base.c + 3 * s]; }
+  /* 基準平均 <1 件／月時 c chart 近似不穩，不設界限（避免低量範圍誤報） */
+  if (PCK[code].cnt) { if (base.c < 1) return null; var s = Math.sqrt(base.c); return [Math.max(0, base.c - 3 * s), base.c + 3 * s]; }
   if (!d || d < 5) return null; var e = 3 * Math.sqrt(base.c * (1 - base.c) / d); return [Math.max(0, base.c - e), Math.min(1, base.c + e)];
 }
 function mqVal(code, s) { return PCK[code].cnt ? s.x : (s.d ? s.x / s.d : null); }
@@ -11409,7 +11410,12 @@ function mqStrat(host, M, yms, pre, title, lab, jump) {
   p.appendChild(tb);
 }
 function mqJump(id) {
-  mqSetView('analysis'); setTimeout(function () { var el = document.querySelector('[data-pcx="' + id + '"]'); if (!el) return; if (el.getAttribute('aria-expanded') !== 'true') el.click(); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 60);
+  mqSetView('analysis');
+  /* 病房／科別看板目前面向與目標不同時，先切換面向（觸發看板重繪）再定位 */
+  var um = /^unit:(ward|dept):/.exec(id), wait = 60;
+  if (um) { var us = [].filter.call(document.querySelectorAll('select'), function (x) { var v = [].map.call(x.options, function (o) { return o.value; }); return v.length === 2 && v.indexOf('ward') >= 0 && v.indexOf('dept') >= 0; })[0];
+    if (us && us.value !== um[1]) { us.value = um[1]; us.dispatchEvent(new Event('change', { bubbles: true })); wait = 400; } }
+  setTimeout(function () { var el = document.querySelector('[data-pcx="' + id + '"]'); if (!el) return; if (el.getAttribute('aria-expanded') !== 'true') el.click(); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, wait);
 }
 
 /* ---------- 控制列 ---------- */
