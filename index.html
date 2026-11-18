@@ -1289,6 +1289,25 @@ details.mq-sec>summary.mq-h{display:list-item}
 .mq-dict{display:grid;grid-template-columns:minmax(160px,auto) 1fr;gap:4px 10px;font-size:.76rem}.mq-dict dd{margin:0;color:#33444f}
 .mq-ph{display:none}
 @media print{body.mq-printing *{visibility:hidden}body.mq-printing .mq-ptarget,body.mq-printing .mq-ptarget *{visibility:visible}body.mq-printing .mq-ptarget{position:absolute;left:0;top:0;width:100%}body.mq-printing .mq-ptarget .mq-bar,body.mq-printing .mq-ptarget .mq-why summary{display:none}body.mq-printing .mq-ph{display:block}body.mq-printing .pcx-row{display:block}body.mq-printing .pcx-panel{break-inside:avoid;margin-bottom:8px}}
+
+/* v7.0.0 CBME 教學成效監測 */
+.v7-bar{display:flex;flex-direction:column;gap:10px;grid-column:1/-1}
+.v7-tabs{display:flex;flex-wrap:wrap;gap:6px}
+.v7-tab{border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:999px;padding:6px 14px;font:600 .9rem var(--body);cursor:pointer}
+.v7-tab.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.v7-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.v7-btn{border:1px solid var(--rule);background:var(--sheet);border-radius:6px;padding:4px 10px;font:500 .82rem var(--body);cursor:pointer}
+.v7-hint{font-size:.78rem;color:var(--ink-3)}
+.v7-view{display:contents}
+.v7-mode>:not(.v7-keep){display:none!important}
+.v7-learner{border:1px solid var(--rule);border-radius:8px;padding:10px 12px;margin:10px 0;break-inside:avoid}
+.v7-learner h4{margin:0 0 4px;font-size:1rem}
+.v7-meta{font-size:.8rem;color:var(--ink-3);margin:4px 0}
+.v7-fb{font-size:.82rem;margin-top:6px;display:flex;flex-direction:column;gap:2px}
+td.v7-blank{min-width:110px;background:repeating-linear-gradient(90deg,transparent 0 6px,var(--rule-2) 6px 7px) bottom/100% 1px no-repeat}
+.v7-done{font-size:.78rem;color:var(--ink-3)}
+.v7-pr{display:none}
+@media print{body.v7-printing>*:not(.v7-pr){display:none!important}body.v7-printing .v7-pr{display:block;font-size:10pt;color:#000}.v7-pr .v7-learner{break-before:page}.v7-pr .ax-info,.v7-pr .ax-peer{display:none}.v7-pr section{break-inside:avoid-page;margin-bottom:8pt}.v7-pr table{border-collapse:collapse;width:100%}.v7-pr th,.v7-pr td{border:1px solid #999;padding:2pt 4pt;font-size:8.5pt}}
 </style>
 </head>
 <body>
@@ -1475,7 +1494,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '6.0.1';
+var APP_VERSION = '7.0.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -12159,6 +12178,484 @@ function mqJump(id) {
   RANGE_DASH = /藥事照會介入成效|臨床藥學服務|PGY 學員個人成績|UGY 學生個人成績/;
 })();
 
+
+/* =====================================================================
+   v7.0.0｜CBME 教學成效監測（2026-11-18）
+   依「CBME 教學成效儀表板｜零信任審查暨施工建議書」E1–E8 裁決施工：
+   H-03 到職日期（有欄位才用，無者標示推論）｜H-04 序位量尺改分布／中位數／達門檻比例
+   H-05 C4、C8 三數（已到期／已判定／達成）｜H-07 群體頁姓名限教學行政與 CCC 角色
+   H-08–H-11 CBME 成效頁檢視切換：CCC 階段判定（K1–K4）｜半年監測（H1–H8）｜年度檢討（Y1–Y9）｜詳細分析
+   H-12–H-15 四成效頁移除每日一題、亮點收合、T1 移入教師頁、U1 分布、個人頁「其他學習證據」收合
+   原則：系統不產生 CCC 正式判定；里程碑、EPA、WBA、CCC 不合併；覆蓋與達標分列；不排名教師或學生。
+   ===================================================================== */
+var AX7 = { view: 'ccc', half: null, cmp: null, year: null, cyear: null, stage: null, P: null, M: {}, ready: null };
+var AX7_ROLE_NAMES = /GOVERN|ADMIN|CCC|DIRECTOR|COORDINATOR/;
+function ax7CanName() { var r = String((S.user && S.user.active_role) || ''); return AX7_ROLE_NAMES.test(r); }
+function ax7Yr(h) { return String(h || '').replace(/\s*[（(]\s*[上下]\s*[）)]\s*$/, '').trim(); }
+function ax7YK(s) { return (String(s || '').match(/\d{2,4}/) || [''])[0]; }
+function ax7IsHalf(h) { return /[（(]\s*[上下]\s*[）)]/.test(String(h || '')); }
+function ax7LoMed(a) { var b = a.slice().sort(function (x, y) { return x - y; }); return b.length ? b[(b.length - 1) >> 1] : null; } /* 序位資料取下中位數，避免出現不存在的等級 */
+function ax7P(a, b) { return b ? Math.round(a / b * 1000) / 10 : null; }
+function ax7PctTxt(a, b) { return b ? a + '／' + b + '（' + ax7P(a, b) + '%）' : 'N/A'; }
+function ax7Days(a, b) { return Math.round((a - b) / 864e5); }
+function ax7Tab(head, rows, cls) {
+  var t = axEl('table', 'ax-gtab v7-agg' + (cls ? ' ' + cls : '')); t.innerHTML = '<thead><tr>' + head.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead>';
+  var tb = document.createElement('tbody');
+  rows.forEach(function (r) { var tr = document.createElement('tr'); r.forEach(function (c, i) { var td = axEl(i ? 'td' : 'th', i ? 'num' : ''); if (c && c.nodeType) td.appendChild(c); else if (c && typeof c === 'object') { td.innerHTML = c.h; if (c.cls) td.className += ' ' + c.cls; if (c.tip) td.title = c.tip; } else td.textContent = c === null || c === undefined ? '—' : String(c); tr.appendChild(td); }); tb.appendChild(tr); });
+  t.appendChild(tb); var s = axEl('div', 'ax-scroll'); s.appendChild(t); return s;
+}
+function ax7Sec(host, ax, title, sub, note) { var s = axGroupSec(host, ax, title, sub, note || '<b>口徑</b>：見建議書第 D 節指標字典。'); s.classList.add('v7-sec'); return s; }
+function ax7State(host, txt) { host.appendChild(axEl('div', 'state', txt)); }
+function ax7Dist6(vals) { var c = [0, 0, 0, 0, 0, 0, 0]; vals.forEach(function (v) { var k = Math.max(1, Math.min(6, Math.round(v))); c[k]++; }); return c; }
+function ax7Bar6(c) { var n = c.slice(1).reduce(function (a, b) { return a + b; }, 0); return axStackBar([1, 2, 3, 4, 5, 6].map(function (k) { return { n: c[k], c: 's' + k, t: k + ' 分' }; }), n || 1); }
+var AX7_LEG6 = '<span><i class="ax-sw2 s1"></i>1</span><span><i class="ax-sw2 s2"></i>2</span><span><i class="ax-sw2 s3"></i>3</span><span><i class="ax-sw2 s4"></i>4</span><span><i class="ax-sw2 s5"></i>5</span><span><i class="ax-sw2 s6"></i>6 分</span>';
+
+/* ---------- H-03：到職日期（學員CBME「到職日期」欄；每位學員填一次即可，任一列有值即套用） ---------- */
+var ax7Rows0 = ax4Rows;
+ax4Rows = function (src) {
+  var P = ax7Rows0(src), hI = axCol(src.cols, /^到職日期$/), today = ax4Today();
+  P.hasHire = hI >= 0; P.hireN = 0;
+  if (hI >= 0) {
+    var by = {}; P.rows.forEach(function (r, i) { var d = axDate(src.rows[i][hI]); if (d && r.key && !by[r.key]) by[r.key] = d; });
+    P.rows.forEach(function (r) {
+      var h = by[r.key]; if (!h || !(r.mo > 0) || r.nonstd) return;
+      r.hire = h; r.due = new Date(h.getFullYear(), h.getMonth() + r.mo, h.getDate()); r.dueSrc = '到職日期'; P.hireN++;
+      var due = r.due.getTime() <= today.getTime(), cccOk = r.date ? r.date.getTime() <= today.getTime() : false;
+      r.state = r.ccc ? (!r.date ? 'undated' : cccOk ? 'done' : 'prefill') : r.any ? (due ? 'obs' : 'obsEarly') : (due ? 'overdue' : 'pending');
+      r.formal = r.state === 'done' && !r.nonstd;
+    });
+  }
+  P.rows.forEach(function (r) { if (!r.due) { r.due = r.date; r.dueSrc = r.date ? '推論（CCC 日期）' : ''; } });
+  return P;
+};
+
+/* ---------- 指標計算：單一計算層（CCC、半年、年度、詳細分析共用） ---------- */
+function ax7Base(P) { return P.rows.filter(function (r) { return !r.excluded && !r.nonstd && r.mo > 0; }); }
+function ax7InWin(r, w) { if (!w) return true; return w.type === 'half' ? r.year === w.v : ax7Yr(r.year) === w.v; }
+function ax7Kpi(P, w) {
+  var R = ax7Base(P).filter(function (r) { return ax7InWin(r, w); }), today = ax4Today(), K = { R: R };
+  var st = {}; R.forEach(function (r) { st[r.state] = (st[r.state] || 0) + 1; }); K.st = st;
+  K.C1 = { n: st.done || 0, d: (st.done || 0) + (st.overdue || 0) + (st.obs || 0) };
+  var persons = {}; R.forEach(function (r) { persons[r.key] = 1; }); K.persons = Object.keys(persons).length;
+  var formal = R.filter(function (r) { return r.formal; });
+  var cov = 0, met = 0, N = 0; K.byStage = {};
+  AX4.stages.forEach(function (s) {
+    var rs = R.filter(function (r) { return r.stage === s; }), fr = rs.filter(function (r) { return r.formal; });
+    var req = P.keys.filter(function (k) { return axTgtApproved(P.kinds[k], s, k) !== undefined; }), reqMs = req.filter(function (k) { return P.kinds[k] === 'ms'; });
+    var o = { rows: rs.length, due: 0, judged: fr.length, full: 0, req: req.length, cov: 0, met: 0, N: fr.length * req.length, msCov: 0, msMet: 0, msN: fr.length * reqMs.length, st: {} };
+    rs.forEach(function (r) { o.st[r.state] = (o.st[r.state] || 0) + 1; if (r.state === 'done' || r.state === 'overdue' || r.state === 'obs') o.due++; });
+    fr.forEach(function (r) {
+      var ok = req.length > 0;
+      req.forEach(function (k) { var c = r.C[k], t = axTgtApproved(P.kinds[k], s, k), ms = P.kinds[k] === 'ms'; if (c) { o.cov++; if (ms) o.msCov++; if (c.v >= t - AX_EPS) { o.met++; if (ms) o.msMet++; } else ok = false; } else ok = false; });
+      if (ok) o.full++;
+    });
+    cov += o.msCov; met += o.msMet; N += o.msN; K.byStage[s] = o;
+  });
+  K.C2 = { n: cov, d: N }; K.C3 = { n: met, d: N };
+  K.C4 = K.byStage; K.C8 = K.byStage.PGY24M;
+  /* C5：EPA 正式信賴（每位學員取窗內最後一個已判定期程；到公版 L4 時機者入分母） */
+  var byP = {}; formal.forEach(function (r) { (byP[r.key] = byP[r.key] || []).push(r); });
+  K.C5 = []; var c5n = 0, c5d = 0;
+  AX_EPA_REG.filter(function (e) { return !e.inhouse; }).forEach(function (e) {
+    var k = P.keys.filter(function (x) { return P.kinds[x] === 'epa' && axEpaId(x) === e; })[0]; if (!k) return;
+    var el = 0, at = 0, lo = 0, no = 0;
+    Object.keys(byP).forEach(function (pk) { var a = byP[pk].slice().sort(function (x, y) { return x.mo - y.mo; }), last = a[a.length - 1]; if (last.mo < e.l4) return; el++; var c = last.C[k]; if (!c) no++; else if (c.v >= 4 - AX_EPS) at++; else lo++; });
+    K.C5.push({ e: e, el: el, at: at, lo: lo, no: no }); c5n += at; c5d += el;
+  });
+  K.C5all = { n: c5n, d: c5d };
+  /* C6／C7：相鄰兩個已判定期程（後期在窗內） */
+  var all = P.rows.filter(function (r) { return r.formal && !r.excluded; }), byA = {}; all.forEach(function (r) { (byA[r.key] = byA[r.key] || []).push(r); });
+  var up = 0, same = 0, down = 0, drops = [];
+  Object.keys(byA).forEach(function (pk) { var a = byA[pk].sort(function (x, y) { return x.mo - y.mo; }); for (var i = 1; i < a.length; i++) { if (!ax7InWin(a[i], w)) continue; P.keys.forEach(function (it) { var x = a[i - 1].C[it], y = a[i].C[it]; if (!x || !y) return; if (y.v > x.v + AX_EPS) up++; else if (y.v < x.v - AX_EPS) { down++; drops.push({ key: pk, item: it, from: a[i - 1].stage, to: a[i].stage, a: axLvText(x.v, P.kinds[it]), b: axLvText(y.v, P.kinds[it]) }); } else same++; }); } });
+  K.C6 = { up: up, same: same, down: down, d: up + same + down }; K.C7 = drops;
+  K.T1 = ax43Agree(P, R);
+  var withLv = R.filter(function (r) { return r.state === 'done' || r.state === 'obs'; }), lb = [0, 0, 0, 0];
+  withLv.forEach(function (r) { var L = r.fb.join('').replace(/\s/g, '').length; lb[L === 0 ? 0 : L < 50 ? 1 : L < 150 ? 2 : 3]++; });
+  K.T2 = { d: withLv.length, n: withLv.length - lb[0], lb: lb };
+  var tb = [0, 0, 0, 0], tn = 0; R.filter(function (r) { return r.state === 'done' && r.dueSrc === '到職日期'; }).forEach(function (r) { var dd = ax7Days(r.date, r.due); tn++; tb[dd <= 0 ? 0 : dd <= 30 ? 1 : dd <= 90 ? 2 : 3]++; });
+  K.T4 = { n: tn, b: tb, hire: P.hasHire };
+  K.od90 = R.filter(function (r) { return (r.state === 'overdue' || r.state === 'obs') && r.due && ax7Days(today, r.due) > 90; });
+  K.inferred = R.filter(function (r) { return r.dueSrc && r.dueSrc !== '到職日期'; }).length;
+  K.dq = { prefill: st.prefill || 0, undated: st.undated || 0, nodate: st.nodate || 0, noyear: R.filter(function (r) { return P.hasYear && !r.year; }).length };
+  var dup = {}; R.forEach(function (r) { var k = r.key + '|' + r.stage; dup[k] = (dup[k] || 0) + 1; }); K.dq.dup = Object.keys(dup).filter(function (k) { return dup[k] > 1; }).length;
+  return K;
+}
+/* 能力項目達標率（公版有目標的項目；分母＝已判定且有 CCC 等級） */
+function ax7ItemRates(P, w) {
+  var R = ax7Base(P).filter(function (r) { return r.formal && ax7InWin(r, w); }), out = [];
+  AX4.stages.forEach(function (s) { P.keys.forEach(function (k) { if (axTgtApproved(P.kinds[k], s, k) === undefined) return; var t = 4, n = 0, d = 0; R.forEach(function (r) { if (r.stage !== s) return; var c = r.C[k]; if (!c) return; d++; if (c.v >= t - AX_EPS) n++; }); if (d) out.push({ stage: s, item: k, n: n, d: d, p: n / d }); }); });
+  return out;
+}
+/* UGY（分析_學生成效）、單位（分析_組別成效）、教師（分析_教師成效）彙總 */
+function ax7Ugy(M, w) {
+  if (!M) return null;
+  var recs = M.recs.filter(function (r) { return !w || (w.type === 'half' ? (ax7IsHalf(r.year) ? r.year === w.v : ax7YK(r.year) === ax7YK(w.v)) : ax7YK(r.year) === ax7YK(w.v)); });
+  var forms = {}, stu = {}; recs.forEach(function (r) { var s = r.subj || '（未填）'; stu[s] = stu[s] || {}; stu[s][r._row] = 1; forms[r._row] = 1; });
+  var ns = Object.keys(stu).length, n5 = Object.keys(stu).filter(function (s) { return Object.keys(stu[s]).length >= 5; }).length;
+  var vals = recs.map(function (r) { return r.v; }), top = vals.filter(function (v) { return v >= 6 - AX_EPS; }).length;
+  var byI = {}; recs.forEach(function (r) { (byI[r.item] = byI[r.item] || []).push(r.v); });
+  var ceil = Object.keys(byI).filter(function (k) { return byI[k].length >= 5 && byI[k].filter(function (v) { return v >= 6 - AX_EPS; }).length / byI[k].length > 0.5; });
+  return { recs: recs, students: ns, forms: Object.keys(forms).length, L1: { n: n5, d: ns }, L3: { n: top, d: vals.length }, dist: ax7Dist6(vals), med: axMedian(vals), ceil: ceil, halfOk: recs.some(function (r) { return ax7IsHalf(r.year); }) };
+}
+function ax7Group(M, w, key) {
+  if (!M) return null;
+  var recs = M.recs.filter(function (r) { return !w || ax7YK(r.year) === ax7YK(w.v); }), g = {};
+  recs.forEach(function (r) { var k = r[key] || '（未填）'; (g[k] = g[k] || []).push(r); });
+  return Object.keys(g).sort().map(function (k) { var a = g[k], vals = a.map(function (r) { return r.v; }); return { k: k, forms: axRows(a), n: vals.length, dist: ax7Dist6(vals), med: axMedian(vals), top: vals.filter(function (v) { return v >= 6 - AX_EPS; }).length }; });
+}
+function ax7Load() {
+  if (AX7.ready) return AX7.ready;
+  var one = function (k) { return axPrep(k).catch(function () { return null; }); };
+  AX7.ready = Promise.all([axLoad(AX.KEYS.cbme).then(function (cb) { return cb.rows.length ? ax4Rows(cb) : null; }).catch(function () { return null; }), one('stu'), one('unit'), one('tea')]).then(function (a) { AX7.P = a[0]; AX7.M = { stu: a[1], unit: a[2], tea: a[3] }; return AX7; });
+  return AX7.ready;
+}
+/* 訊號（只標示，不下結論；門檻為建議書起始值，非文獻或院內規定） */
+function ax7Signals(P, w, wc) {
+  var K = ax7Kpi(P, w), Kc = wc ? ax7Kpi(P, wc) : null, out = [];
+  if (K.od90.length) out.push(['判定逾期', K.od90.length + ' 個學員×期程已到期逾 90 天仍無 CCC 等級']);
+  if (Kc && K.C1.d >= 10 && Kc.C1.d >= 10) { var d = ax7P(K.C1.n, K.C1.d) - ax7P(Kc.C1.n, Kc.C1.d); if (Math.abs(d) > 10) out.push(['覆蓋差距', 'C1 本期 ' + ax7P(K.C1.n, K.C1.d) + '%、對照期 ' + ax7P(Kc.C1.n, Kc.C1.d) + '%（差 ' + Math.round(d * 10) / 10 + ' 個百分點）']); }
+  if (K.C7.length) { var ps = {}, its = {}; K.C7.forEach(function (x) { ps[x.key] = 1; its[x.item.split(' ')[0]] = 1; }); out.push(['等級下降', K.C7.length + ' 項次、' + Object.keys(ps).length + ' 人；項目：' + Object.keys(its).join('、')]); }
+  if (Kc && K.T1.pairs && Kc.T1.pairs) { var a = ax7P(K.T1.hi, K.T1.pairs), b = ax7P(Kc.T1.hi, Kc.T1.pairs); if (a - b > 10) out.push(['校準偏移', '教師觀察高於 CCC 的比例 ' + b + '% → ' + a + '%']); }
+  var U = ax7Ugy(AX7.M.stu, w); if (U && U.ceil.length) out.push(['天花板效應', 'UGY ' + U.ceil.length + ' 題 6 分比例超過 50%：' + U.ceil.slice(0, 6).join('、') + (U.ceil.length > 6 ? '…' : '')]);
+  return out;
+}
+function ax7SignalsSec(host, ax, P, w, wc, extra) {
+  var s = ax7Sec(host, ax, '訊號清單', '只標示需要討論的事實，不下結論；門檻（90 天、10 個百分點、50%）為建議書起始值，無文獻或院內規定依據', '<b>規則</b>：判定逾期＝已到期逾 90 天仍無 CCC 等級；覆蓋差距＝本期與對照期 C1 差 &gt;10 個百分點（兩期分母皆 ≥10）；等級下降＝C7 &gt;0；校準偏移＝T1 教師高於 CCC 比例增加 &gt;10 個百分點；天花板效應＝UGY 某題 6 分比例 &gt;50%（n≥5）；反覆缺口＝同一項目連續兩個半年在同期程達標率為最低三項之一（分母皆 ≥5，僅年度檢視）。');
+  var L = ax7Signals(P, w, wc).concat(extra || []);
+  if (!L.length) ax7State(s, '本期無符合規則的訊號'); else s.appendChild(ax7Tab(['訊號', '事實'], L));
+  return s;
+}
+
+/* ---------- 頁首列：檢視切換＋期間＋列印／匯出彙總 CSV ---------- */
+function ax7Windows(P) {
+  var hs = (P.years || []).slice(), ys = []; hs.forEach(function (h) { var y = ax7Yr(h); if (y && ys.indexOf(y) < 0) ys.push(y); });
+  return { halves: hs, years: ys };
+}
+function ax7Csv(view) {
+  var rows = [['檢視', '區塊', '欄位', '值']];
+  Array.prototype.forEach.call(view.querySelectorAll('section.v7-sec'), function (s) {
+    var t = (s.querySelector('.ax-title') || {}).textContent || '';
+    Array.prototype.forEach.call(s.querySelectorAll('table.v7-agg'), function (tab) {
+      var hd = Array.prototype.map.call(tab.querySelectorAll('thead th'), function (x) { return x.textContent; });
+      Array.prototype.forEach.call(tab.querySelectorAll('tbody tr'), function (tr) { var c = tr.children; for (var i = 1; i < c.length; i++) rows.push([AX7.view, t, c[0].textContent + '｜' + (hd[i] || ''), c[i].textContent]); });
+    });
+    Array.prototype.forEach.call(s.querySelectorAll('.ax-gt'), function (g) { rows.push([AX7.view, t, (g.querySelector('.ax-gt-l') || {}).textContent || '', ((g.querySelector('.ax-gt-v') || {}).textContent || '') + ' ' + ((g.querySelector('.ax-gt-f') || {}).textContent || '')]); });
+  });
+  var csv = '﻿' + rows.map(function (r) { return r.map(function (c) { c = String(c == null ? '' : c).replace(/\s+/g, ' ').trim(); return /[",\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c; }).join(','); }).join('\n');
+  var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = 'CBME教學成效_' + AX7.view + '_' + axFmtDate(ax4Today()).replace(/\//g, '') + '.csv'; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function ax7Mount(box) {
+  if (box.querySelector('.v7-bar')) return;
+  var bar = axEl('section', 'chart ax-card v7-bar v7-keep'), view = axEl('div', 'v7-view v7-keep');
+  box.insertBefore(view, box.firstChild); box.insertBefore(bar, view);
+  var V = [['ccc', 'CCC 階段判定'], ['half', '半年監測'], ['year', '年度檢討'], ['ana', '詳細分析']];
+  function draw() {
+    bar.innerHTML = '';
+    var tabs = axEl('div', 'v7-tabs'); tabs.setAttribute('role', 'tablist');
+    V.forEach(function (v) { var b = axEl('button', 'v7-tab' + (AX7.view === v[0] ? ' on' : ''), v[1]); b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', AX7.view === v[0] ? 'true' : 'false'); b.addEventListener('click', function () { AX7.view = v[0]; draw(); }); tabs.appendChild(b); });
+    bar.appendChild(tabs);
+    var tools = axEl('div', 'v7-tools'), ctl = axEl('div', 'ax-bar v7-ctl'); bar.appendChild(ctl); bar.appendChild(tools);
+    box.classList.toggle('v7-mode', AX7.view !== 'ana');
+    view.innerHTML = '';
+    if (AX7.view === 'ana') { tools.appendChild(axEl('span', 'v7-hint', '詳細分析：原 CBME 成效分析卡（每日一題、後台原始圖表已移除；亮點與綜合分數收合於頁尾）')); return; }
+    var pb = axEl('button', 'v7-btn', '列印本檢視'); pb.type = 'button'; pb.addEventListener('click', function () { ax7Print(view); }); tools.appendChild(pb);
+    var cb = axEl('button', 'v7-btn', '匯出彙總 CSV'); cb.type = 'button'; cb.title = '只匯出彙總表與指標磚，不含學員姓名與個別紀錄'; cb.addEventListener('click', function () { ax7Csv(view); }); tools.appendChild(cb);
+    tools.appendChild(axEl('span', 'v7-hint', '資料更新：' + axFmtDate(new Date()) + ' 載入時重算'));
+    var ld = axEl('div', 'chart ax-card ax-loading'); ld.innerHTML = '<div class="ax-spin" aria-hidden="true"></div><span>檢視計算中…</span>'; view.appendChild(ld);
+    ax7Load().then(function () {
+      ld.remove(); var P = AX7.P;
+      if (!P) { var s0 = axEl('section', 'chart ax-card'); ax7State(s0, '目前角色無法讀取「學員CBME」，此檢視無法計算。'); view.appendChild(s0); return; }
+      var W = ax7Windows(P);
+      try {
+        if (AX7.view === 'ccc') ax7Ccc(view, ctl, P, W, draw);
+        else if (AX7.view === 'half') ax7HalfView(view, ctl, P, W, draw);
+        else ax7YearView(view, ctl, P, W, draw);
+      } catch (e) { if (window.console) console.error(e); ax7State(view, '檢視計算失敗：' + (e && e.message || e)); }
+    });
+  }
+  draw();
+}
+function ax7Print(view) {
+  var pr = axEl('div', 'v7-pr'), h = axEl('h2', '', 'CBME 教學成效監測｜' + ({ ccc: 'CCC 階段判定', half: '半年監測', year: '年度檢討' }[AX7.view] || '') + '｜列印 ' + axFmtDate(new Date()));
+  pr.appendChild(h); pr.appendChild(view.cloneNode(true));
+  Array.prototype.forEach.call(pr.querySelectorAll('.ax-note'), function (n) { n.hidden = false; });
+  document.body.appendChild(pr); document.body.classList.add('v7-printing');
+  var done = function () { document.body.classList.remove('v7-printing'); pr.remove(); window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done); setTimeout(function () { window.print(); setTimeout(done, 1500); }, 50);
+}
+
+/* ---------- CCC 階段判定（K1–K4） ---------- */
+function ax7Ccc(view, ctl, P, W, redraw) {
+  if (!AX7.stage) { var cnt = {}; ax7Base(P).forEach(function (r) { if (r.state === 'overdue' || r.state === 'obs') cnt[r.stage] = (cnt[r.stage] || 0) + 1; }); AX7.stage = AX4.stages.filter(function (s) { return cnt[s]; }).pop() || 'PGY24M'; }
+  ctl.appendChild(axSelect('期程', AX4.stages.map(function (s) { return { v: s, t: s }; }), AX7.stage, function (v) { AX7.stage = v; redraw(); }));
+  ctl.appendChild(axSelect('評量年份', [{ v: '', t: '全部（含逾期未判定）' }].concat(W.halves.map(function (h) { return { v: h, t: h }; })), AX7.half || '', function (v) { AX7.half = v || null; redraw(); }));
+  var w = AX7.half ? { type: 'half', v: AX7.half } : null, can = ax7CanName();
+  var R = ax7Base(P).filter(function (r) { return r.stage === AX7.stage && ax7InWin(r, w); });
+  var K1 = R.filter(function (r) { return r.state === 'done' || r.state === 'obs' || r.state === 'overdue'; }).sort(function (a, b) { return (a.due || 0) - (b.due || 0); });
+  /* K1 */
+  var s1 = ax7Sec(view, 'k1', 'K1 本期應判定名單與狀態｜' + AX7.stage, '應判定＝已到期（已判定＋僅教師觀察＋逾期待補）；未到期、預填、無日期不列入', '<b>到期日</b>：學員CBME 有「到職日期」者＝到職日＋期程月數；無者以 CCC 日期推論並標示。<br><b>系統不產生 CCC 正式判定</b>；本頁僅整理會議所需資料，「本次 CCC 等級」欄留白供會議填寫。<br><b>姓名</b>：限教學行政與 CCC 角色顯示（E7）；其他角色只看件數。');
+  var c = { done: 0, obs: 0, overdue: 0 }; K1.forEach(function (r) { c[r.state]++; });
+  var g = axEl('div', 'ax-gtiles'); s1.appendChild(g);
+  g.appendChild(axTile('應判定', '<b>' + K1.length + '</b><small> 人次</small>', '已到期之學員×期程'));
+  g.appendChild(axTile('已判定', '<b>' + c.done + '</b>', ax7PctTxt(c.done, K1.length)));
+  g.appendChild(axTile('僅教師觀察（待 CCC）', '<b>' + c.obs + '</b>', '', c.obs ? 'warn' : ''));
+  g.appendChild(axTile('逾期待補', '<b>' + c.overdue + '</b>', '已到期、尚無任何等級', c.overdue ? 'warn' : ''));
+  if (!K1.length) { ax7State(s1, '此期程目前沒有已到期的學員。'); }
+  else if (can) s1.appendChild(ax7Tab(['學員', '到期日', '到期日來源', 'CCC 日期', '狀態', '教師觀察項數', 'CCC 項數', '回饋則數'], K1.map(function (r) { return [r.key, axFmtDate(r.due), r.dueSrc || '—', axFmtDate(r.date), AX4_STATE[r.state][0], Object.keys(r.T).length, Object.keys(r.C).length, r.fb.length]; }), 'v7-names'));
+  else ax7State(s1, '目前角色不顯示學員姓名（E7：限教學行政與 CCC 角色）；以上為件數。');
+  /* K2：每位學員一頁 */
+  if (can && K1.length) {
+    var s2 = ax7Sec(view, 'k2', 'K2 每位學員會議頁｜' + AX7.stage, '每位學員一頁（列印時自動分頁）；公版應達項目標 ●；教師觀察為參照，非正式判定', '<b>欄位</b>：公版目標（2023 台灣藥師 EPAs、里程碑公版；院內草案目標未核定，不列入，E5）｜教師觀察等級（參照）｜前次 CCC 等級（前一個已判定期程）｜本次 CCC 等級（留白，會議填寫）。<br>EPA 工作場域證據件數（PCNE、諮詢、CbD）見「PGY 學員個人成績」頁之 EPA 評量規劃卡；本頁不重算。');
+    var byA = {}; P.rows.filter(function (r) { return r.formal && !r.excluded; }).forEach(function (r) { (byA[r.key] = byA[r.key] || []).push(r); });
+    var drops = ax43Drops(P);
+    K1.forEach(function (r) {
+      var pg = axEl('article', 'v7-learner');
+      var prev = (byA[r.key] || []).filter(function (x) { return x.mo < r.mo; }).sort(function (a, b) { return b.mo - a.mo; })[0];
+      pg.appendChild(axEl('h4', '', r.key + '｜' + r.stage + '｜' + AX4_STATE[r.state][0]));
+      pg.appendChild(axEl('div', 'v7-meta', '到期日 ' + (axFmtDate(r.due) || '—') + '（' + (r.dueSrc || '—') + '）｜CCC 日期 ' + (axFmtDate(r.date) || '—') + '｜前次已判定期程 ' + (prev ? prev.stage : '無') + '｜評量年份 ' + (r.year || '—')));
+      pg.appendChild(ax7Tab(['項目', '公版應達', '教師觀察（參照）', '前次 CCC', '本次 CCC（會議填寫）'], P.keys.map(function (k) {
+        var t = axTgtApproved(P.kinds[k], r.stage, k), o = r.T[k], p = prev && prev.C[k], cur = r.C[k];
+        return [k, t === undefined ? '—' : { h: '● L' + t }, o ? axLvText(o.v, P.kinds[k]) : '—', p ? axLvText(p.v, P.kinds[k]) : '—', cur ? { h: '<span class="v7-done">已登錄 ' + axLvText(cur.v, P.kinds[k]) + '</span>' } : { h: '', cls: 'v7-blank' }];
+      })));
+      var dr = drops.filter(function (x) { return x.key === r.key; });
+      pg.appendChild(axEl('div', 'v7-meta', '先前 CCC 等級下降：' + (dr.length ? dr.map(function (x) { return x.item.split(' ')[0] + ' ' + x.from + '→' + x.to + '（' + x.a + '→' + x.b + '）'; }).join('；') : '無')));
+      var fb = r.fb.map(function (t) { t = String(t).replace(/\s+/g, ' ').trim(); return t.length > 160 ? t.slice(0, 160) + '…' : t; }).slice(0, 4);
+      var fw = axEl('div', 'v7-fb'); fw.appendChild(axEl('b', '', '質性回饋摘錄（' + r.fb.length + ' 則）')); if (!fb.length) fw.appendChild(axEl('div', '', '無')); fb.forEach(function (t) { fw.appendChild(axEl('div', '', '・' + t)); }); pg.appendChild(fw);
+      s2.appendChild(pg);
+    });
+  }
+  /* K3：群體能力缺口（教師觀察，參照） */
+  var s3 = ax7Sec(view, 'k3', 'K3 本期群體能力分布（教師觀察，參照）', '同期程所有學員×期程的教師觀察等級分布；非 CCC 判定，不作正式成效', '<b>分母</b>＝該項目有教師觀察等級的學員×期程。里程碑（Level 1–5）與 EPA（Level 1–5）各自呈現，不合併、不平均。');
+  var rowsK3 = P.keys.map(function (k) { var v = R.map(function (r) { return r.T[k]; }).filter(Boolean).map(function (x) { return x.v; }); if (!v.length) return null; var d = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }; v.forEach(function (x) { d[Math.max(1, Math.min(5, Math.floor(x + AX_EPS)))]++; }); return [k, v.length, axLvText(ax7LoMed(v), P.kinds[k]), axStackBar([1, 2, 3, 4, 5].map(function (q) { return { n: d[q], c: 'l' + q, t: 'Level ' + q }; }), v.length)]; }).filter(Boolean);
+  if (rowsK3.length) { s3.appendChild(ax7Tab(['項目', 'n', '中位等級', '等級分布'], rowsK3)); var lg = axEl('div', 'ax-legend'); lg.innerHTML = [1, 2, 3, 4, 5].map(function (k) { return '<span><i class="ax-sw2 l' + k + '"></i>Level ' + k + '</span>'; }).join(''); s3.appendChild(lg); } else ax7State(s3, '此期程尚無教師觀察等級。');
+  /* K4 */
+  ax7Quality(view, 'k4', 'K4 資料可信度', P, R);
+}
+function ax7Quality(view, ax, title, P, R) {
+  var s = ax7Sec(view, ax, title, '以下情形不計入正式判定或分母；請於學員CBME 修正', '<b>預填</b>＝CCC 日期未到卻已有 CCC 等級；<b>無日期</b>＝有等級但 CCC 日期空白；<b>推論到期日</b>＝學員CBME 尚無「到職日期」，以 CCC 日期推論（E3）。');
+  var st = {}; R.forEach(function (r) { st[r.state] = (st[r.state] || 0) + 1; });
+  var dup = {}; R.forEach(function (r) { var k = r.key + '|' + r.stage; dup[k] = (dup[k] || 0) + 1; });
+  var nonstd = P.rows.filter(function (r) { return r.nonstd && !r.excluded; }).length;
+  s.appendChild(ax7Tab(['項目', '件數', '處理'], [
+    ['預填（不計正式）', st.prefill || 0, '確認 CCC 日期或等級'], ['無日期（不計正式）', (st.undated || 0) + (st.nodate || 0), '補 CCC 日期'],
+    ['到期日為推論', R.filter(function (r) { return r.dueSrc && r.dueSrc !== '到職日期'; }).length + '／' + R.length, P.hasHire ? '補齊「到職日期」' : '學員CBME 尚無「到職日期」欄（E3）'],
+    ['年份空白', R.filter(function (r) { return P.hasYear && !r.year; }).length, '補年份欄'], ['重複列（同學員同期程）', Object.keys(dup).filter(function (k) { return dup[k] > 1; }).length, '合併或刪除重複列'],
+    ['非公版期程（全表，不入分析）', nonstd, '統一期程寫法']
+  ]));
+  return s;
+}
+
+/* ---------- 半年監測（H1–H8） ---------- */
+function ax7HalfView(view, ctl, P, W, redraw) {
+  var hs = W.halves; if (!hs.length) { ax7State(view, '學員CBME 無「年份」欄，無法依半年區分。'); return; }
+  if (!AX7.half || hs.indexOf(AX7.half) < 0) AX7.half = hs[hs.length - 1];
+  if (AX7.cmp === null || (AX7.cmp && hs.indexOf(AX7.cmp) < 0) || AX7.cmp === AX7.half) AX7.cmp = hs[hs.indexOf(AX7.half) - 1] || '';
+  ctl.appendChild(axSelect('本期', hs.map(function (h) { return { v: h, t: h }; }), AX7.half, function (v) { AX7.half = v; AX7.cmp = null; redraw(); }));
+  ctl.appendChild(axSelect('對照期', [{ v: '', t: '不比較' }].concat(hs.filter(function (h) { return h !== AX7.half; }).map(function (h) { return { v: h, t: h }; })), AX7.cmp, function (v) { AX7.cmp = v; redraw(); }));
+  var w = { type: 'half', v: AX7.half }, wc = AX7.cmp ? { type: 'half', v: AX7.cmp } : null;
+  ax7Monitor(view, P, w, wc, 'H');
+}
+/* ---------- 年度檢討（Y1–Y9） ---------- */
+function ax7YearView(view, ctl, P, W, redraw) {
+  var ys = W.years; if (!ys.length) { ax7State(view, '學員CBME 無「年份」欄，無法依年度區分。'); return; }
+  if (!AX7.year || ys.indexOf(AX7.year) < 0) AX7.year = ys[ys.length - 1];
+  if (AX7.cyear === null || AX7.cyear === AX7.year) AX7.cyear = ys[ys.indexOf(AX7.year) - 1] || '';
+  ctl.appendChild(axSelect('年度', ys.map(function (h) { return { v: h, t: h }; }), AX7.year, function (v) { AX7.year = v; AX7.cyear = null; redraw(); }));
+  ctl.appendChild(axSelect('對照年度', [{ v: '', t: '不比較' }].concat(ys.filter(function (h) { return h !== AX7.year; }).map(function (h) { return { v: h, t: h }; })), AX7.cyear, function (v) { AX7.cyear = v; redraw(); }));
+  var w = { type: 'year', v: AX7.year }, wc = AX7.cyear ? { type: 'year', v: AX7.cyear } : null;
+  ax7Monitor(view, P, w, wc, 'Y');
+}
+function ax7Cmp(lab, a, b) { var pa = ax7P(a.n, a.d), pb = b ? ax7P(b.n, b.d) : null; return [lab, a.d ? { h: '<b>' + a.n + '</b>／' + a.d + '　<span>' + pa + '%</span>' } : 'N/A', b ? (b.d ? { h: b.n + '／' + b.d + '　<span>' + pb + '%</span>' } : 'N/A') : '—', pa !== null && pb !== null ? (pa - pb > 0 ? '+' : '') + Math.round((pa - pb) * 10) / 10 + ' 個百分點' : '—']; }
+function ax7Monitor(view, P, w, wc, pre) {
+  var K = ax7Kpi(P, w), Kc = wc ? ax7Kpi(P, wc) : null, U = ax7Ugy(AX7.M.stu, w), Uc = wc ? ax7Ugy(AX7.M.stu, wc) : null, can = ax7CanName(), Y = pre === 'Y';
+  var lbl = w.v + (wc ? ' 對照 ' + wc.v : '');
+  /* H1／Y1 */
+  if (Y) {
+    var s0 = ax7Sec(view, 'y1', 'Y1 年度訓練成果總覽｜' + lbl, 'PGY 與 UGY 分列；人數、完訓條件（C8，三數）、各期程判定完成（C1）', '<b>C8</b>：PGY24M 15 項里程碑 L4＋8 項公版 EPA L4 皆經 CCC 判定；同時列已到期、已判定、達成三數（H-05）。');
+    var g0 = axEl('div', 'ax-gtiles'); s0.appendChild(g0);
+    g0.appendChild(axTile('PGY 學員', '<b>' + K.persons + '</b><small> 人</small>', K.R.length + ' 個學員×期程' + (Kc ? '｜對照 ' + Kc.persons + ' 人' : '')));
+    var c8 = K.C8; g0.appendChild(axTile('C8 PGY24M 完訓條件', '<b>' + c8.due + '／' + c8.judged + '／' + c8.full + '</b>', '已到期／已判定／達成' + (Kc ? '｜對照 ' + Kc.C8.due + '／' + Kc.C8.judged + '／' + Kc.C8.full : '')));
+    g0.appendChild(axTile('C1 CCC 判定完成', K.C1.d ? '<b>' + ax7P(K.C1.n, K.C1.d) + '</b><small>%</small>' : '—', K.C1.n + '／' + K.C1.d + ' 已到期'));
+    if (U) g0.appendChild(axTile('UGY 學生', '<b>' + U.students + '</b><small> 人</small>', U.forms + ' 份他評' + (Uc ? '｜對照 ' + Uc.students + ' 人' : '')));
+  }
+  var s1 = ax7Sec(view, pre.toLowerCase() + 'core', (Y ? 'Y2 ' : 'H1 ') + '核心比較｜' + lbl, '分子／分母並列；覆蓋（C1、C2）與達標（C3、C5）分列', '<b>C1</b> CCC 判定完成率＝已判定 ÷ 已到期學員×期程｜<b>C2</b> 里程碑 CCC 裁決涵蓋率｜<b>C3</b> 里程碑正式項次達標率（CCC ≥ 公版目標；公版僅 PGY24M 訂里程碑目標）｜<b>C5</b> EPA 正式信賴達成（窗內最後已判定期程到公版 L4 時機者為分母）｜<b>L1</b> UGY 他評 ≥5 份學生比例（分母暫為資料中出現的學生，名冊來源待確認）｜<b>L3</b> UGY 他評 6 分比例。');
+  s1.appendChild(ax7Tab(['指標', '本期', '對照期', '差'], [
+    ax7Cmp('C1 CCC 判定完成率', K.C1, Kc && Kc.C1), ax7Cmp('C2 里程碑裁決涵蓋率', K.C2, Kc && Kc.C2), ax7Cmp('C3 里程碑正式項次達標率', K.C3, Kc && Kc.C3), ax7Cmp('C5 EPA 正式信賴達成（合計人次）', K.C5all, Kc && Kc.C5all),
+    U ? ax7Cmp('L1 UGY 他評 ≥5 份（分母待名冊）', U.L1, Uc && Uc.L1) : ['L1 UGY 他評 ≥5 份', '無權限或無資料', '—', '—'], U ? ax7Cmp('L3 UGY 他評 6 分比例', U.L3, Uc && Uc.L3) : ['L3 UGY 6 分比例', '無權限或無資料', '—', '—']
+  ]));
+  if (U && !Y && !U.halfOk) s1.appendChild(axEl('div', 'ax-legend', 'UGY「年份」欄無上／下半年區分，L1、L3 以同一年度呈現。'));
+  /* H2：覆蓋與達標（期程） */
+  var s2 = ax7Sec(view, pre.toLowerCase() + 'stage', (Y ? 'Y2-1 ' : 'H2 ') + 'PGY 評量覆蓋與達標（依期程）', '已到期／已判定／全項達成三數並列（C4）；達標只計公版有目標的項目', '<b>C4 正式全項達標</b>：該期應評項目全部有 CCC 等級且 ≥ 公版目標的學員。公版未訂應達項目之期程顯示 N/A。院內草案 25 項目標未核定，不列入（E5）。');
+  s2.appendChild(ax7Tab(['期程', '列數', '已到期／已判定／全項達成', 'C1 完成率', '裁決涵蓋（里程碑＋EPA 應評項次）', '項次達標（里程碑＋EPA）', '狀態分布'], AX4.stages.filter(function (s) { return K.byStage[s].rows; }).map(function (s) {
+    var o = K.byStage[s]; return [s, o.rows, { h: '<b>' + o.due + '／' + o.judged + '／' + (o.req ? o.full : 'N/A') + '</b>' }, ax7PctTxt(o.st.done || 0, o.due), o.req ? ax7PctTxt(o.cov, o.N) : 'N/A', o.req ? ax7PctTxt(o.met, o.N) : 'N/A',
+      axStackBar([{ n: o.st.done || 0, c: 'up', t: '已判定' }, { n: o.st.obs || 0, c: 'same', t: '僅教師觀察' }, { n: o.st.overdue || 0, c: 'down', t: '逾期待補' }, { n: (o.st.pending || 0) + (o.st.obsEarly || 0), c: 'none', t: '未到期' }, { n: (o.st.prefill || 0) + (o.st.undated || 0) + (o.st.nodate || 0), c: 'pf', t: '預填／無日期' }], o.rows || 1)];
+  })));
+  s2.appendChild(ax7Tab(['EPA（公版 L4 時機）', '已到時機', 'CCC L4', '低於 L4', '尚無 CCC'], K.C5.map(function (x) { return ['EPA ' + x.e.no + ' ' + x.e.name + '（' + x.e.l4 + ' 個月）', x.el, x.el ? ax7PctTxt(x.at, x.el) : 'N/A', x.lo, x.no]; })));
+  /* H3：跨期進展與下降 */
+  var s3 = ax7Sec(view, pre.toLowerCase() + 'prog', (Y ? 'Y2-2 ' : 'H3 ') + 'PGY 跨期進展與下降（C6、C7）', '同一學員同一項目、相鄰兩個已判定期程（後期落在本期）', '<b>C6</b>：等級上升項次 ÷ 兩期皆有 CCC 的項次｜<b>C7</b>：等級下降只列事實，建議列入 ILP 討論。');
+  var g3 = axEl('div', 'ax-gtiles'); s3.appendChild(g3);
+  g3.appendChild(axTile('C6 項目層進展', K.C6.d ? '<b>' + ax7P(K.C6.up, K.C6.d) + '</b><small>% 上升</small>' : '—', K.C6.d ? '上升 ' + K.C6.up + '｜持平 ' + K.C6.same + '｜下降 ' + K.C6.down + '（共 ' + K.C6.d + ' 項次）' : '本期無可配對項次'));
+  var dp = {}; K.C7.forEach(function (x) { dp[x.key] = 1; });
+  g3.appendChild(axTile('C7 CCC 等級下降', '<b>' + K.C7.length + '</b><small> 項次</small>', Object.keys(dp).length + ' 人', K.C7.length ? 'warn' : ''));
+  if (K.C7.length && can) s3.appendChild(ax7Tab(['學員', '項目', '期程', '等級'], K.C7.map(function (x) { return [x.key, x.item, x.from + '→' + x.to, x.a + '→' + x.b]; }), 'v7-names'));
+  else if (K.C7.length) { var bi = {}; K.C7.forEach(function (x) { bi[x.item] = (bi[x.item] || 0) + 1; }); s3.appendChild(ax7Tab(['項目', '下降項次'], Object.keys(bi).map(function (k) { return [k, bi[k]]; }))); }
+  /* Y3：反覆缺口 */
+  var extra = [];
+  if (Y) {
+    var s3b = ax7Sec(view, 'y3', 'Y3 能力缺口（連續兩個半年達標率最低三項）', '只列事實；分母＝已判定且有 CCC 等級的學員×期程（≥5）', '<b>規則</b>：同一能力項目在同一期程、本年度上下兩個半年的達標率皆為該期程最低三項之一。');
+    var halves = ax7Windows(P).halves.filter(function (h) { return ax7Yr(h) === w.v; }), rec = [];
+    if (halves.length >= 2) {
+      var low = halves.slice(-2).map(function (h) { var r = ax7ItemRates(P, { type: 'half', v: h }).filter(function (x) { return x.d >= 5; }), by = {}; r.forEach(function (x) { (by[x.stage] = by[x.stage] || []).push(x); }); var o = {}; Object.keys(by).forEach(function (s) { by[s].sort(function (a, b) { return a.p - b.p; }).slice(0, 3).forEach(function (x) { o[s + '|' + x.item] = x; }); }); return o; });
+      Object.keys(low[0]).forEach(function (k) { if (low[1][k]) rec.push([k.split('|')[0], k.split('|')[1], ax7PctTxt(low[0][k].n, low[0][k].d), ax7PctTxt(low[1][k].n, low[1][k].d)]); });
+      if (rec.length) { s3b.appendChild(ax7Tab(['期程', '項目', halves[halves.length - 2], halves[halves.length - 1]], rec)); extra.push(['反覆缺口', rec.length + ' 項：' + rec.map(function (x) { return x[0] + ' ' + x[1].split(' ')[0]; }).join('、')]); }
+      else ax7State(s3b, '無符合規則的項目（或分母 <5）。');
+    } else ax7State(s3b, '本年度不足兩個半年資料。');
+  }
+  /* H4：UGY */
+  var s4 = ax7Sec(view, pre.toLowerCase() + 'ugy', (Y ? 'Y4 ' : 'H4 ') + 'UGY 學習成果（L1、L3）', 'UGY 無 CCC；以他評分布、6 分比例與涵蓋率呈現，不與 PGY 合併', '<b>資料</b>：分析_學生成效（不含自評）。序位量尺不計平均；呈現分布、中位數與 6 分比例（H-04）。<b>L2</b>（雙來源、自評完成）、<b>L4</b>（自評他評差異）、<b>L5</b>（實習總成績）見「學生學習成效」頁。');
+  if (!U) ax7State(s4, '目前角色無法讀取分析_學生成效。');
+  else if (!U.recs.length) ax7State(s4, '本期無 UGY 他評資料。');
+  else {
+    s4.appendChild(ax7Tab(['期間', '學生', '他評份數', 'L1 ≥5 份', '中位數', 'L3 6 分比例', '分數分布'], [[w.v, U.students, U.forms, ax7PctTxt(U.L1.n, U.L1.d), axFmt(U.med, 1), ax7PctTxt(U.L3.n, U.L3.d), ax7Bar6(U.dist)]].concat(Uc && Uc.recs.length ? [[wc.v, Uc.students, Uc.forms, ax7PctTxt(Uc.L1.n, Uc.L1.d), axFmt(Uc.med, 1), ax7PctTxt(Uc.L3.n, Uc.L3.d), ax7Bar6(Uc.dist)]] : [])));
+    var lg4 = axEl('div', 'ax-legend'); lg4.innerHTML = AX7_LEG6; s4.appendChild(lg4);
+  }
+  /* H5：單位 */
+  var G = ax7Group(AX7.M.unit, w, 'unit'), s5 = ax7Sec(view, pre.toLowerCase() + 'unit', (Y ? 'Y5 ' : 'H5 ') + '單位學習環境（U1）', '各單位評核分數分布；份數 <5 不比較；以年度為單位（組別成效無半年欄）', '<b>資料</b>：分析_組別成效（不含填答者姓名）。不排名；依單位名稱排序。');
+  if (!G) ax7State(s5, '目前角色無法讀取分析_組別成效。'); else if (!G.length) ax7State(s5, '本期無單位評核資料。');
+  else { s5.appendChild(ax7Tab(['單位', '份數', '中位數', '6 分比例', '分數分布'], G.map(function (x) { return x.forms < 5 ? [x.k, x.forms, { h: '<span>n&lt;5 不比較</span>' }, '—', '—'] : [x.k, x.forms, axFmt(x.med, 1), ax7PctTxt(x.top, x.n), ax7Bar6(x.dist)]; }))); var lg5 = axEl('div', 'ax-legend'); lg5.innerHTML = AX7_LEG6; s5.appendChild(lg5); }
+  /* H6：教師 */
+  ax7Teacher(view, pre.toLowerCase() + 'tea', (Y ? 'Y6 ' : 'H6 ') + '教師評量行為與校準（T1–T4）', K, Kc, w, Y);
+  /* H7／Y7 */
+  ax7SignalsSec(view, pre.toLowerCase() + 'sig', P, w, wc, extra).querySelector('.ax-title').textContent = (Y ? 'Y7 優先討論清單（訊號）' : 'H7 訊號清單');
+  /* Y8 */
+  if (Y) {
+    var s8 = ax7Sec(view, 'y8', 'Y8 可能影響指標的因素', '解讀年度差異前先核對；只列事實', '人數、期別組成與判定覆蓋差距會改變比率的分母；量尺版本變動（如 EPA 2a–5、UGY 1–6）不可跨版本比較。');
+    var comp = function (KK) { return AX4.stages.map(function (s) { return s.replace('PGY', '') + ' ' + KK.byStage[s].rows; }).join('｜'); };
+    s8.appendChild(ax7Tab(['因素', w.v, wc ? wc.v : '對照'], [['PGY 人數', K.persons, Kc ? Kc.persons : '—'], ['期程組成（列數）', comp(K), Kc ? comp(Kc) : '—'], ['已到期未判定（覆蓋差距）', K.C1.d - K.C1.n, Kc ? Kc.C1.d - Kc.C1.n : '—'], ['到期日為推論', K.inferred, Kc ? Kc.inferred : '—'], ['UGY 學生', U ? U.students : '—', Uc ? Uc.students : '—']]));
+  }
+  /* H8／Y9 */
+  ax7Quality(view, pre.toLowerCase() + 'dq', (Y ? 'Y9 ' : 'H8 ') + '資料可信度與解讀限制', P, K.R);
+}
+function ax7Teacher(view, ax, title, K, Kc, w, Y) {
+  var s = ax7Sec(view, ax, title, '只呈現教師群體；不歸因、不排名個別教師（E6）', '<b>T1</b> 教師觀察與 CCC 一致率（兩者皆有等級的項次）｜<b>T2</b> 質性回饋覆蓋與字數級距（字數為具體性的替代觀察）｜<b>T3</b> 學員對教師評核分布（分析_教師成效，不排名）｜<b>T4</b> CCC 判定時效（CCC 日期 − 到期日；需「到職日期」）。');
+  var g = axEl('div', 'ax-gtiles'); s.appendChild(g);
+  var A = K.T1; g.appendChild(axTile('T1 教師觀察 vs CCC 一致', A.pairs ? '<b>' + ax7P(A.same, A.pairs) + '</b><small>%</small>' : '—', A.pairs ? '高於 CCC ' + ax7P(A.hi, A.pairs) + '%｜低於 ' + ax7P(A.lo, A.pairs) + '%｜' + A.pairs + ' 項次' + (Kc && Kc.T1.pairs ? '｜對照一致 ' + ax7P(Kc.T1.same, Kc.T1.pairs) + '%' : '') : '尚無兩者皆有等級的項目'));
+  var T2 = K.T2; g.appendChild(axTile('T2 質性回饋覆蓋', T2.d ? '<b>' + ax7P(T2.n, T2.d) + '</b><small>%</small>' : '—', T2.d ? T2.n + '／' + T2.d + '｜字數 1–49：' + T2.lb[1] + '、50–149：' + T2.lb[2] + '、≥150：' + T2.lb[3] : '尚無已到期且有等級之列'));
+  var T4 = K.T4; g.appendChild(axTile('T4 CCC 判定時效', T4.n ? '<b>' + ax7P(T4.b[0] + T4.b[1], T4.n) + '</b><small>% ≤30 天</small>' : '—', T4.n ? '準時 ' + T4.b[0] + '｜1–30 天 ' + T4.b[1] + '｜31–90 天 ' + T4.b[2] + '｜>90 天 ' + T4.b[3] : (T4.hire ? '已填到職日期者尚無已判定列' : '【資料不足，無法確認】學員CBME 尚無「到職日期」（E3）')));
+  var T = ax7Group(AX7.M.tea, w, 'item');
+  if (T && T.length) { s.appendChild(axEl('div', 'ax-ftitle', 'T3 學員對教師評核分布（依題目，教師群體）')); s.appendChild(ax7Tab(['題目', '評分數', '中位數', '6 分比例', '分數分布'], T.map(function (x) { return [x.k, x.n, axFmt(x.med, 1), ax7PctTxt(x.top, x.n), ax7Bar6(x.dist)]; }))); var lg = axEl('div', 'ax-legend'); lg.innerHTML = AX7_LEG6; s.appendChild(lg); }
+  else s.appendChild(axEl('div', 'ax-legend', 'T3：' + (T ? '本期無教師評核資料' : '目前角色無法讀取分析_教師成效')));
+  return s;
+}
+
+/* ---------- H-04：三成效頁矩陣預設改「6 分比例」，平均只留在選項 ---------- */
+var ax7Matrix0 = axMatrix;
+axMatrix = function (host, M, cfg) {
+  if (cfg && /^(學生學習成效|單位組別成效|教師教學成效)/.test(cfg.title || '') && !cfg.measures) {
+    cfg = Object.assign({}, cfg, { measure: 'top', measures: [{ v: 'top', t: '6 分比例（達門檻）' }, { v: 'median', t: '中位數' }, { v: 'mean', t: '平均（僅供參照）' }] });
+    cfg.note = String(cfg.note || '').replace('每格為該條件下所有評分的平均；改選「最高分比例」可避開天花板效應。', '') + '序位量尺：預設呈現 6 分比例，可改中位數；平均僅供參照（H-04）。';
+  }
+  return ax7Matrix0(host, M, cfg);
+};
+
+/* ---------- H-05：G01 表加「已到期／已判定／達成」三數 ---------- */
+var ax7Team0 = ax4Team;
+ax4Team = function (host, P) {
+  var sec = ax7Team0(host, P), K = ax7Kpi(P, AX4.year ? { type: 'half', v: AX4.year } : null);
+  var tab = Array.prototype.filter.call(sec.querySelectorAll('table'), function (t) { return !t.closest('.ax-note'); })[0]; if (!tab || !tab.querySelector('thead tr')) return sec;
+  var hr = tab.querySelector('thead tr'), th = axEl('th', '', '已到期／已判定／全項達成'); th.title = 'C4、C8：同時呈現三數（H-05）'; hr.insertBefore(th, hr.children[2]);
+  Array.prototype.forEach.call(tab.querySelectorAll('tbody tr'), function (tr) { var s = tr.children[0].textContent.trim(), o = K.byStage[s], td = axEl('td', 'num'); td.innerHTML = o ? '<b>' + o.due + '／' + o.judged + '／' + (o.req ? o.full : 'N/A') + '</b>' : '—'; tr.insertBefore(td, tr.children[2]); });
+  return sec;
+};
+
+/* ---------- E4：成效頁移除每日一題（個人頁保留，收合於「其他學習證據」） ---------- */
+var ax7DqGroup0 = axDqGroup;
+axDqGroup = function () { return Promise.resolve(); };
+
+/* ---------- 共用：收合、姓名遮蔽 ---------- */
+function ax7Fold(box, sel, title, open) {
+  var ks = Array.prototype.filter.call(box.children, function (k) { return sel(k); }); if (!ks.length) return null;
+  var dt = document.createElement('details'); dt.className = 'ax-fold v7-fold'; if (open) dt.open = true; var sm = document.createElement('summary'); sm.textContent = title + '（' + ks.length + ' 張）'; dt.appendChild(sm);
+  var inner = axEl('div', 'ax-foldbody'); box.insertBefore(dt, ks[0]); ks.forEach(function (k) { inner.appendChild(k); }); dt.appendChild(inner); return dt;
+}
+function ax7AxIs(list) { return function (k) { return k.dataset && list.indexOf(k.dataset.ax) >= 0; }; }
+function ax7TitleIs(re) { return function (k) { return k.dataset && !k.dataset.ax && re.test(k.dataset.title || ''); }; }
+function ax7NameGate(box, axList, what) {
+  if (ax7CanName()) return;
+  Array.prototype.forEach.call(box.querySelectorAll(axList.map(function (a) { return 'section[data-ax="' + a + '"]'; }).join(',')), function (s) {
+    var n = s.querySelectorAll('.ax-cb, .ax-bcard, article').length;
+    var r = axEl('section', 'chart ax-card ax-gsec'); r.dataset.ax = s.dataset.ax; axGrowthHead(r, (s.querySelector('.ax-title') || {}).textContent || what, '', '<b>E7</b>：群體頁的學員或教師姓名限教學行政與 CCC 角色顯示。', false);
+    r.appendChild(axEl('div', 'state', '目前角色不顯示個別姓名' + (n ? '；本區共 ' + n + ' 張個別卡片' : '') + '。請切換為教學行政角色或至個人成績頁查看本人資料。'));
+    s.parentNode.replaceChild(r, s);
+  });
+}
+function ax7MaskCbme(box) {
+  if (ax7CanName()) return;
+  /* 詳細分析卡中的逾期名單、資料品質明細含學員姓名：改為件數 */
+  Array.prototype.forEach.call(box.querySelectorAll('section[data-ax="prog"] .ax-g2'), function (w) { var n = w.querySelectorAll('.ax-gchip').length; w.innerHTML = ''; w.appendChild(axEl('div', 'ax-ftitle', '逾期待補 CCC 判定：' + n + ' 筆（姓名限教學行政與 CCC 角色顯示，E7）')); });
+  Array.prototype.forEach.call(box.querySelectorAll('section[data-ax="dq"]'), function (s) { var P = AX7.P; if (!P) return; var keys = {}; P.rows.forEach(function (r) { if (r.key) keys[r.key] = 1; }); var ks = Object.keys(keys).sort(function (a, b) { return b.length - a.length; }); var walk = document.createTreeWalker(s, NodeFilter.SHOW_TEXT, null, false), t, list = []; while ((t = walk.nextNode())) list.push(t); list.forEach(function (n) { var v = n.nodeValue; ks.forEach(function (k) { if (v.indexOf(k) >= 0) v = v.split(k).join('（學員）'); }); n.nodeValue = v; }); });
+}
+
+/* ---------- CBME 成效頁：檢視切換＋整併（H-08–H-12） ---------- */
+AX_PANELS['CBME 成效'] = function (host, d) { AX7.ready = null; return Promise.all([axCbmeGroup(host, d), ax7Load()]); };
+DASH_LAYOUT['CBME 成效'] = {
+  order: ['ax:ov', 'ax:prog', 'ax:team', 'ax:epa', 'ax:g2', 'ax:heat', 'ax:dq', 'ax:sum', 'ax:hl'], hide: [/./],
+  post: function (box) {
+    Array.prototype.forEach.call(box.querySelectorAll('section[data-ax="dqx"]'), function (s) { s.remove(); });
+    ax7MaskCbme(box); ax7NameGate(box, ['hl'], '個人亮點');
+    ax7Fold(box, ax7AxIs(['sum', 'hl']), '收合：綜合分數（非能力判定，不與里程碑或 EPA 合併）與個人亮點');
+    ax7Mount(box);
+  }
+};
+/* 學生學習成效（H-13）：亮點收合、姓名依角色 */
+DASH_LAYOUT['學生學習成效'] = { order: ['ax:ind', 'ax:l3', 'ax:team', 'ax:matrix', 'ax:board'], hide: [/^實習總成績組成/],
+  post: function (box) { ax7NameGate(box, ['board'], '學生亮點'); ax7Fold(box, ax7AxIs(['board']), '收合：學生亮點（依實習年份同期群）'); } };
+DASH_LAYOUT['單位組別成效'] = { order: ['ax:u1', 'ax:env', 'ax:matrix', 'ax:board'],
+  post: function (box) { ax7Fold(box, ax7AxIs(['env']), '深入分析：學習環境品質（各面向平均與年變化，僅供參照；序位量尺以上方分布為準）'); ax7Fold(box, ax7AxIs(['board']), '收合：單位組別亮點'); } };
+DASH_LAYOUT['教師教學成效'] = { order: ['ax:t7', 'ax:team', 'ax:matrix', 'ax:board'],
+  post: function (box) { ax7NameGate(box, ['board'], '教師亮點'); ax7Fold(box, ax7AxIs(['team']), '深入分析：教師團隊專業成長（面向平均與配對趨勢，僅供參照）'); ax7Fold(box, ax7AxIs(['board']), '收合：教師亮點'); } };
+/* L3（學生頁）、U1（單位頁）、T1–T4（教師頁，T1 由 CBME 頁移入） */
+(function () {
+  var after = function (name, fn) { var f = AX_PANELS[name]; if (!f) return; AX_PANELS[name] = function (host, d) { return Promise.resolve().then(function () { return f(host, d); }).then(function (v) { return Promise.resolve().then(function () { return fn(host, d); }).catch(function (e) { if (window.console) console.error(e); }).then(function () { return v; }); }); }; };
+  after('學生學習成效', function (host) {
+    return axPrep('stu').then(function (M) {
+      var ys = axSortKeys(Object.keys(axGroup(M.recs, 'year')), 'year'), s = ax7Sec(host, 'l3', 'UGY 他評分數分布（L3）', '依年份；序位量尺不計平均，呈現分布、中位數與 6 分比例（H-04）', '<b>資料</b>：分析_學生成效（不含自評）。<b>L1</b>：他評 ≥5 份學生比例，分母暫為資料中出現的學生（名冊來源待確認）。<b>天花板</b>：題目 6 分比例 &gt;50%（n≥5）。');
+      s.appendChild(ax7Tab(['年份', '學生', '他評份數', 'L1 ≥5 份', '中位數', '6 分比例', '分數分布', '天花板題數'], ys.map(function (y) { var U = ax7Ugy({ recs: M.recs.filter(function (r) { return r.year === y; }) }, null); return [y, U.students, U.forms, ax7PctTxt(U.L1.n, U.L1.d), axFmt(U.med, 1), ax7PctTxt(U.L3.n, U.L3.d), ax7Bar6(U.dist), U.ceil.length]; })));
+      var lg = axEl('div', 'ax-legend'); lg.innerHTML = AX7_LEG6; s.appendChild(lg);
+    });
+  });
+  after('單位組別成效', function (host) {
+    return axPrep('unit').then(function (M) {
+      var ys = axSortKeys(Object.keys(axGroup(M.recs, 'year')), 'year'), y = ys[ys.length - 1];
+      var s = ax7Sec(host, 'u1', 'U1 單位學習環境評核分布｜' + (y || ''), '最新年份；份數 <5 不比較；不排名，依單位名稱排序', '<b>資料</b>：分析_組別成效。序位量尺不計平均（H-04）；其他年份與題目層次見下方四維比較。');
+      var G = ax7Group({ recs: M.recs.filter(function (r) { return r.year === y; }) }, null, 'unit');
+      s.appendChild(ax7Tab(['單位', '份數', '中位數', '6 分比例', '分數分布'], G.map(function (x) { return x.forms < 5 ? [x.k, x.forms, { h: '<span>n&lt;5 不比較</span>' }, '—', '—'] : [x.k, x.forms, axFmt(x.med, 1), ax7PctTxt(x.top, x.n), ax7Bar6(x.dist)]; })));
+      var lg = axEl('div', 'ax-legend'); lg.innerHTML = AX7_LEG6; s.appendChild(lg);
+    });
+  });
+  after('教師教學成效', function (host) {
+    AX7.ready = null;
+    return ax7Load().then(function () {
+      if (!AX7.P) { var s0 = ax7Sec(host, 't7', '教師評量行為與校準（T1、T2、T4）', '', ''); ax7State(s0, '目前角色無法讀取「學員CBME」，T1、T2、T4 無法計算；T3 見下方。'); return; }
+      var hs = AX7.P.years || [], w = hs.length ? { type: 'year', v: ax7Yr(hs[hs.length - 1]) } : null;
+      ax7Teacher(host, 't7', '教師評量行為與校準（T1–T4）｜' + (w ? w.v : '全部'), ax7Kpi(AX7.P, w), null, w, true);
+    });
+  });
+})();
+/* H-15：個人頁非核心卡收合為「其他學習證據」 */
+(function () {
+  var wrapPost = function (name, fn) { var L = DASH_LAYOUT[name] = DASH_LAYOUT[name] || {}, p0 = L.post; L.post = function (box, host) { if (p0) p0(box, host); fn(box); }; };
+  wrapPost('PGY 學員個人成績', function (box) { ax7Fold(box, function (k) { return ax7AxIs(['dqx', 'hcp', 'pcp', 'pres', 'morning'])(k) || ax7TitleIs(/^藥事照會紀錄|^藥品諮詢紀錄/)(k); }, '其他學習證據：PCNE、藥品諮詢、病人用藥教育、每日一題、簡報'); });
+  wrapPost('UGY 學生個人成績', function (box) {
+    ax7Fold(box, ax7TitleIs(/^簡報分數|^簡報各評核面向|^簡報文字回饋/), '簡報評核（分數、各面向、文字回饋）', true);
+    ax7Fold(box, ax7AxIs(['dqx', 'hcp', 'cmp']), '其他學習證據：病人用藥教育、每日一題、同儕比較');
+  });
+})();
+
+
+/* ---------- H-01：頁面錨點列（控制台「儀表板設定」；只用來保留選單，網頁不顯示） ---------- */
+var ax7Visible0 = visibleCharts;
+visibleCharts = function (d, name) { return ax7Visible0(d, name).filter(function (c) { return !/^頁面錨點/.test(c.title || ''); }); };
 </script>
 </body>
 </html>
