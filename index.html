@@ -1308,6 +1308,17 @@ td.v7-blank{min-width:110px;background:repeating-linear-gradient(90deg,transpare
 .v7-done{font-size:.78rem;color:var(--ink-3)}
 .v7-pr{display:none}
 @media print{body.v7-printing>*:not(.v7-pr){display:none!important}body.v7-printing .v7-pr{display:block;font-size:10pt;color:#000}.v7-pr .v7-learner{break-before:page}.v7-pr .ax-info,.v7-pr .ax-peer{display:none}.v7-pr section{break-inside:avoid-page;margin-bottom:8pt}.v7-pr table{border-collapse:collapse;width:100%}.v7-pr th,.v7-pr td{border:1px solid #999;padding:2pt 4pt;font-size:8.5pt}}
+
+/* v7.1.0 連貫照護整合成效 */
+.ccx-on>:not(.ccx-keep){display:none!important}
+.ccx-chain{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:6px 0}
+.ccx-col h4{margin:0 0 6px;font-size:.9rem}
+.ccx-row{display:grid;grid-template-columns:1fr;gap:2px;margin:0 0 8px;font-size:.8rem}
+.ccx-l{line-height:1.35}
+.ccx-bar{display:block;height:8px;border-radius:4px;background:var(--teal)}
+.ccx-v{color:var(--ink-3);font-size:.75rem}
+.ccx-sum th,.ccx-sum td{font-weight:700;border-top:2px solid var(--rule)}
+.ccx-recon{margin-top:12px}
 </style>
 </head>
 <body>
@@ -1494,7 +1505,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '7.0.1';
+var APP_VERSION = '7.1.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -12690,8 +12701,313 @@ function ax7WbaSec(view, ax, title) {
   return s;
 }
 
-/* H-06（3）UGY 頁「DOPS 各項次數」：DOPS 分頁未開放（E8：只供後端彙總）且其逐項名單為 PGY 學員，UGY 學生永遠無資料；自 UGY 頁移除，DOPS 完成紀錄改見 CBME 成效頁 C10 */
+/* H-06（3）UGY 頁「DOPS 各項次數」：DOPS 分頁未開放（E8：只供後端彙總），此卡無法顯示任何學生資料；自 UGY 頁移除，DOPS 完成紀錄改見 CBME 成效頁 C10 */
 (function () { var L = DASH_LAYOUT['UGY 學生個人成績'] = DASH_LAYOUT['UGY 學生個人成績'] || {}; L.hide = (L.hide || []).concat([/^DOPS 各項次數/]); })();
+
+/* =====================================================================
+   v7.1.0｜連貫照護整合成效：每月監測｜每季品質檢討｜分析（2026-11-18）
+   依「臨床藥學服務儀表板｜連貫照護整合成效 零信任查核暨整併施工建議書」施工（K-01–K-13）。
+   F1：接受率主指標＝接受 ÷（接受＋不接受）；月報「完全接受」改名「完全接受占比」並列。
+   F2：整合病房「照會統整」與全院「PCNE-DRPs」部分重疊（使用者確認），兩來源一律分列、不加總、不相減；以逐月件數並列對帳。
+   原則：只提供監測與檢討所需數據；不含改善措施執行、追蹤或簽核。不含病歷號、姓名與照會內容。
+   ===================================================================== */
+var CCX = { view: 'month', ym: null, q: null, cq: null, M: null, P: null, FL: null, end: null };
+var CCX_NAMES = /^(連貫照護整合成效|整合病房減藥成效)$/;
+function ccxInd(id) { return CC_IND.filter(function (x) { return x.id === id; })[0]; }
+function ccxPctTxt(x, n, d) { return n ? x + '／' + Math.round(n * 10) / 10 + '（' + ccPct(x / n, d === undefined ? 1 : d) + '）' : 'N/A'; }
+function ccxQ(ym) { var y = +ym.slice(0, 4), m = +ym.slice(5, 7); return y + '-Q' + Math.ceil(m / 3); }
+function ccxQLab(q) { var y = +q.slice(0, 4), n = +q.slice(-1); return (y - 1911) + ' 年第 ' + n + ' 季（' + ((n - 1) * 3 + 1) + '–' + (n * 3) + ' 月）'; }
+function ccxQMonths(q) { var y = q.slice(0, 4), n = +q.slice(-1); return [1, 2, 3].map(function (i) { return y + '-' + ('0' + ((n - 1) * 3 + i)).slice(-2); }); }
+function ccxPrevQ(q) { var y = +q.slice(0, 4), n = +q.slice(-1); return n > 1 ? y + '-Q' + (n - 1) : (y - 1) + '-Q4'; }
+function ccxTab(head, rows, cls) {
+  var t = axEl('table', 'ax-gtab ccx-agg' + (cls ? ' ' + cls : '')); t.innerHTML = '<thead><tr>' + head.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead>';
+  var tb = document.createElement('tbody');
+  rows.forEach(function (r) { var tr = document.createElement('tr'); if (r.cls) tr.className = r.cls; (r.cells || r).forEach(function (c, i) { var td = axEl(i ? 'td' : 'th', i ? 'num' : ''); if (c && c.nodeType) td.appendChild(c); else if (c && typeof c === 'object') { td.innerHTML = c.h; if (c.tip) td.title = c.tip; } else td.textContent = c === null || c === undefined ? '—' : String(c); tr.appendChild(td); }); tb.appendChild(tr); });
+  t.appendChild(tb); var s = axEl('div', 'ax-scroll'); s.appendChild(t); return s;
+}
+function ccxSec(host, ax, title, sub, note) { var s = axEl('section', 'chart ax-card cc-card ccx-sec'); s.dataset.ax = ax; host.appendChild(s); ccSecHead(s, title, sub, note || ''); return s; }
+
+/* ---------- 單一計算層：月報（整合病房月成效）、照會統整、訪視、PCNE-DRPs ---------- */
+function ccxMonPt(id, ym) { var ind = ccxInd(id); if (!ind) return null; var R = ccRun(ind, CCX.M, CCX.end, CCX.FL); var p = R.pts.filter(function (x) { return x.ym === ym; })[0] || null; return { ind: ind, R: R, p: p }; }
+/* 期間合併：比率與密度＝分子合計 ÷ 分母合計；平均值型（I）＝各月平均（不加權，標示） */
+function ccxPeriod(id, yms) {
+  var ind = ccxInd(id); if (!ind) return null; var R = ccRun(ind, CCX.M, CCX.end, CCX.FL), x = 0, n = 0, vs = [], ex = [], k = 0;
+  R.pts.forEach(function (p) { if (yms.indexOf(p.ym) < 0) return; if (p.ex) { ex.push(ccYmShort(p.ym)); return; } if (ind.type === 'i') { if (p.v !== null) vs.push(p.v); } else if (p.x !== null && p.n) { x += p.x; n += p.n; } k++; });
+  var v = ind.type === 'i' ? (vs.length ? vs.reduce(function (s, a) { return s + a; }, 0) / vs.length : null) : (n ? x / n * (ind.scale || 1) : null);
+  return { ind: ind, x: x, n: n, v: v, months: k, ex: ex };
+}
+/* 照會統整（整合病房）：以「問題類別」維度合計每月件數與接受（接受 ÷ 接受＋不接受） */
+function ccxConsult(yms) {
+  var o = { n: 0, a: 0, x: 0 }; (CCX.M.agg || []).forEach(function (r) { if (r.dim !== '問題類別' || yms.indexOf(r.ym) < 0) return; o.n += r.n; o.a += r.a; o.x += r.x; }); o.d = o.a + o.x; o.v = o.d ? o.a / o.d : null; o.ci = ccWilson(o.a, o.d); return o;
+}
+function ccxDim(dim, yms) { var g = {}; (CCX.M.agg || []).forEach(function (r) { if (r.dim !== dim || yms.indexOf(r.ym) < 0) return; var o = g[r.cat] = g[r.cat] || { n: 0, a: 0, x: 0 }; o.n += r.n; o.a += r.a; o.x += r.x; }); return g; }
+function ccxVisit(yms) { var V = ccVisitSeries(CCX.M), o = { done: 0, miss: 0, late: 0, na: 0, other: 0 }; yms.forEach(function (m) { var b = V[m]; if (!b) return; Object.keys(o).forEach(function (k) { o[k] += b[k]; }); }); o.d = o.done + o.miss; o.v = o.d ? o.done / o.d : null; return o; }
+/* PCNE-DRPs（全院）：件數、接受率、高齡 PIM（規則庫未啟用時標示） */
+function ccxPcne(yms) {
+  var P = CCX.P; if (!P) return null; var o = { n: 0, A1: 0, A2: 0, ger: 0, gerD: 0, pimHit: 0, pimMiss: 0, pimOff: 0, pimDrp: 0 };
+  yms.forEach(function (ym) {
+    var a = pcMon(P, ym, '全部')['全部']; if (a) { o.n += a.n; o.A1 += a.G.A1; o.A2 += a.G.A2; }
+    var g = pcMon(P, ym, '高齡'); if (g['≥65 歲']) o.ger += g['≥65 歲'].n; Object.keys(g).forEach(function (k) { o.gerD += g[k].n; });
+    var pm = pcMon(P, ym, '高齡 PIM'); if (pm['候選命中']) o.pimHit += pm['候選命中'].n; if (pm['未命中']) o.pimMiss += pm['未命中'].n; if (pm['規則庫未啟用']) o.pimOff += pm['規則庫未啟用'].n;
+    var pd = pcMon(P, ym, '高齡 PIM-DRP'); Object.keys(pd).forEach(function (k) { o.pimDrp += pd[k].n; });
+  });
+  o.accD = o.A1 + o.A2; return o;
+}
+/* 各來源資料截至（最後一個完整月：不含進行中的當月） */
+function ccxAsOf() {
+  var now = ccNowYm(), M = CCX.M, mon = CCX.end;
+  var ag = {}, vs = {}; (M.agg || []).forEach(function (r) { if (r.ym >= now) return; if (r.dim === '訪視狀態') vs[r.ym] = 1; else if (r.dim === '問題類別') ag[r.ym] = 1; });
+  var last = function (o) { var k = Object.keys(o).sort(); return k.length ? k[k.length - 1] : ''; };
+  var pc = ''; if (CCX.P) { var ks = Object.keys(CCX.P.yms || {}).filter(function (y) { return y && y < now; }).sort(); pc = ks.length ? ks[ks.length - 1] : ''; }
+  return { mon: mon, consult: last(ag), visit: last(vs), pcne: pc, now: now };
+}
+function ccxLag(ym) { if (!ym) return null; var a = +ym.slice(0, 4) * 12 + +ym.slice(5, 7), n = ccNowYm(), b = +n.slice(0, 4) * 12 + +n.slice(5, 7); return b - a - 1; }
+
+/* ---------- 頁首：K-02 核心 4 數字、K-05 各來源資料截至 ---------- */
+function ccxHeader() {
+  var kp = $('dashKpis'); if (!kp || !CCX.M) return; kp.innerHTML = '';
+  var A = ccxAsOf(), ym = A.mon;
+  var w1 = ccxMonPt('consult', ym), e1 = ccxMonPt('optim', ym), c = ccxConsult([A.consult]), v = ccxVisit([A.visit]);
+  var tile = function (lab, val, foot) { kp.appendChild(metaTile(lab, val, foot)); };
+  tile('照會密度（W1）', w1 && w1.p && w1.p.v !== null ? ccFmt(w1.ind, w1.p.v) : '—', ccYmLab(ym) + '｜' + (w1 && w1.p ? w1.p.x + ' 件／' + w1.p.n + ' 位出院' : '—') + '｜整合病房月報');
+  tile('接受率（A1）', c.v !== null ? ccPct(c.v) : '—', (A.consult ? ccYmLab(A.consult) : '—') + '｜' + c.a + '／' + c.d + '（接受÷接受＋不接受）｜照會統整');
+  tile('處方優化病人比率（E1）', e1 && e1.p && e1.p.v !== null ? ccFmt(e1.ind, e1.p.v) : '—', ccYmLab(ym) + '｜' + (e1 && e1.p ? e1.p.x + '／' + e1.p.n : '—') + '｜整合病房月報');
+  tile('高齡訪視完成率（W3）', v.v !== null ? ccPct(v.v) : '—', (A.visit ? ccYmLab(A.visit) : '—') + '｜' + v.done + '／' + v.d + '｜訪視');
+  var lab = function (n, y) { var l = ccxLag(y); return n + ' ' + (y ? ccYmLab(y) : '無') + (l > 1 ? '（落後 ' + l + ' 個月）' : ''); };
+  setChips([chip('clock', '資料截至：' + [lab('整合病房月報', A.mon), lab('照會統整', A.consult), lab('訪視', A.visit), lab('PCNE-DRPs（全院）', A.pcne)].join('｜'), [A.mon, A.consult, A.visit].some(function (y) { return ccxLag(y) > 1; })), chip('lock', '只顯示彙總；照會統整與 PCNE-DRPs 部分重疊，不加總')]);
+}
+
+/* ---------- 共用：指標磚、對帳列、訊號 ---------- */
+function ccxTile(host, id, ym, label) {
+  var r = ccxMonPt(id, ym); if (!r) return;
+  var p = r.p, ind = r.ind, st = { cls: 'na', txt: '無資料' };
+  if (p) { if (p.ex) st = { cls: 'na', txt: '不納入計算', note: p.ex }; else if (!r.R.L) st = { cls: 'na', txt: '基線不足' }; else if (p.sig && p.sig.length) { var good = ind.dir === 0 ? null : (p.side * ind.dir > 0); st = { cls: good === null ? 'neu' : good ? 'good' : 'bad', txt: '特殊原因｜' + (good === null ? (p.side > 0 ? '高於常態' : '低於常態') : good ? '改善' : '惡化'), note: p.sig.join('、') }; } else st = { cls: 'stable', txt: '共同原因變異' }; }
+  var t = axEl('article', 'cc-kpi ' + st.cls); t.appendChild(axEl('span', 'cc-kpi-l', label || ind.short));
+  t.appendChild(axEl('span', 'cc-kpi-v', p && p.v !== null ? ccFmt(ind, p.v) : '—'));
+  t.appendChild(axEl('span', 'cc-kpi-m', (p && p.n && ind.type !== 'i' ? p.x + '／' + Math.round(p.n * 10) / 10 + '｜' : '') + (r.R.L ? 'CL ' + ccFmt(ind, r.R.L.cl) : '')));
+  t.appendChild(ccChip(st)); host.appendChild(t);
+}
+function ccxRecon(yms) {
+  var rows = yms.map(function (ym) {
+    var row = CCX.M.rows.filter(function (r) { return r.ym === ym; })[0], mon = row ? ccV(row, '藥師照會醫療端接受率｜照會數') : null, c = ccxConsult([ym]).n, P = ccxPcne([ym]);
+    return [ccYmLab(ym), mon === null ? '—' : mon, c || '—', P ? P.n : '—'];
+  });
+  return ccxTab(['月份', '整合病房月報 照會數', '照會統整（整合病房）', 'PCNE-DRPs（全院）'], rows);
+}
+function ccxSignals(yms, cmp) {
+  var out = [];
+  ['consult', 'cover', 'visit', 'accept', 'optim', 'deprx', 'acb', 'los'].forEach(function (id) {
+    var ind = ccxInd(id); if (!ind) return; var R = ccRun(ind, CCX.M, CCX.end, CCX.FL);
+    R.pts.forEach(function (p) { if (yms.indexOf(p.ym) < 0 || !p.sig || !p.sig.length) return; out.push(['特殊原因變異', ind.name, ccYmLab(p.ym) + '：' + ccFmt(ind, p.v), p.sig.join('、')]); });
+    if (ind.type === 'p') R.pts.forEach(function (p) { if (yms.indexOf(p.ym) >= 0 && p.n && p.n < 20) out.push(['小分母（<20）', ind.name, ccYmLab(p.ym) + '：' + p.x + '／' + p.n, '比率不判讀方向']); });
+  });
+  if (cmp) {
+    var share = function (ms) { var a = ccxPeriod('acb', ms), b = ccxPeriod('optim', ms); return a && b && b.n ? a.n / b.n : null; };
+    var s1 = share(yms), s0 = share(cmp); if (s1 !== null && s0 !== null && Math.abs(s1 - s0) > 0.1) out.push(['組成改變', '≥65 歲占住院病人比', ccPct(s0, 0) + ' → ' + ccPct(s1, 0), '差 >10 個百分點；比率指標不宜直接比較']);
+  }
+  var all = ccxConsult(yms);
+  CC_DIMS.forEach(function (dm) { var g = ccxDim(dm[0], yms); Object.keys(g).forEach(function (k) { var o = g[k], d = o.a + o.x, ci = ccWilson(o.a, d); if (d >= 20 && all.v !== null && ci[1] < all.v) out.push(['接受率偏低的類別', dm[1] + '：' + k, o.a + '／' + d + '（' + ccPct(o.a / d, 0) + '）', '95% 信賴區間上界低於整體 ' + ccPct(all.v, 0)]); }); });
+  var A = ccxAsOf(); [['整合病房月報', A.mon], ['照會統整', A.consult], ['訪視', A.visit]].forEach(function (x) { var l = ccxLag(x[1]); if (l > 1) out.push(['資料落後', x[0], '最新完整月 ' + (x[1] ? ccYmLab(x[1]) : '無'), '落後 ' + l + ' 個月']); });
+  yms.forEach(function (ym) { var f = CCX.FL.byYm[ym]; if (f) Object.keys(f).forEach(function (k) { if (k !== 'info') out.push(['資料品質', ccYmLab(ym), f[k], '已排除於對應指標之管制界限']); }); });
+  return out;
+}
+function ccxSigSec(host, ax, title, yms, cmp) {
+  var s = ccxSec(host, ax, title, '只列可檢查的事實；原因與臨床意義由檢討會議判斷', '<b>規則</b>：特殊原因變異＝單點超出 3σ、連續 8 點同側、連續 6 點遞增或遞減；小分母＝分母 <20；組成改變＝≥65 歲占比差 >10 個百分點；接受率偏低＝該類別 95% 信賴區間上界低於整體且 ≥20 件；資料落後＝最新完整月落後 >1 個月。門檻沿用臨床藥學服務頁現行值（F7），非文獻或院內規定。');
+  var L = ccxSignals(yms, cmp); if (!L.length) s.appendChild(axEl('div', 'state', '本期無符合規則的訊號。')); else s.appendChild(ccxTab(['訊號', '指標或類別', '數值', '說明'], L));
+  return s;
+}
+function ccxSpc(host, ids) {
+  var g = axEl('div', 'cc-spcgrid'); host.appendChild(g); var later = [];
+  ids.forEach(function (id) { var ind = ccxInd(id); if (!ind) return; if (ind.agg && !(CCX.M.agg && CCX.M.agg.length)) return; var R = ccRun(ind, CCX.M, CCX.end, CCX.FL), last = R.pts.slice(-1)[0];
+    var art = axEl('article', 'cc-spc'); var hd = axEl('header', 'cc-spc-h'); hd.appendChild(axEl('h4', '', ind.name)); hd.appendChild(ccChip(R.st)); art.appendChild(hd);
+    art.appendChild(axEl('p', 'cc-spc-m', (last ? '最近 ' + ccYmLab(last.ym) + '：' + ccFmt(ind, last.v) + (last.n && ind.type !== 'i' ? '（' + last.x + '／' + Math.round(last.n * 10) / 10 + '）' : '') : '無資料') + (R.L ? '｜CL ' + ccFmt(ind, R.L.cl) + '｜基線 ' + R.L.n + ' 個月' + (R.L.n < 20 ? '（少於 20 個月，界限僅供參考）' : '') : '')));
+    var cw = axEl('div', 'cc-chartwrap'); art.appendChild(cw); g.appendChild(art); later.push([cw, R]); });
+  setTimeout(function () { later.forEach(function (x) { x[0].appendChild(ccChart(x[0], x[1], { h: 190 })); }); }, 0);
+}
+function ccxChain(host, yms, top) {
+  var all = ccxConsult(yms), wrap = axEl('div', 'ccx-chain'); host.appendChild(wrap);
+  [['問題類別', '問題（P）'], ['原因類別', '原因（C）'], ['介入方案', '介入（I）'], ['介入結果', '結果（O）']].forEach(function (dm) {
+    var g = ccxDim(dm[0], yms), ks = Object.keys(g).sort(function (a, b) { return g[b].n - g[a].n; }); var col = axEl('div', 'ccx-col'); col.appendChild(axEl('h4', '', dm[1] + '｜' + ks.reduce(function (s, k) { return s + g[k].n; }, 0) + ' 件'));
+    if (!ks.length) col.appendChild(axEl('div', 'state', '無資料'));
+    var mx = ks.length ? g[ks[0]].n : 1;
+    ks.slice(0, top || 5).forEach(function (k) { var o = g[k], d = o.a + o.x, r = axEl('div', 'ccx-row'); r.appendChild(axEl('span', 'ccx-l', k)); var b = axEl('i', 'ccx-bar'); b.style.width = Math.max(2, o.n / mx * 100) + '%'; r.appendChild(b); r.appendChild(axEl('span', 'ccx-v', o.n + ' 件' + (dm[0] !== '介入結果' && d ? '｜接受 ' + ccPct(o.a / d, 0) + '（' + o.a + '／' + d + '）' : ''))); col.appendChild(r); });
+    if (ks.length > (top || 5)) col.appendChild(axEl('small', 'ax-muted', '其餘 ' + (ks.length - (top || 5)) + ' 類見分析檢視'));
+    wrap.appendChild(col);
+  });
+  host.appendChild(axEl('p', 'ax-muted', '來源：照會統整（整合病房）。接受率＝接受 ÷（接受＋不接受），未回覆不入分母；整體 ' + (all.d ? all.a + '／' + all.d + '（' + ccPct(all.v) + '）' : '—') + '。與 PCNE-DRPs 表單部分重疊，不加總。'));
+}
+
+/* ---------- 每月成效監測 M1–M5 ---------- */
+function ccxMonth(view, ctl) {
+  var ms = CCX.M.months.filter(function (m) { return m <= CCX.end; }); if (!ms.length) { view.appendChild(axEl('div', 'state', '月報無資料')); return; }
+  if (!CCX.ym || ms.indexOf(CCX.ym) < 0) CCX.ym = ms[ms.length - 1];
+  ctl.appendChild(axSelect('月份', ms.slice().reverse().map(function (m) { return { v: m, t: ccYmLab(m) }; }), CCX.ym, function (v) { CCX.ym = v; ccxDraw(); }));
+  var ym = CCX.ym;
+  var s1 = ccxSec(view, 'cxM1', 'M1 本月核心數字｜' + ccYmLab(ym), '每磚：本月值、分子／分母、中心線（CL）、管制判讀', '<b>W1</b> 每百位出院病人照會件數｜<b>A1</b> 接受率（照會統整，接受÷接受＋不接受）｜<b>E1</b> 處方優化病人比率｜<b>E2</b> 減藥病人比率｜<b>W3</b> 高齡訪視完成率｜<b>W2</b> 每人日審視涵蓋率。定義見季檢視「指標定義」。');
+  var g = axEl('div', 'cc-kpis'); s1.appendChild(g);
+  ccxTile(g, 'consult', ym, 'W1 照會密度');
+  var c = ccxConsult([ym]), ta = axEl('article', 'cc-kpi stable'); ta.appendChild(axEl('span', 'cc-kpi-l', 'A1 接受率')); ta.appendChild(axEl('span', 'cc-kpi-v', c.v !== null ? ccPct(c.v) : '—')); ta.appendChild(axEl('span', 'cc-kpi-m', c.d ? c.a + '／' + c.d + (c.d >= 5 ? '｜95% CI ' + ccPct(c.ci[0], 0) + '–' + ccPct(c.ci[1], 0) : '') : '本月無照會統整資料')); ta.appendChild(ccChip({ cls: 'na', txt: c.d < 20 ? '分母 <20，不判讀方向' : '照會統整' })); g.appendChild(ta);
+  ccxTile(g, 'optim', ym, 'E1 處方優化'); ccxTile(g, 'deprx', ym, 'E2 減藥人比率'); ccxTile(g, 'visit', ym, 'W3 訪視完成'); ccxTile(g, 'cover', ym, 'W2 每日涵蓋');
+  var lg = axEl('div', 'cc-legend'); lg.innerHTML = '<span><i class="cc-dot good"></i>特殊原因｜改善</span><span><i class="cc-dot bad"></i>特殊原因｜惡化</span><span><i class="cc-dot neu"></i>特殊原因｜無好壞方向</span><span><i class="cc-dot stable"></i>共同原因變異</span><span><i class="cc-dot na"></i>資料缺漏／基線不足</span>'; s1.appendChild(lg);
+  var s2 = ccxSec(view, 'cxM2', 'M2 服務量與涵蓋趨勢', '管制圖；基線為近 24 個有效月', '管制界限計算與判讀規則同分析檢視「SPC 管制圖」。'); ccxSpc(s2, ['consult', 'cover', 'visit']);
+  var s3 = ccxSec(view, 'cxM3', 'M3 照會處理鏈｜' + ccYmLab(ym), '問題 → 原因 → 介入 → 結果；各列前 5 類', '依照會日期歸月；件數少於 20 的接受率不判讀方向。'); ccxChain(s3, [ym], 5);
+  var s4 = ccxSec(view, 'cxM4', 'M4 病人層結果', '處方優化與減藥；住院期間最高對出院的口服顆數', '減藥以「每人每日口服顆數」判定，與以品項數定義的多重用藥不可直接比較。');
+  var row = CCX.M.rows.filter(function (r) { return r.ym === ym; })[0];
+  if (row) { var mx = ccV(row, '口服顆數｜MAX 平均'), dc = ccV(row, '口服顆數｜出院 平均'); s4.appendChild(axEl('p', 'cc-spc-m', '本月口服顆數：住院最高平均 ' + (mx === null ? '—' : mx.toFixed(2)) + ' → 出院平均 ' + (dc === null ? '—' : dc.toFixed(2)) + (mx && dc !== null ? '（−' + ((mx - dc) / mx * 100).toFixed(1) + '%）' : ''))); }
+  ccxSpc(s4, ['optim', 'deprx']);
+  var s5 = ccxSigSec(view, 'cxM5', 'M5 本月訊號與資料可信度', [ym], null);
+  s5.appendChild(axEl('div', 'ax-ftitle', '三來源照會件數對帳（部分重疊，不加總、不相減）')); s5.appendChild(ccxRecon([ym]));
+}
+
+/* ---------- 每季品質檢討 Q1–Q8 ---------- */
+function ccxQuarter(view, ctl) {
+  var ms = CCX.M.months.filter(function (m) { return m <= CCX.end; }), qs = {}; ms.forEach(function (m) { qs[ccxQ(m)] = (qs[ccxQ(m)] || 0) + 1; });
+  var full = Object.keys(qs).filter(function (q) { return qs[q] === 3; }).sort(); if (!full.length) { view.appendChild(axEl('div', 'state', '尚無完整的季（3 個月皆有月報）')); return; }
+  if (!CCX.q || full.indexOf(CCX.q) < 0) CCX.q = full[full.length - 1];
+  if (CCX.cq === null || CCX.cq === CCX.q) CCX.cq = full.indexOf(ccxPrevQ(CCX.q)) >= 0 ? ccxPrevQ(CCX.q) : '';
+  ctl.appendChild(axSelect('本季', full.slice().reverse().map(function (q) { return { v: q, t: ccxQLab(q) }; }), CCX.q, function (v) { CCX.q = v; CCX.cq = null; ccxDraw(); }));
+  ctl.appendChild(axSelect('對照季', [{ v: '', t: '不比較' }].concat(full.filter(function (q) { return q !== CCX.q; }).reverse().map(function (q) { return { v: q, t: ccxQLab(q) }; })), CCX.cq, function (v) { CCX.cq = v; ccxDraw(); }));
+  var Y = ccxQMonths(CCX.q), C = CCX.cq ? ccxQMonths(CCX.cq) : null, lab = ccxQLab(CCX.q) + (C ? ' 對照 ' + ccxQLab(CCX.cq) : '');
+  var cmp = function (a, b, fmt) { var d = a !== null && b !== null && b !== undefined ? a - b : null; return d === null ? '—' : (d > 0 ? '+' : '') + fmt(d); };
+  /* Q1 */
+  var s1 = ccxSec(view, 'cxQ1', 'Q1 本季對照季核心比較｜' + lab, '比率＝三個月分子合計 ÷ 分母合計；平均值型＝三個月平均', '<b>A1</b> 照會統整：接受 ÷（接受＋不接受）｜<b>A1c</b> 月報：完全接受件數 ÷ 照會件數（原「接受率」將部分接受計 0.5 件，已停用）｜<b>B1</b> 平均住院天數為平衡指標，不預設好壞方向。數值上升或下降不等於品質改善或惡化，請同時看 Q7、Q8。');
+  var rowsQ = [['W1 照會密度', 'consult'], ['W2 每人日審視涵蓋率', 'cover'], ['W3 高齡訪視完成率', 'visit'], ['A1c 完全接受占比（月報）', 'accept'], ['E1 處方優化病人比率', 'optim'], ['E2 減藥病人比率', 'deprx'], ['B1 平均住院天數', 'los']].map(function (x) {
+    var a = x[1] === 'visit' ? (function () { var v = ccxVisit(Y); return { ind: ccxInd('visit'), x: v.done, n: v.d, v: v.v }; })() : ccxPeriod(x[1], Y);
+    var b = C ? (x[1] === 'visit' ? (function () { var v = ccxVisit(C); return { ind: ccxInd('visit'), x: v.done, n: v.d, v: v.v }; })() : ccxPeriod(x[1], C)) : null;
+    var ind = a.ind, f = function (v) { return v === null || v === undefined ? '—' : ccFmt(ind, v); };
+    var cell = function (o) { return !o ? '—' : { h: '<b>' + f(o.v) + '</b>' + (ind.type !== 'i' && o.n ? '　<span>' + o.x + '／' + Math.round(o.n * 10) / 10 + '</span>' : '') + (o.ex && o.ex.length ? '　<span>排除 ' + o.ex.join('、') + '</span>' : '') }; };
+    return [x[0], cell(a), cell(b), b ? cmp(a.v, b.v, function (d) { return ind.type === 'p' ? (d * 100).toFixed(1) + ' 個百分點' : ccFmt(ind, d); }) : '—'];
+  });
+  var a1 = ccxConsult(Y), b1 = C ? ccxConsult(C) : null;
+  rowsQ.splice(3, 0, ['A1 接受率（照會統整）', { h: '<b>' + (a1.v === null ? '—' : ccPct(a1.v)) + '</b>　<span>' + a1.a + '／' + a1.d + '</span>' }, b1 ? { h: '<b>' + (b1.v === null ? '—' : ccPct(b1.v)) + '</b>　<span>' + b1.a + '／' + b1.d + '</span>' } : '—', b1 && a1.v !== null && b1.v !== null ? ((a1.v - b1.v) * 100 > 0 ? '+' : '') + ((a1.v - b1.v) * 100).toFixed(1) + ' 個百分點' : '—']);
+  s1.appendChild(ccxTab(['指標', '本季', '對照季', '差'], rowsQ));
+  /* Q2 */
+  var s2 = ccxSec(view, 'cxQ2', 'Q2 服務量與涵蓋', '高齡訪視四分類與不需訪視原因', '已訪視；可訪未訪＝住院 >72 小時仍未完成；未及訪視＝住院 <72 小時即離開；不需訪視＝依規定排除。完成率分母＝已訪視＋可訪未訪。');
+  var vq = ccxVisit(Y), vc = C ? ccxVisit(C) : null;
+  s2.appendChild(ccxTab(['類別', '本季', '對照季'], [['已訪視', vq.done, vc ? vc.done : '—'], ['可訪未訪（>72 小時）', vq.miss, vc ? vc.miss : '—'], ['未及訪視（<72 小時）', vq.late, vc ? vc.late : '—'], ['不需訪視', vq.na, vc ? vc.na : '—'], ['完成率', ccxPctTxt(vq.done, vq.d), vc ? ccxPctTxt(vc.done, vc.d) : '—']]));
+  var rs = {}; (CCX.M.agg || []).forEach(function (r) { if (r.dim === '訪視狀態' && /^不進行訪視/.test(r.cat) && Y.indexOf(r.ym) >= 0) { var k = r.cat.replace(/^不進行訪視\s*,?\s*/, '').trim() || '未註明'; rs[k] = (rs[k] || 0) + r.n; } });
+  var ks = Object.keys(rs).sort(function (a, b) { return rs[b] - rs[a]; }); if (ks.length) s2.appendChild(axEl('p', 'ax-muted', '本季不需訪視原因：' + ks.map(function (k) { return k + ' ' + rs[k]; }).join('、') + '。'));
+  /* Q3、Q4 */
+  var comp = function (dim, title, ax, sub, acc) {
+    var s = ccxSec(view, ax, title, sub, acc ? '接受率＝接受 ÷（接受＋不接受），附 Wilson 95% 信賴區間；未回覆不入分母。標示「偏低」＝95% 信賴區間上界低於整體且 ≥20 件。' : '占比＝該類件數 ÷ 本期總件數；組成指標不預設好壞方向。');
+    var g = ccxDim(dim, Y), h = C ? ccxDim(dim, C) : {}, tn = Object.keys(g).reduce(function (s0, k) { return s0 + g[k].n; }, 0), hn = Object.keys(h).reduce(function (s0, k) { return s0 + h[k].n; }, 0), all = ccxConsult(Y);
+    var ks2 = Object.keys(g).concat(Object.keys(h).filter(function (k) { return !g[k]; })).sort(function (a, b) { return (g[b] ? g[b].n : 0) - (g[a] ? g[a].n : 0); });
+    s.appendChild(ccxTab(acc ? ['類別', '本季件數', '接受率（95% CI）', '對照季接受率'] : ['類別', '本季件數（占比）', '對照季件數（占比）', '占比差'], ks2.map(function (k) {
+      var o = g[k] || { n: 0, a: 0, x: 0 }, p = h[k] || { n: 0, a: 0, x: 0 };
+      if (acc) { var d = o.a + o.x, ci = ccWilson(o.a, d), low = d >= 20 && all.v !== null && ci[1] < all.v, dp = p.a + p.x; return { cls: low ? 'cc-low' : '', cells: [k, o.n, d ? ccPct(o.a / d, 0) + '（' + (d >= 5 ? ccPct(ci[0], 0) + '–' + ccPct(ci[1], 0) : 'n＝' + d) + '）' + (low ? '　偏低' : '') : '—', C ? (dp ? ccPct(p.a / dp, 0) + '（' + p.a + '／' + dp + '）' : '—') : '—'] }; }
+      var sa = tn ? o.n / tn : null, sb = hn ? p.n / hn : null; return [k, o.n + (sa !== null ? '（' + ccPct(sa, 0) + '）' : ''), C ? p.n + (sb !== null ? '（' + ccPct(sb, 0) + '）' : '') : '—', C && sa !== null && sb !== null ? ((sa - sb) * 100 > 0 ? '+' : '') + ((sa - sb) * 100).toFixed(1) + ' 個百分點' : '—'];
+    })));
+  };
+  comp('問題類別', 'Q3 問題類別（PCNE P）組成', 'cxQ3', '照會統整（整合病房）；本季對照季', false);
+  comp('原因類別', 'Q3-2 原因類別（PCNE C）組成', 'cxQ3b', '照會統整（整合病房）；本季對照季', false);
+  comp('介入方案', 'Q4 介入方案與接受', 'cxQ4', '照會統整（整合病房）；各類別接受率', true);
+  /* Q5 */
+  var s5 = ccxSec(view, 'cxQ5', 'Q5 病人層結果：處方優化依年齡層', '月報；本季三個月分子分母合計', '年齡層「優化處方人數」合計與全體不一致的月份（資料品質卡「定義不一致」）年齡層僅作層內比較。');
+  var strat = function (ms) { var o = {}; CC_AGE.concat(['<65']).forEach(function (s) { var n = 0, x = 0; CCX.M.rows.forEach(function (r) { if (ms.indexOf(r.ym) < 0) return; var k = ccV(r, '住院病人人數｜' + s), v = ccV(r, '優化處方人數｜' + s); if (!k || v === null) return; n += k; x += v; }); o[s] = { x: x, n: n }; }); return o; };
+  var sa = strat(Y), sb = C ? strat(C) : null; var tot = function (o) { return Object.keys(o).reduce(function (s0, k) { return { x: s0.x + o[k].x, n: s0.n + o[k].n }; }, { x: 0, n: 0 }); };
+  var all1 = ccxPeriod('optim', Y), ta1 = tot(sa);
+  s5.appendChild(ccxTab(['年齡層', '本季', '對照季'], CC_AGE.concat(['<65']).map(function (s) { return [ccAgeLab(s), ccxPctTxt(sa[s].x, sa[s].n), sb ? ccxPctTxt(sb[s].x, sb[s].n) : '—']; }).concat([{ cls: 'ccx-sum', cells: ['各層合計（對帳）', ta1.x + '／' + ta1.n, sb ? tot(sb).x + '／' + tot(sb).n : '—'] }, { cls: 'ccx-sum', cells: ['全體（月報總計）', all1 ? all1.x + '／' + all1.n : '—', C ? (function () { var z = ccxPeriod('optim', C); return z.x + '／' + z.n; })() : '—'] }])));
+  if (all1 && (ta1.x !== all1.x || ta1.n !== all1.n)) s5.appendChild(axEl('p', 'cc-exnote', '對帳不符：各層合計 ' + ta1.x + '／' + ta1.n + ' ≠ 全體 ' + all1.x + '／' + all1.n + '；根因在月報兩區塊判定規則，需填報者確認。'));
+  /* Q6 */
+  var s6 = ccxSec(view, 'cxQ6', 'Q6 高齡與潛在不適當用藥（PIM）', '整合病房月報（ACB、量表）與全院 PCNE-DRPs（PIM 候選）分列，不加總', '<b>E3</b> ACB 抗膽鹼負荷改善比率（≥65 歲）。<b>E4</b> HK、TW 量表改善比率：量表正式名稱與出處待院內提供（F6），確認前只列數值、不作正式比較。<b>E5</b> PCNE-DRPs 高齡 PIM 候選：由 PcneAgg 依已簽核並授權的規則庫判定，屬系統候選，不是臨床判定；規則庫未啟用時不計算。');
+  var e = function (id, ms) { var o = ccxPeriod(id, ms); return o ? ccxPctTxt(o.x, o.n) : '—'; };
+  var P1 = ccxPcne(Y), P0 = C ? ccxPcne(C) : null;
+  var pimTxt = function (P) { if (!P) return '無法讀取 PCNE 彙總'; if (P.pimOff && !P.pimHit && !P.pimMiss) return '規則庫未啟用（' + P.pimOff + ' 筆 ≥65 歲照會未判定）'; var d = P.pimHit + P.pimMiss; return d ? P.pimHit + '／' + d + '（' + ccPct(P.pimHit / d) + '）' : '—'; };
+  s6.appendChild(ccxTab(['指標', '來源', '本季', '對照季'], [['E3 ACB 改善比率（≥65 歲）', '整合病房月報', e('acb', Y), C ? e('acb', C) : '—'], ['E4 HK 量表改善比率【未經查證】', '整合病房月報', e('hk', Y), C ? e('hk', C) : '—'], ['E4 TW 量表改善比率【未經查證】', '整合病房月報', e('tw', Y), C ? e('tw', C) : '—'], ['≥65 歲照會件數', 'PCNE-DRPs（全院）', P1 ? P1.ger + '／' + P1.gerD : '—', P0 ? P0.ger + '／' + P0.gerD : '—'], ['E5 高齡 PIM 候選照會', 'PCNE-DRPs（全院）', pimTxt(P1), C ? pimTxt(P0) : '—'], ['PIM 相關 DRP（原因碼 C1.1–C1.4、C3.2、C4.2）', 'PCNE-DRPs（全院）', P1 ? P1.pimDrp : '—', P0 ? P0.pimDrp : '—']]));
+  /* Q7 */
+  ccxSigSec(view, 'cxQ7', 'Q7 優先討論清單（訊號）與可能影響因素', Y, C);
+  var s7 = view.querySelector('section[data-ax="cxQ7"]');
+  var fac = function (ms) { var los = ccxPeriod('los', ms), dis = 0; CCX.M.rows.forEach(function (r) { if (ms.indexOf(r.ym) >= 0) dis += ccV(r, '藥師照會醫療端接受率｜出院人數') || 0; }); var g65 = ccxPeriod('acb', ms), opt = ccxPeriod('optim', ms); return [dis, los && los.v !== null ? los.v.toFixed(2) + ' 天' : '—', g65 && opt && opt.n ? ccPct(g65.n / opt.n, 0) : '—']; };
+  var fa = fac(Y), fb = C ? fac(C) : ['—', '—', '—'];
+  s7.appendChild(axEl('div', 'ax-ftitle', '可能影響指標變動的因素（數值變動不等於品質改善或惡化）'));
+  s7.appendChild(ccxTab(['因素', '本季', '對照季'], [['出院人數', fa[0], fb[0]], ['B1 平均住院天數（平衡指標）', fa[1], fb[1]], ['≥65 歲占住院病人比', fa[2], fb[2]]]));
+  /* Q8 */
+  var s8 = ccxSec(view, 'cxQ8', 'Q8 資料可信度與指標定義', '對帳、排除月份、定義', '三來源件數部分重疊（使用者確認：部分照會兩邊都有填），只並列、不加總、不相減。');
+  s8.appendChild(axEl('div', 'ax-ftitle', '三來源照會件數對帳')); s8.appendChild(ccxRecon(Y));
+  var ex = []; Y.forEach(function (ym) { var f = CCX.FL.byYm[ym]; if (f) Object.keys(f).forEach(function (k) { ex.push([ccYmLab(ym), f[k]]); }); }); if (ex.length) { s8.appendChild(axEl('div', 'ax-ftitle', '本季資料品質事項')); s8.appendChild(ccxTab(['月份', '說明'], ex)); }
+  var dl = axEl('dl', 'mq-dict');
+  [['W1 每百位出院病人照會件數', ccxInd('consult').def], ['W2 每人日審視涵蓋率（近似）', ccxInd('cover').def], ['W3 高齡病人訪視完成率', ccxInd('visit').def], ['A1 接受率（主指標，F1）', '接受 ÷（接受＋不接受）；未回覆與空值不入分母。整合病房以「照會統整」計算；全院以 PCNE-DRPs 表單 A1 ÷（A1＋A2）計算，兩者分列。'], ['A1c 完全接受占比', ccxInd('accept').def], ['E1 處方優化病人比率', ccxInd('optim').def], ['E2 減藥病人比率', ccxInd('deprx').def], ['E3 ACB 改善比率', ccxInd('acb').def], ['B1 平均住院天數', ccxInd('los').def]].forEach(function (x) { dl.appendChild(axEl('dt', '', x[0])); dl.appendChild(axEl('dd', '', x[1])); });
+  s8.appendChild(dl);
+}
+
+/* ---------- 分析檢視：K-09 管制圖收為「管制圖庫」、K-04 分層對帳、K-10 高齡與 PIM ---------- */
+function ccxAnalysisFix(box) {
+  /* K-04：分層比較加對帳列（以目前統計期間） */
+  var st = box.querySelector('section[data-ax="ccStrat"]');
+  if (st && !st.querySelector('.ccx-recon')) {
+    var rows = ccWinRows(CCX.M, CCX.end), sum = function (strata, useFlag) { var n = 0, x = 0; strata.forEach(function (s) { rows.forEach(function (r) { if (useFlag && CCX.FL.byYm[r.ym] && CCX.FL.byYm[r.ym].review) return; var k = ccV(r, '住院病人人數｜' + s), v = ccV(r, '優化處方人數｜' + s); if (!k || v === null) return; n += k; x += v; }); }); return { x: x, n: n }; };
+    var tn = 0, tx = 0; rows.forEach(function (r) { var k = ccV(r, '住院病人人數｜總'), v = ccV(r, '優化處方人數｜總'); if (k) tn += k; if (v) tx += v; });
+    var a = sum(CC_SRC4, true), b = sum(CC_AGE.concat(['<65']), false), c = sum(CC_PILL, false);
+    var w = axEl('div', 'ccx-recon'); w.appendChild(axEl('div', 'ax-ftitle', '對帳：各分層合計 vs 全體（同一統計期間）'));
+    var chk = function (o) { return o.n === tn && o.x === tx ? '相符' : '不符'; };
+    w.appendChild(ccxTab(['分層', '優化人數合計', '住院病人合計', '全體（優化／住院）', '差額（人）', '狀態'], [['依入院來源（排除審視資料缺漏月份）', a.x, a.n, tx + '／' + tn, tn - a.n, chk(a)], ['依年齡層', b.x, b.n, tx + '／' + tn, tn - b.n, chk(b)], ['依出院用藥顆數', c.x, c.n, tx + '／' + tn, tn - c.n, chk(c)]].map(function (r) { return { cls: r[5] === '不符' ? 'cc-low' : '', cells: r }; })));
+    w.appendChild(axEl('p', 'ax-muted', '不符時只作層內比較，不跨層比較。入院來源差額＝未歸類或因資料品質排除的人次【資料不足，無法確認】；根因在月報各區塊判定規則，需填報者確認。'));
+    st.appendChild(w);
+  }
+  /* K-10：高齡與 PIM（分析檢視，依目前統計期間） */
+  if (!box.querySelector('section[data-ax="cxPim"]')) {
+    var rows2 = ccWinRows(CCX.M, CCX.end), yms = rows2.map(function (r) { return r.ym; });
+    var tmp = axEl('div', ''); var s = ccxSec(tmp, 'cxPim', '高齡與潛在不適當用藥（PIM）', (yms.length ? ccYmLab(yms[0]) + '－' + ccYmLab(yms[yms.length - 1]) : '') + '｜整合病房月報與全院 PCNE-DRPs 分列', '整合病房月報的 ACB、ARS、HK、TW 為住院最高對出院的分數改善；PCNE-DRPs 的 PIM 為規則庫候選（需簽核並授權才計算）。兩來源母體不同，不加總、不互相推論。HK、TW 量表名稱與出處【未經查證】（F6）。');
+    var P = ccxPcne(yms), pe = function (id) { var o = ccxPeriod(id, yms); return o ? ccxPctTxt(o.x, o.n) : '—'; };
+    s.appendChild(ccxTab(['指標', '來源', '統計期間'], [['ACB 改善比率（≥65 歲）', '整合病房月報', pe('acb')], ['ARS 改善比率（≥65 歲）', '整合病房月報', pe('ars')], ['HK 量表改善比率【未經查證】', '整合病房月報', pe('hk')], ['TW 量表改善比率【未經查證】', '整合病房月報', pe('tw')], ['≥65 歲照會件數', 'PCNE-DRPs（全院）', P ? P.ger + '／' + P.gerD : '無法讀取'], ['高齡 PIM 候選照會', 'PCNE-DRPs（全院）', !P ? '無法讀取' : P.pimOff && !P.pimHit && !P.pimMiss ? '規則庫未啟用' : (P.pimHit + P.pimMiss ? ccxPctTxt(P.pimHit, P.pimHit + P.pimMiss) : '—')], ['PIM 相關 DRP', 'PCNE-DRPs（全院）', P ? P.pimDrp : '—']]));
+    var dep = box.querySelector('section[data-ax="ccDeprx"]'); if (dep) dep.parentNode.insertBefore(s, dep.nextSibling); else box.appendChild(s);
+  }
+  /* K-09：14 張管制圖收為「管制圖庫」（核心 6 張已在每月、每季檢視） */
+  var spc = box.querySelector(':scope > section[data-ax="ccSpc"]');
+  if (spc) { var dt = document.createElement('details'); dt.className = 'ax-fold ccx-lib'; var sm = document.createElement('summary'); sm.textContent = '管制圖庫（14 張；核心 6 張已列於每月成效監測）'; dt.appendChild(sm); var inner = axEl('div', 'ax-foldbody'); spc.parentNode.insertBefore(dt, spc); inner.appendChild(spc); dt.appendChild(inner); }
+  /* 資料品質卡收合 */
+  var dq = box.querySelector(':scope > section[data-ax="ccDq"]');
+  if (dq) { var d2 = document.createElement('details'); d2.className = 'ax-fold'; var s2 = document.createElement('summary'); s2.textContent = '資料品質與指標定義（逐月自動檢查）'; d2.appendChild(s2); var in2 = axEl('div', 'ax-foldbody'); dq.parentNode.insertBefore(d2, dq); in2.appendChild(dq); d2.appendChild(in2); }
+}
+
+/* ---------- 檢視切換 ---------- */
+function ccxDraw() {
+  var box = $('charts'); if (!box || !CCX.M) return; var bar = box.querySelector(':scope > .ccx-bar'), view = box.querySelector(':scope > .ccx-view'); if (!bar || !view) return;
+  bar.innerHTML = ''; view.innerHTML = '';
+  var tabs = axEl('div', 'v7-tabs'); [['month', '每月成效監測'], ['quarter', '每季品質檢討'], ['analysis', '分析（全部圖卡）']].forEach(function (z) { var b = axEl('button', 'v7-tab' + (CCX.view === z[0] ? ' on' : ''), z[1]); b.type = 'button'; b.setAttribute('aria-pressed', CCX.view === z[0] ? 'true' : 'false'); b.addEventListener('click', function () { CCX.view = z[0]; ccxDraw(); }); tabs.appendChild(b); }); bar.appendChild(tabs);
+  var ctl = axEl('div', 'ax-bar'), tools = axEl('div', 'v7-tools'); bar.appendChild(ctl); bar.appendChild(tools);
+  box.classList.remove('mq-on'); box.classList.toggle('ccx-on', CCX.view !== 'analysis');
+  if (CCX.view === 'analysis') { tools.appendChild(axEl('span', 'v7-hint', '分析：依「服務量與涵蓋 → 照會處理鏈 → 病人層結果 → 分層 → 資料品質」排序；各卡可自選統計期間。')); return; }
+  var pb = axEl('button', 'v7-btn', '列印本檢視'); pb.type = 'button'; pb.addEventListener('click', function () { ccxPrint(view); }); tools.appendChild(pb);
+  var cb = axEl('button', 'v7-btn', '匯出彙總 CSV'); cb.type = 'button'; cb.title = '只匯出彙總表與指標磚，不含姓名、病歷號與照會內容'; cb.addEventListener('click', function () { var o = AX7.view; AX7.view = 'cc-' + CCX.view; try { ax7Csv(view); } finally { AX7.view = o; } }); tools.appendChild(cb);
+  try { if (CCX.view === 'month') ccxMonth(view, ctl); else ccxQuarter(view, ctl); } catch (e) { if (window.console) console.error(e); view.appendChild(axEl('div', 'state', '檢視產生失敗：' + (e && e.message || e))); }
+  Array.prototype.forEach.call(view.querySelectorAll('section'), function (s) { s.classList.add('v7-sec'); });
+}
+function ccxPrint(view) {
+  var pr = axEl('div', 'v7-pr'); pr.appendChild(axEl('h2', '', '連貫照護整合成效｜' + (CCX.view === 'month' ? '每月成效監測 ' + ccYmLab(CCX.ym) : '每季品質檢討 ' + ccxQLab(CCX.q)) + '｜列印 ' + axFmtDate(new Date())));
+  pr.appendChild(view.cloneNode(true)); Array.prototype.forEach.call(pr.querySelectorAll('.ax-note'), function (n) { n.hidden = false; });
+  document.body.appendChild(pr); document.body.classList.add('v7-printing');
+  var done = function () { document.body.classList.remove('v7-printing'); pr.remove(); window.removeEventListener('afterprint', done); }; window.addEventListener('afterprint', done); setTimeout(function () { window.print(); setTimeout(done, 1500); }, 50);
+}
+function ccxMount(box) {
+  if (box.querySelector(':scope > .ccx-bar')) return;
+  var bar = axEl('section', 'chart ax-card v7-bar ccx-bar ccx-keep'), view = axEl('div', 'v7-view ccx-view ccx-keep');
+  box.insertBefore(view, box.firstChild); box.insertBefore(bar, view);
+  ccxHeader(); ccxAnalysisFix(box); ccxDraw();
+}
+/* 載入：沿用 axCcGroup 的資料，另讀 PCNE 彙總（失敗不阻斷） */
+(function () {
+  var base = AX_PANELS['連貫照護整合成效'];
+  var panel = function (host, d) {
+    CCX.M = null; CCX.P = null;
+    var pk = typeof pcFindKey === 'function' ? pcFindKey() : null;
+    var pP = pk ? axLoad(pk).then(function (src) { return pcIndex(pcParseAgg(src)); }).catch(function () { return null; }) : Promise.resolve(null);
+    return Promise.all([ccLoad().catch(function () { return null; }), pP]).then(function (a) {
+      if (a[0]) { CCX.M = a[0]; CCX.FL = ccFlags(a[0]); CCX.end = ccEndYm(a[0].months); } CCX.P = a[1];
+      return base(host, d);
+    });
+  };
+  AX_PANELS['連貫照護整合成效'] = panel; AX_PANELS['整合病房減藥成效'] = panel;
+  var L = { order: ['ax:ccKpi', 'ax:ccVisit', 'ax:ccDrp', 'ax:ccDeprx', 'ax:ccStrat', 'ax:ccSpc', 'ax:ccDq'], hide: [/./],
+    post: function (box) { Array.prototype.forEach.call(box.querySelectorAll('section[data-ax="ccKudos"]'), function (s) { s.remove(); }); if (CCX.M) ccxMount(box); } };
+  DASH_LAYOUT['連貫照護整合成效'] = L; DASH_LAYOUT['整合病房減藥成效'] = L;
+})();
+/* K-01：換頁時清除前一頁留下的檢視樣式（臨床藥學服務的 mq-on、本頁的 ccx-on）；各頁掛載時自行重設 */
+(function () {
+  var r0 = renderDashboard;
+  renderDashboard = function (d) { var b = $('charts'); if (b) b.classList.remove('mq-on', 'ccx-on'); var cc = CCX_NAMES.test(dashName(S.dashId) || (d && d.name) || ''); var out = r0.apply(this, arguments); if (cc) { var kp = $('dashKpis'); if (kp) { kp.innerHTML = ''; kp.appendChild(metaTile('連貫照護整合成效', '載入中…', '整合病房月報、照會統整、訪視')); } } return out; };
+})();
+
 </script>
 </body>
 </html>
