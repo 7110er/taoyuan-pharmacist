@@ -1506,7 +1506,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '7.1.4';
+var APP_VERSION = '7.2.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -12660,7 +12660,7 @@ DASH_LAYOUT['教師教學成效'] = { order: ['ax:t7', 'ax:team', 'ax:matrix', '
 /* H-15：個人頁非核心卡收合為「其他學習證據」 */
 (function () {
   var wrapPost = function (name, fn) { var L = DASH_LAYOUT[name] = DASH_LAYOUT[name] || {}, p0 = L.post; L.post = function (box, host) { if (p0) p0(box, host); fn(box); }; };
-  wrapPost('PGY 學員個人成績', function (box) { ax7Fold(box, function (k) { return ax7AxIs(['dqx', 'hcp', 'pcp', 'pres', 'morning'])(k) || ax7TitleIs(/^藥事照會紀錄|^藥品諮詢紀錄/)(k); }, '其他學習證據：PCNE、藥品諮詢、病人用藥教育、每日一題、簡報'); });
+  wrapPost('PGY 學員個人成績', function (box) { ax7Fold(box, function (k) { return ax7AxIs(['dqx', 'hcp', 'pcp', 'ccp', 'pres', 'morning'])(k) || ax7TitleIs(/^藥事照會紀錄|^藥品諮詢紀錄/)(k); }, '其他學習證據：PCNE、整合病房照會、藥品諮詢、病人用藥教育、每日一題、簡報'); });
   wrapPost('UGY 學生個人成績', function (box) {
     /* H-06（1）亮點卡「沒有評分紀錄」：該生不在分析_學生成效（UGY-360 他評），與「學生分數」實習總分來源不同，改寫為來源說明 */
     Array.prototype.forEach.call(box.querySelectorAll('[data-ax="hl"].state'), function (el) { if (/沒有評分紀錄/.test(el.textContent)) el.textContent = el.textContent.replace(/在學生學習成效資料中沒有評分紀錄。?/, '尚無 UGY-360 他評紀錄（來源：分析_學生成效）。實習總分與各面向分數來自「學生分數」分頁，兩者為不同評量來源，不互相推論。'); });
@@ -13012,6 +13012,43 @@ function ccxMount(box) {
 
 /* K-01（v7.1.1）：個人頁不經 renderDashboard，改在進入任何儀表板時先清除檢視樣式 */
 (function () { var o0 = openDashboard; openDashboard = function (id) { var b = $('charts'); if (b) b.classList.remove('mq-on', 'ccx-on', 'v7-mode'); document.body.classList.remove('mq-hide'); return o0.apply(this, arguments); }; })();
+
+/* =====================================================================
+   v7.2.0｜整合病房照會（個人）：原群體頁「深度照護亮點」改列個人頁（建議書 K-11、F5）
+   只顯示本頁對象自己的件數與比率；不排名、不與他人比較；找不到對應紀錄時不顯示卡片。
+   ===================================================================== */
+function ccxPersonal(host, d) {
+  var lab = typeof axSubjLabel === 'function' ? axSubjLabel(d) : '', nm = axName(lab), self = !d.subject || (S.user && (d.subject === S.user.person_id || d.subject === S.user.pid));
+  if (!nm && self && S.user) nm = axName(S.user.display_name || '');
+  if (!nm) return Promise.resolve();
+  return kdLoadCube(KD_CC_T, /連貫照護|整合病房/, ['人員', '問題類別', '後續追蹤']).then(function (C) {
+    var pk = typeof pcFindKey === 'function' ? pcFindKey() : '';
+    var mapP = pk ? axLoad(pk).then(function (src) { var ci = src.cols.indexOf('維度'), cc = src.cols.indexOf('類別'), map = {}; src.rows.forEach(function (r) { if (r[ci] !== '人員') return; var m = /^([A-Za-z]{0,2}\d+)\s*(.+)$/.exec(String(r[cc] || '').trim()); if (m) map[m[1].toUpperCase()] = m[2]; }); return map; }).catch(function () { return {}; }) : Promise.resolve({});
+    return mapP.then(function (map) {
+      var who = function (r) { var p = String(r.c['人員'] || '').trim(), m = /^([A-Za-z]{0,2}\d+)\s*(.*)$/.exec(p); if (m && m[2]) return axName(m[2]); if (m && map[m[1].toUpperCase()]) return axName(map[m[1].toUpperCase()]); return axName(p); };
+      var yms = Object.keys(C.yms).sort(), end = yms[yms.length - 1] || ccNowYm(), from = pcSeq('2000-01', end).slice(-12)[0];
+      var mine = C.rows.filter(function (r) { return r.ym >= from && who(r) === nm; }); if (!mine.length) return;
+      var n = 0, fu = 0, mc = 0, mi = 0, a = 0, x = 0, cats = {}, ms = {};
+      mine.forEach(function (r) { n += r.n; ms[r.ym] = 1; if (r.c['後續追蹤'] === '有') fu += r.n; if (r.c['多重原因'] === '有') mc += r.n; if (r.c['多重介入'] === '有') mi += r.n; var rs = r.c['照會結果'] || ''; if (/不接受/.test(rs)) x += r.n; else if (/^接受/.test(rs)) a += r.n; var k = r.c['問題類別']; if (k && k !== '（空白）') cats[k] = 1; });
+      var sec = axEl('section', 'chart ax-card ax-gsec'); sec.dataset.ax = 'ccp'; host.appendChild(sec);
+      axGrowthHead(sec, '整合病房照會（連貫照護）', (self ? '本人' : '指派對象') + '｜' + ccYmLab(from) + '－' + ccYmLab(end) + '｜不排名、不與他人比較',
+        '<b>資料</b>：整合病房「照會統整」經「連貫照護人員彙總」分頁彙總，只含件數，不含病歷號、病人姓名與照會內容；依照會者代碼對應同仁姓名（同名或未對應者不顯示）。<br><b>接受率</b>＝接受 ÷（接受＋不接受），未回覆不入分母。分母 &lt;5 只列件數。<br>與 PCNE-DRPs 表單部分重疊，兩者不加總。', false);
+      var g = axEl('div', 'ax-gtiles'); sec.appendChild(g);
+      var rate = function (k, d0) { return d0 >= 5 ? '<b>' + Math.round(k / d0 * 100) + '</b><small>%</small>' : '<b>' + k + '</b><small>／' + d0 + '</small>'; };
+      g.appendChild(axTile('照會件數', '<b>' + n + '</b><small> 件</small>', '有照會的月份 ' + Object.keys(ms).length + ' 個月'));
+      g.appendChild(axTile('建議獲醫療端接受', a + x ? rate(a, a + x) : '—', a + x ? a + '／' + (a + x) + '（有結果者）' : '尚無結果紀錄'));
+      g.appendChild(axTile('有後續追蹤紀錄', rate(fu, n), fu + '／' + n));
+      g.appendChild(axTile('記錄第二原因', rate(mc, n), mc + '／' + n));
+      g.appendChild(axTile('提出兩項以上介入', rate(mi, n), mi + '／' + n));
+      g.appendChild(axTile('PCNE 問題類別', '<b>' + Object.keys(cats).length + '</b><small> 類</small>', '期間內處理過的類別數'));
+    });
+  }).catch(function (e) { if (window.console) console.warn('整合病房個人卡略過', e && e.message); });
+}
+(function () {
+  var after = function (name) { var f = AX_PANELS[name]; if (!f) return; AX_PANELS[name] = function (host, d) { return Promise.resolve().then(function () { return f(host, d); }).then(function (v) { return Promise.resolve(ccxPersonal(host, d)).catch(function () { }).then(function () { return v; }); }); }; };
+  ['教師個人成績', '教師教學評核（個人）', 'PGY 學員個人成績'].forEach(after);
+  var L = DASH_LAYOUT['PGY 學員個人成績']; if (L && L.order && L.order.indexOf('ax:ccp') < 0) L.order.push('ax:ccp');
+})();
 </script>
 </body>
 </html>
