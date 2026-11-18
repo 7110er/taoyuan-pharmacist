@@ -1505,7 +1505,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '7.1.1';
+var APP_VERSION = '7.1.2';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -13010,7 +13010,7 @@ function ccxMount(box) {
 
 
 /* K-01（v7.1.1）：個人頁不經 renderDashboard，改在進入任何儀表板時先清除檢視樣式 */
-(function () { var o0 = openDashboard; openDashboard = function (id) { var b = $('charts'); if (b) b.classList.remove('mq-on', 'ccx-on'); document.body.classList.remove('mq-hide'); return o0.apply(this, arguments); }; })();
+(function () { var o0 = openDashboard; openDashboard = function (id) { var b = $('charts'); if (b) b.classList.remove('mq-on', 'ccx-on', 'v7-mode'); document.body.classList.remove('mq-hide'); return o0.apply(this, arguments); }; })();
 </script>
 </body>
 </html>
