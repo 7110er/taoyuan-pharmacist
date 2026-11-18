@@ -1505,7 +1505,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '7.1.0';
+var APP_VERSION = '7.1.1';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -12940,7 +12940,7 @@ function ccxAnalysisFix(box) {
     var a = sum(CC_SRC4, true), b = sum(CC_AGE.concat(['<65']), false), c = sum(CC_PILL, false);
     var w = axEl('div', 'ccx-recon'); w.appendChild(axEl('div', 'ax-ftitle', '對帳：各分層合計 vs 全體（同一統計期間）'));
     var chk = function (o) { return o.n === tn && o.x === tx ? '相符' : '不符'; };
-    w.appendChild(ccxTab(['分層', '優化人數合計', '住院病人合計', '全體（優化／住院）', '差額（人）', '狀態'], [['依入院來源（排除審視資料缺漏月份）', a.x, a.n, tx + '／' + tn, tn - a.n, chk(a)], ['依年齡層', b.x, b.n, tx + '／' + tn, tn - b.n, chk(b)], ['依出院用藥顆數', c.x, c.n, tx + '／' + tn, tn - c.n, chk(c)]].map(function (r) { return { cls: r[5] === '不符' ? 'cc-low' : '', cells: r }; })));
+    w.appendChild(ccxTab(['分層', '優化人數合計', '住院病人合計', '全體（優化／住院）', '差額（住院／優化，人）', '狀態'], [['依入院來源（排除審視資料缺漏月份）', a.x, a.n, tx + '／' + tn, (tn - a.n) + '／' + (tx - a.x), chk(a)], ['依年齡層', b.x, b.n, tx + '／' + tn, (tn - b.n) + '／' + (tx - b.x), chk(b)], ['依出院用藥顆數', c.x, c.n, tx + '／' + tn, (tn - c.n) + '／' + (tx - c.x), chk(c)]].map(function (r) { return { cls: r[5] === '不符' ? 'cc-low' : '', cells: r }; })));
     w.appendChild(axEl('p', 'ax-muted', '不符時只作層內比較，不跨層比較。入院來源差額＝未歸類或因資料品質排除的人次【資料不足，無法確認】；根因在月報各區塊判定規則，需填報者確認。'));
     st.appendChild(w);
   }
@@ -12980,7 +12980,7 @@ function ccxPrint(view) {
   var done = function () { document.body.classList.remove('v7-printing'); pr.remove(); window.removeEventListener('afterprint', done); }; window.addEventListener('afterprint', done); setTimeout(function () { window.print(); setTimeout(done, 1500); }, 50);
 }
 function ccxMount(box) {
-  if (box.querySelector(':scope > .ccx-bar')) return;
+  if (box.querySelector(':scope > .ccx-bar')) { ccxHeader(); ccxDraw(); return; }
   var bar = axEl('section', 'chart ax-card v7-bar ccx-bar ccx-keep'), view = axEl('div', 'v7-view ccx-view ccx-keep');
   box.insertBefore(view, box.firstChild); box.insertBefore(bar, view);
   ccxHeader(); ccxAnalysisFix(box); ccxDraw();
@@ -13008,6 +13008,9 @@ function ccxMount(box) {
   renderDashboard = function (d) { var b = $('charts'); if (b) b.classList.remove('mq-on', 'ccx-on'); var cc = CCX_NAMES.test(dashName(S.dashId) || (d && d.name) || ''); var out = r0.apply(this, arguments); if (cc) { var kp = $('dashKpis'); if (kp) { kp.innerHTML = ''; kp.appendChild(metaTile('連貫照護整合成效', '載入中…', '整合病房月報、照會統整、訪視')); } } return out; };
 })();
 
+
+/* K-01（v7.1.1）：個人頁不經 renderDashboard，改在進入任何儀表板時先清除檢視樣式 */
+(function () { var o0 = openDashboard; openDashboard = function (id) { var b = $('charts'); if (b) b.classList.remove('mq-on', 'ccx-on'); document.body.classList.remove('mq-hide'); return o0.apply(this, arguments); }; })();
 </script>
 </body>
 </html>
