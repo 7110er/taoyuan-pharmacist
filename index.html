@@ -1494,7 +1494,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '7.0.0';
+var APP_VERSION = '7.0.1';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -12306,7 +12306,7 @@ function ax7Group(M, w, key) {
 function ax7Load() {
   if (AX7.ready) return AX7.ready;
   var one = function (k) { return axPrep(k).catch(function () { return null; }); };
-  AX7.ready = Promise.all([axLoad(AX.KEYS.cbme).then(function (cb) { return cb.rows.length ? ax4Rows(cb) : null; }).catch(function () { return null; }), one('stu'), one('unit'), one('tea')]).then(function (a) { AX7.P = a[0]; AX7.M = { stu: a[1], unit: a[2], tea: a[3] }; return AX7; });
+  AX7.ready = Promise.all([axLoad(AX.KEYS.cbme).then(function (cb) { return cb.rows.length ? ax4Rows(cb) : null; }).catch(function () { return null; }), one('stu'), one('unit'), one('tea'), ax7WbaLoad()]).then(function (a) { AX7.P = a[0]; AX7.M = { stu: a[1], unit: a[2], tea: a[3] }; AX7.W = a[4]; return AX7; });
   return AX7.ready;
 }
 /* 訊號（只標示，不下結論；門檻為建議書起始值，非文獻或院內規定） */
@@ -12491,6 +12491,7 @@ function ax7Monitor(view, P, w, wc, pre) {
       axStackBar([{ n: o.st.done || 0, c: 'up', t: '已判定' }, { n: o.st.obs || 0, c: 'same', t: '僅教師觀察' }, { n: o.st.overdue || 0, c: 'down', t: '逾期待補' }, { n: (o.st.pending || 0) + (o.st.obsEarly || 0), c: 'none', t: '未到期' }, { n: (o.st.prefill || 0) + (o.st.undated || 0) + (o.st.nodate || 0), c: 'pf', t: '預填／無日期' }], o.rows || 1)];
   })));
   s2.appendChild(ax7Tab(['EPA（公版 L4 時機）', '已到時機', 'CCC L4', '低於 L4', '尚無 CCC'], K.C5.map(function (x) { return ['EPA ' + x.e.no + ' ' + x.e.name + '（' + x.e.l4 + ' 個月）', x.el, x.el ? ax7PctTxt(x.at, x.el) : 'N/A', x.lo, x.no]; })));
+  ax7WbaSec(view, pre.toLowerCase() + 'c10', (Y ? 'Y2-3 ' : 'H2-1 ') + '逐次評量覆蓋（C10：EPA 逐次觀察、DOPS）');
   /* H3：跨期進展與下降 */
   var s3 = ax7Sec(view, pre.toLowerCase() + 'prog', (Y ? 'Y2-2 ' : 'H3 ') + 'PGY 跨期進展與下降（C6、C7）', '同一學員同一項目、相鄰兩個已判定期程（後期落在本期）', '<b>C6</b>：等級上升項次 ÷ 兩期皆有 CCC 的項次｜<b>C7</b>：等級下降只列事實，建議列入 ILP 討論。');
   var g3 = axEl('div', 'ax-gtiles'); s3.appendChild(g3);
@@ -12593,7 +12594,8 @@ function ax7MaskCbme(box) {
   if (ax7CanName()) return;
   /* 詳細分析卡中的逾期名單、資料品質明細含學員姓名：改為件數 */
   Array.prototype.forEach.call(box.querySelectorAll('section[data-ax="prog"] .ax-g2'), function (w) { var n = w.querySelectorAll('.ax-gchip').length; w.innerHTML = ''; w.appendChild(axEl('div', 'ax-ftitle', '逾期待補 CCC 判定：' + n + ' 筆（姓名限教學行政與 CCC 角色顯示，E7）')); });
-  Array.prototype.forEach.call(box.querySelectorAll('section[data-ax="dq"]'), function (s) { var P = AX7.P; if (!P) return; var keys = {}; P.rows.forEach(function (r) { if (r.key) keys[r.key] = 1; }); var ks = Object.keys(keys).sort(function (a, b) { return b.length - a.length; }); var walk = document.createTreeWalker(s, NodeFilter.SHOW_TEXT, null, false), t, list = []; while ((t = walk.nextNode())) list.push(t); list.forEach(function (n) { var v = n.nodeValue; ks.forEach(function (k) { if (v.indexOf(k) >= 0) v = v.split(k).join('（學員）'); }); n.nodeValue = v; }); });
+  var P = AX7.P; if (!P) return; var ks = {}; P.rows.forEach(function (r) { if (r.key) ks[r.key] = 1; if (r.who && r.who.length > 1) ks[r.who] = 1; }); ks = Object.keys(ks).sort(function (a, b) { return b.length - a.length; });
+  Array.prototype.forEach.call(box.querySelectorAll('section[data-ax]'), function (s) { if (s.closest('.v7-view')) return; var walk = document.createTreeWalker(s, NodeFilter.SHOW_TEXT, null, false), t, list = []; while ((t = walk.nextNode())) list.push(t); list.forEach(function (n) { var v = n.nodeValue, o = v; ks.forEach(function (k) { if (v.indexOf(k) >= 0) v = v.split(k).join('（學員）'); }); if (v !== o) n.nodeValue = v; }); Array.prototype.forEach.call(s.querySelectorAll('[title]'), function (el) { var v = el.title; ks.forEach(function (k) { if (v.indexOf(k) >= 0) v = v.split(k).join('（學員）'); }); el.title = v; }); });
 }
 
 /* ---------- CBME 成效頁：檢視切換＋整併（H-08–H-12） ---------- */
@@ -12603,16 +12605,17 @@ DASH_LAYOUT['CBME 成效'] = {
   post: function (box) {
     Array.prototype.forEach.call(box.querySelectorAll('section[data-ax="dqx"]'), function (s) { s.remove(); });
     ax7MaskCbme(box); ax7NameGate(box, ['hl'], '個人亮點');
+    if (!ax7CanName() && window.MutationObserver) { var tmo = null, mo = new MutationObserver(function () { clearTimeout(tmo); tmo = setTimeout(function () { mo.disconnect(); ax7MaskCbme(box); ax7NameGate(box, ['hl'], '個人亮點'); mo.observe(box, { childList: true, subtree: true }); }, 30); }); mo.observe(box, { childList: true, subtree: true }); }
     ax7Fold(box, ax7AxIs(['sum', 'hl']), '收合：綜合分數（非能力判定，不與里程碑或 EPA 合併）與個人亮點');
     ax7Mount(box);
   }
 };
 /* 學生學習成效（H-13）：亮點收合、姓名依角色 */
-DASH_LAYOUT['學生學習成效'] = { order: ['ax:ind', 'ax:l3', 'ax:team', 'ax:matrix', 'ax:board'], hide: [/^實習總成績組成/],
+DASH_LAYOUT['學生學習成效'] = { order: ['ax:ind', 'ax:l3', 'ax:team', 'ax:matrix', 'ax:board'], hide: [/^實習總成績組成/], collapse: [/./], collapseTitle: '深入分析：後台原始圖表（實習總分、各面向、360 度；部分以平均計，僅供參照）',
   post: function (box) { ax7NameGate(box, ['board'], '學生亮點'); ax7Fold(box, ax7AxIs(['board']), '收合：學生亮點（依實習年份同期群）'); } };
-DASH_LAYOUT['單位組別成效'] = { order: ['ax:u1', 'ax:env', 'ax:matrix', 'ax:board'],
+DASH_LAYOUT['單位組別成效'] = { order: ['ax:u1', 'ax:env', 'ax:matrix', 'ax:board'], collapse: [/./], collapseTitle: '深入分析：後台原始圖表（歷年等第、評核項目平均、各組回饋意見；平均僅供參照）',
   post: function (box) { ax7Fold(box, ax7AxIs(['env']), '深入分析：學習環境品質（各面向平均與年變化，僅供參照；序位量尺以上方分布為準）'); ax7Fold(box, ax7AxIs(['board']), '收合：單位組別亮點'); } };
-DASH_LAYOUT['教師教學成效'] = { order: ['ax:t7', 'ax:team', 'ax:matrix', 'ax:board'],
+DASH_LAYOUT['教師教學成效'] = { order: ['ax:t7', 'ax:team', 'ax:matrix', 'ax:board'], collapse: [/./], collapseTitle: '深入分析：後台原始圖表（教師資格、年資、評核等第分布）',
   post: function (box) { ax7NameGate(box, ['board'], '教師亮點'); ax7Fold(box, ax7AxIs(['team']), '深入分析：教師團隊專業成長（面向平均與配對趨勢，僅供參照）'); ax7Fold(box, ax7AxIs(['board']), '收合：教師亮點'); } };
 /* L3（學生頁）、U1（單位頁）、T1–T4（教師頁，T1 由 CBME 頁移入） */
 (function () {
@@ -12647,6 +12650,10 @@ DASH_LAYOUT['教師教學成效'] = { order: ['ax:t7', 'ax:team', 'ax:matrix', '
   var wrapPost = function (name, fn) { var L = DASH_LAYOUT[name] = DASH_LAYOUT[name] || {}, p0 = L.post; L.post = function (box, host) { if (p0) p0(box, host); fn(box); }; };
   wrapPost('PGY 學員個人成績', function (box) { ax7Fold(box, function (k) { return ax7AxIs(['dqx', 'hcp', 'pcp', 'pres', 'morning'])(k) || ax7TitleIs(/^藥事照會紀錄|^藥品諮詢紀錄/)(k); }, '其他學習證據：PCNE、藥品諮詢、病人用藥教育、每日一題、簡報'); });
   wrapPost('UGY 學生個人成績', function (box) {
+    /* H-06（1）亮點卡「沒有評分紀錄」：該生不在分析_學生成效（UGY-360 他評），與「學生分數」實習總分來源不同，改寫為來源說明 */
+    Array.prototype.forEach.call(box.querySelectorAll('[data-ax="hl"].state'), function (el) { if (/沒有評分紀錄/.test(el.textContent)) el.textContent = el.textContent.replace(/在學生學習成效資料中沒有評分紀錄。?/, '尚無 UGY-360 他評紀錄（來源：分析_學生成效）。實習總分與各面向分數來自「學生分數」分頁，兩者為不同評量來源，不互相推論。'); });
+    /* H-06（2）個人實習總分：單一學生的數字卡標籤「中位數」改為「總分」 */
+    Array.prototype.forEach.call(box.children, function (k) { if (k.dataset && /^個人實習總分/.test(k.dataset.title || '')) { var w = document.createTreeWalker(k, NodeFilter.SHOW_TEXT, null, false), t; while ((t = w.nextNode())) if (/中位數/.test(t.nodeValue)) t.nodeValue = t.nodeValue.replace(/中位數/g, '總分（到勤 30%＋態度 20%＋品德 20%＋學識 30%）'); } });
     ax7Fold(box, ax7TitleIs(/^簡報分數|^簡報各評核面向|^簡報文字回饋/), '簡報評核（分數、各面向、文字回饋）', true);
     ax7Fold(box, ax7AxIs(['dqx', 'hcp', 'cmp']), '其他學習證據：病人用藥教育、每日一題、同儕比較');
   });
@@ -12656,6 +12663,35 @@ DASH_LAYOUT['教師教學成效'] = { order: ['ax:t7', 'ax:team', 'ax:matrix', '
 /* ---------- H-01：頁面錨點列（控制台「儀表板設定」；只用來保留選單，網頁不顯示） ---------- */
 var ax7Visible0 = visibleCharts;
 visibleCharts = function (d, name) { return ax7Visible0(d, name).filter(function (c) { return !/^頁面錨點/.test(c.title || ''); }); };
+
+/* ---------- H-06：身分鍵正規化（v7.0.1）
+   根因【已查原始分頁】：學生分數、360學員 學生 的「學生姓名」有學號與姓名之間無空白（約 18%）與零寬字元（BOM）兩種寫法，
+   舊版 axName／axIdKey 需要空白才能剝除學號，造成同一學生在不同分頁被視為不同人（總分、亮點、DOPS 三處不一致）。 ---------- */
+var AX7_ZW = /[​-‏⁠﻿]/g;
+axName = function (s) { return String(s || '').replace(AX7_ZW, '').replace(/（.*$/, '').replace(/^\s*[A-Za-z]{0,2}\d+\s*(?=[^\d\s])/, '').replace(/\s+/g, '').trim(); };
+axIdKey = function (s) { return String(s || '').replace(AX7_ZW, '').replace(/（.*$/, '').replace(/^\s*([A-Za-z]{0,2}\d+)\s*(?=[^\d\s])/, '$1 ').replace(/\s+/g, ' ').trim(); };
+axCodeOf = function (s) { var m = /^\s*([A-Za-z]{1,2}\d+)\s*(?=[^\dA-Za-z\s])|^\s*([A-Za-z]{1,2}\d+)\s/.exec(String(s || '').replace(AX7_ZW, '')); return m ? (m[1] || m[2]).toUpperCase() : ''; };
+kdName = function (s) { var t = String(s || '').replace(AX7_ZW, '').replace(/^\s*[A-Za-z]{0,2}\d+\s*(?=[^\d\s])/, '').trim(); return t || String(s || ''); };
+
+/* ---------- H-17：C10 逐次評量覆蓋（後端 cbmeWbaAgg 去識別彙總「儀表板用_CBME_WBA」；E8：原始 EPA／DOPS 分頁不開放為網頁資料卡） ---------- */
+function ax7WbaLoad() {
+  var s = (S.catalog && S.catalog.sheets || []).concat(S.catalogHidden || []).filter(function (x) { return /^(CBME 逐次評量覆蓋（彙總）|儀表板用_CBME_WBA)$/.test(x.title || ''); })[0];
+  if (!s) return Promise.resolve(null);
+  return axLoad(s.key).then(function (src) { var c = src.cols, ix = function (re) { return axCol(c, re); }; var I = { k: ix(/^指標$/), o: ix(/^對象$/), s: ix(/^期程或項目$/), n: ix(/^分子$/), d: ix(/^分母$/), m: ix(/^中位數$/), t: ix(/^更新時間$/) };
+    return src.rows.map(function (r) { return { k: String(r[I.k] || ''), o: String(r[I.o] || ''), s: String(r[I.s] || ''), n: axNum(r[I.n]), d: axNum(r[I.d]), m: axNum(r[I.m]), t: String(r[I.t] || '') }; }); }).catch(function () { return null; });
+}
+function ax7WbaSec(view, ax, title) {
+  var W = AX7.W, s = ax7Sec(view, ax, title, '全期累計（彙總表不分半年）；件數不等於信賴等級', '<b>資料</b>：後端 cbmeWbaAgg 由 EPA、DOPS 分頁產生去識別彙總（不含姓名），原始分頁不開放為網頁資料卡（E8）。<br><b>EPA 逐次觀察覆蓋</b>＝該期程有 ≥1 筆逐次 EPA 觀察的學員×期程 ÷ 學員CBME 該期程列數；中位數＝有觀察者的觀察筆數。<br><b>DOPS</b>：應評人數未定義，只列完成人數與總筆數。');
+  if (!W) { ax7State(s, '彙總表尚未開放或目前角色無法讀取。'); return s; }
+  var e = W.filter(function (x) { return /EPA/.test(x.k); }), d = W.filter(function (x) { return /DOPS/.test(x.k); });
+  if (e.length) s.appendChild(ax7Tab(['期程', 'EPA 逐次觀察覆蓋', '觀察筆數中位數'], e.map(function (x) { return [x.s, x.d ? ax7PctTxt(x.n, x.d) : 'N/A', x.m === null ? '—' : x.m]; })));
+  if (d.length) s.appendChild(ax7Tab(['DOPS 項目', '對象', '完成人數', '總筆數'], d.map(function (x) { return [x.s, x.o, x.n, x.m]; })));
+  if (W[0] && W[0].t) s.appendChild(axEl('div', 'ax-legend', '彙總更新：' + W[0].t));
+  return s;
+}
+
+/* H-06（3）UGY 頁「DOPS 各項次數」：DOPS 分頁未開放（E8：只供後端彙總）且其逐項名單為 PGY 學員，UGY 學生永遠無資料；自 UGY 頁移除，DOPS 完成紀錄改見 CBME 成效頁 C10 */
+(function () { var L = DASH_LAYOUT['UGY 學生個人成績'] = DASH_LAYOUT['UGY 學生個人成績'] || {}; L.hide = (L.hide || []).concat([/^DOPS 各項次數/]); })();
 </script>
 </body>
 </html>
