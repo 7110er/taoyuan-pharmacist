@@ -2,7 +2,7 @@
 * 問題量＝該病房當月件數；藥師投入＝折算人力（每位藥師當月在 n 個病房有登錄，每個病房計 1÷n）。
 * 兩者都跟該病房自身前 12 個完整月中位數比。所有門檻為起始值，無文獻或院內依據。 */
 var MQC = { inc: '增加照護班次', keep: '維持照護班次', two: '先照護兩週再決定', dec: '減少照護班次', na: '登錄者資料不足', none: '不調整' };
-var MQC_S = { inc: '增', keep: '維', two: '兩週', dec: '減', na: '缺', none: '—' };
+var MQC_S = { inc: '增', keep: '維', two: '兩週', dec: '減', na: '未填', none: '—' };
 function opMqNotWard(u) { return !u || /^(不適用|未填)/.test(u); }
 function opMqW(M, ym) {
 if (!OP.mqWC || OP.mqWC.M !== M) OP.mqWC = { M: M, c: {}, j: {} };
@@ -353,7 +353,7 @@ dl.forEach(function (d) {
 var cc = opMqCard(box, M, d.k, (PC_DIS_NAME[d.c] || d.c), qms, cms, q8, { ax: 'opQd', fold: d.n < 20 }), dc = cards.filter(function (x) { return x.c === d.c; })[0];
 if (!dc) return;
 var rw = dc.resp.wards.map(function (u) { var r = q2rows.filter(function (x) { return x.u === u; })[0]; return u + '：' + (r ? FIN[r.fin] : '—'); }).join('；');
-cc.body.appendChild(opTable(['主責病房（主要＋共病，滾動四季 ' + dc.resp.tot + ' 件）', '佐證狀態（主要＋共病，本季 ' + dc.n + ' 件）', '主責病房季結論'], [[dc.resp.txt, ({ gap: '缺口', weak: '偏弱', ok: '正常' })[dc.st] + (dc.why ? '：' + dc.why : ''), rw || '—']]));
+cc.body.appendChild(opTable(['主責病房（住院有病房碼，主要＋共病，滾動四季 ' + dc.resp.tot + ' 件）', '佐證狀態（含門急診，主要＋共病，本季 ' + dc.n + ' 件）', '主責病房季結論'], [[dc.resp.txt, ({ gap: '缺口', weak: '偏弱', ok: '正常' })[dc.st] + (dc.why ? '：' + dc.why : ''), rw || '—']]));
 });
 /* Q5 上一季調整的病房（v7.4.6） */
 var dq = (QD || []).filter(function (d) { return d.q === pq; });
