@@ -1506,7 +1506,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '7.4.7';
+var APP_VERSION = '7.4.8';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -13492,8 +13492,7 @@ function hcxMount(box) {
    卡片：標題為問句；固定一張圖或表＋狀態＋「下一步」規則提示＋判讀前提。只提示，不派工、不追蹤、不結案。
    小分母（三頁統一）：0＝—；1–4 只列件數（累積中）；5–19 比率附 95% 信賴區間；≥20 比率。
    評鑑條文：醫院評鑑基準－研修格式 108.11（109 年草案）第 2.5 章；本院現行版本條號【未經查證】。
-   v7.4.7（2026-11-26）：Q5 在「儀表板檢討紀錄」尚無資料列時，不誤報缺欄。
-   v7.4.6（2026-11-26）：臨床藥學服務照護班次調度——月頁 M2 依問題量×折算人力下結論（增加／先照護兩週／減少／維持），登錄者未填 >20% 不判定；季頁 Q2 彙整 3 個月結論並依主責疾病佐證卡調整，Q4 加主責病房，Q5 上季病房決議前後對照，月頁顯示「執行中」。
+   v7.4.8（2026-11-26）：臨床藥學服務照護班次調度改為滾動 12 個月 × 病房相對排序（有紀錄月數 × 每月件數四格圖）；取代 v7.4.6–7.4.7 單月自身基線規則。
    v7.4.5（2026-11-26）：連貫照護季頁 Q1–Q7（服務量、服務線、疾病、用藥負擔、高齡、問題原因、上季決議）；讀取「儀表板檢討紀錄」。
    v7.4.4（2026-11-26）：連貫照護月頁重組（M2 工作量對人力、M3 比率橫條圖、M4 含進行中月份存量）。
    v7.4.3（2026-11-26）：連貫照護頁刪除審視相關指標（每位病人平均審視次數、每人日審視涵蓋率）；M3 偏低只看處方優化。
@@ -13501,7 +13500,7 @@ function hcxMount(box) {
    v7.4.1（2026-11-25）：「下一步」提示文字與評鑑條文改讀設定分頁「儀表板下一步規則」「儀表板評鑑條文對應」；
    分頁未開放、讀取失敗或儲存格空白時，一律用本檔內建文字。觸發條件與門檻仍在程式內，改分頁不影響判定。
    ===================================================================== */
-var OP = { ver: '7.4.7', mqFrozen: false };
+var OP = { ver: '7.4.8', mqFrozen: false };
 var OP_CLAUSE = {
   TDM: { no: '2.5.10 符合 1；優良 3', t: '提供療劑監測（TDM）服務；有後續追蹤評估，建議獲醫師接受' },
   DDI: { no: '2.5.10 符合 3', t: '有藥品交互作用評估機制（紀錄、通知、檢討改進、預防）' },
@@ -13623,11 +13622,7 @@ function opMqUnitRows(M, ym, base, dim, sliceP) {
 }
 function opMqZeroRun(M, ym, base, dim, u) { var seq = base.concat([ym]), z = 0; for (var i = seq.length - 1; i >= 0; i--) { var d = mqD(M, [seq[i]], 'all:全院', dim); if (d[u] && d[u].n) break; z++; } return z; }
 function opMqWho(M, ym, dim, u) { var d = pcMon(M, ym, dim + '×登錄者'), p = u + '｜', c = 0; Object.keys(d).forEach(function (k) { if (k.indexOf(p) === 0 && d[k].n) c++; }); return c; }
-/* ---------- v7.4.6 臨床藥學服務：照護班次調度（定案藍圖 2026-11-26，只用現有資料） ----------
- * 問題量＝該病房當月件數；藥師投入＝折算人力（每位藥師當月在 n 個病房有登錄，每個病房計 1÷n）。
- * 兩者都跟該病房自身前 12 個完整月中位數比。所有門檻為起始值，無文獻或院內依據。 */
-var MQC = { inc: '增加照護班次', keep: '維持照護班次', two: '先照護兩週再決定', dec: '減少照護班次', na: '登錄者資料不足', none: '不調整' };
-var MQC_S = { inc: '增', keep: '維', two: '兩週', dec: '減', na: '未填', none: '—' };
+/* ---------- v7.4.8 臨床藥學服務：共用（病房月彙總、排序、季會決議、佐證卡主責病房） ---------- */
 function opMqNotWard(u) { return !u || /^(不適用|未填)/.test(u); }
 function opMqW(M, ym) {
   if (!OP.mqWC || OP.mqWC.M !== M) OP.mqWC = { M: M, c: {}, j: {} };
@@ -13642,38 +13637,6 @@ function opMqW(M, ym) {
   });
   Object.keys(fte).forEach(function (u) { if (!out[u]) out[u] = { n: 0, fte: fte[u], blank: 0, hr: 0, rej: 0, o3: 0 }; });
   return (C[ym] = out);
-}
-function opMqRaw(M, ym, u) {
-  var MS = mqMonths(M), base = mqBack(ym, 12).filter(function (y) { return MS.done.indexOf(y) >= 0; }), Z = { n: 0, fte: 0, blank: 0, hr: 0, rej: 0, o3: 0 };
-  var cur = opMqW(M, ym)[u] || Z, hs = base.map(function (y) { return opMqW(M, y)[u] || Z; });
-  var hv = hs.filter(function (h) { return !h.n || h.blank / h.n <= 0.2; }), med = opMed(hs.map(function (h) { return h.n; })), fm = hv.length >= 3 ? opMed(hv.map(function (h) { return h.fte; })) : null, hm = opMed(hs.map(function (h) { return h.hr; }));
-  var r = { u: u, ym: ym, n: cur.n, med: med, fte: cur.fte, fm: fm, hr: cur.hr, hm: hm, rej: cur.rej, o3: cur.o3, blank: cur.blank, nb: base.length, nv: hv.length, act: hs.some(function (h) { return h.n; }) };
-  r.vol = med === null ? 'na' : cur.n >= 5 && cur.n >= 2 * med ? 'hi' : med >= 2 && cur.n <= med / 2 ? 'lo' : 'flat';
-  r.inp = fm === null ? 'na' : fm > 0 ? (cur.fte >= 1.5 * fm ? 'up' : cur.fte <= 0.5 * fm ? 'dn' : 'flat') : (cur.fte > 0 ? 'up' : 'flat');
-  r.bad = cur.n > 0 && cur.blank / cur.n > 0.2;
-  r.safe = cur.hr + cur.rej + cur.o3;
-  return r;
-}
-function opMqJudge(M, ym, u) {
-  opMqW(M, ym); var J = OP.mqWC.j, key = ym + '|' + u; if (J[key]) return J[key];
-  var r = opMqRaw(M, ym, u); r.c = 'none'; r.why = '';
-  if (r.nb < 3) r.why = '歷史不足 3 個完整月，不判定';
-  else if (r.bad) { r.c = 'na'; r.why = '登錄者未填 ' + r.blank + '／' + r.n + ' 件，投入算不準'; }
-  else if (!r.n && r.med !== null && r.med >= 1) { r.c = 'two'; r.zero = true; r.why = '本月 0 件（自身中位數 ' + r.med + '）'; }
-  else if (r.vol === 'hi' && r.inp === 'na') { r.c = 'na'; r.why = '問題變多，但前 12 個月登錄者資料完整的月份不足 3 個，無法判斷藥師投入'; }
-  else if (r.vol === 'hi') { r.c = r.inp === 'up' ? 'keep' : 'inc'; r.why = r.inp === 'up' ? '問題多，但藥師也去得多，量是看出來的' : '問題變多，藥師投入沒有增加'; }
-  else if (r.vol === 'lo') {
-    if (r.inp === 'na') r.why = '問題偏少，但藥師投入基準不足，不判定';
-    else if (r.inp === 'dn') { r.c = 'two'; r.why = '問題少、藥師也去得少，分不出是處方好還是沒人看'; }
-    else {
-      var k = 1, y = ym; while (k < 3) { y = mqPrevYm(y); var p = opMqRaw(M, y, u); if (p.nb < 3 || p.bad || p.vol !== 'lo' || p.inp === 'dn') break; k++; }
-      r.lowRun = k;
-      if (k < 3) r.why = '問題偏少第 ' + k + ' 個月（滿 3 個月才列減少）';
-      else if (r.hm !== null && r.hr > r.hm) { r.c = 'keep'; r.guard = true; r.why = '問題連續 3 個月偏少，但高警訊藥品 ' + r.hr + ' 高於自身中位數 ' + r.hm + '，不列減少'; }
-      else { r.c = 'dec'; r.why = '藥師有去，問題連續 3 個月偏少'; }
-    }
-  }
-  return (J[key] = r);
 }
 function opMqWards(M, yms) {
   var MS = mqMonths(M), set = {};
@@ -13739,31 +13702,65 @@ function opMqDisCards(M, q) {
   return (C[q] = opMqDisList(M).map(function (c) { var s = opMqCardSt(M, q, ['dis:' + c, 'co:' + c]), r = opMqResp(M, q, c); return { c: c, name: PC_DIS_NAME[c] || c, st: s.st, why: s.why, n: s.n, resp: r }; }));
 }
 function opMqWardCards(M, q, u) { return opMqDisCards(M, q).filter(function (d) { return (d.st === 'gap' || d.st === 'weak') && d.resp.wards.indexOf(u) >= 0; }); }
-/* 某月各病房結論＋分組排序（月頁 M2 與季頁 Q2 共用） */
-function opMqMonthGroups(M, ym) {
+/* ---------- v7.4.8 照護班次調度：滾動 12 個月 × 病房相對排序（2026-11-26 重擬藍圖） ----------
+ * 藥師投入＝12 個完整月中該病房有紀錄的月數（不靠登錄者欄）；問題密度＝件數 ÷ 有紀錄月數。
+ * 以 12 個月件數 ≥5 的病房為比較群，兩條軸各以比較群中位數為界（≥中位數＝高）。所有界線為起始值。 */
+var MQR = { inc: '增加照護班次', busy: '維持（常去、問題多）', two: '先照護兩週再決定', dec: '可減少照護班次', keep: '維持照護班次', hold: '維持，先補佐證' };
+var MQR_S = { inc: '增', busy: '多', two: '兩週', dec: '減', keep: '維', hold: '補', few: '少', nd: '' };
+var MQR_COL = { inc: '#dd6b20', busy: '#805ad5', two: '#d69e2e', dec: '#3182ce', keep: '#718096', hold: '#718096' };
+function opMqWin(M, ym) { return mqMonths(M).done.filter(function (y) { return y <= ym; }).slice(-12); }
+function opMqCardQ(ym) { var m = +ym.slice(5, 7); return m % 3 === 0 ? mqQ(ym) : mqPrevQ(mqQ(ym)); }
+function opMqRoll12(M, ym) {
   if (!OP.mqWC || OP.mqWC.M !== M) OP.mqWC = { M: M, c: {}, j: {} };
-  var G = OP.mqWC.g = OP.mqWC.g || {}; if (G[ym]) return G[ym];
-  var MS = mqMonths(M), base = mqBack(ym, 12).filter(function (y) { return MS.done.indexOf(y) >= 0; }), q = mqQ(ym), pq = mqPrevQ(q);
-  var qBefore = mqQMonths(q).filter(function (y) { return y <= ym && MS.all.indexOf(y) >= 0; });
-  var rows = opMqWards(M, [ym]).map(function (u) {
-    var r = opMqJudge(M, ym, u);
-    r.inQ = qBefore.filter(function (y) { return opMqJudge(M, y, u).c === r.c; }).length;
-    r.gapC = opMqWardCards(M, pq, u);
-    r.gapN = r.gapC.map(function (d) { var n = 0; ['dis:', 'co:'].forEach(function (p) { var x = mqD(M, [ym], p + d.c, '病房')[u]; n += x ? x.n : 0; }); return { name: d.name, n: n }; });
-    if (r.c === 'two') r.zr = opMqZeroRun(M, ym, base, '病房', u);
-    return r;
+  var RC = OP.mqWC.r = OP.mqWC.r || {}; if (RC[ym] !== undefined) return RC[ym];
+  var W = opMqWin(M, ym); if (W.length < 6) return (RC[ym] = null);
+  var o = {};
+  W.forEach(function (y, i) { var X = opMqW(M, y); Object.keys(X).forEach(function (u) { var a = o[u] = o[u] || { u: u, n: 0, a: 0, hr: 0, rej: 0, o3: 0, li: -1 }; a.n += X[u].n; if (X[u].n) { a.a++; a.li = i; } a.hr += X[u].hr; a.rej += X[u].rej; a.o3 += X[u].o3; }); });
+  var all = Object.keys(o).map(function (k) { var r = o[k]; r.d = r.a ? r.n / r.a : 0; r.safe = r.hr + r.rej + r.o3; r.sr = r.n ? r.safe / r.n : 0; r.since = r.li < 0 ? W.length : W.length - 1 - r.li; r.el = r.n >= 5; return r; }).filter(function (r) { return r.n > 0; });
+  var el = all.filter(function (r) { return r.el; }), am = opMed(el.map(function (r) { return r.a; })), dm = opMed(el.map(function (r) { return r.d; })), sm = opMed(el.map(function (r) { return r.sr; })), cq = opMqCardQ(W[W.length - 1]);
+  el.forEach(function (r) {
+    var hiD = r.d >= dm, hiA = r.a >= am; r.c0 = hiD ? (hiA ? 'busy' : 'inc') : (hiA ? 'dec' : 'two'); r.c = r.c0; r.why = '';
+    r.gapC = opMqWardCards(M, cq, r.u);
+    if (r.c === 'dec') { if (r.safe > 0 && r.sr > sm) { r.c = 'keep'; r.why = '高警訊＋不接受＋未解決占件數 ' + Math.round(r.sr * 100) + '%，高於病房中位數 ' + Math.round(sm * 100) + '%，不列調出'; } else if (r.gapC.length) { r.c = 'hold'; r.why = '主責疾病佐證卡有缺口，先補再調'; } }
+    r.fillTxt = r.gapC.length ? r.gapC.map(function (d) { return d.name + (d.st === 'gap' ? '（缺口）' : '（偏弱）'); }).join('、') : '';
   });
-  var by = function (c) { return rows.filter(function (r) { return r.c === c; }); };
-  var out = {
-    inc: opMqSort(by('inc'), [function (r) { return r.safe; }, function (r) { return opMqR1(r.n / Math.max(r.med || 0, 1)); }, function (r) { return r.gapC.length ? 1 : 0; }, function (r) { return r.inQ; }], 1),
-    two: opMqSort(by('two'), [function (r) { return r.med || 0; }, function (r) { return r.zr || 0; }], 0),
-    dec: opMqSort(by('dec'), [function (r) { return opMqR1(r.fte); }, function (r) { return -opMqR1(r.n / Math.max(r.med || 0, 1)); }, function (r) { return r.lowRun || 0; }], 0),
-    keep: by('keep'), na: by('na'), none: by('none'), all: rows
-  };
-  return (G[ym] = out);
+  var g = function (c) { return el.filter(function (r) { return r.c === c; }); };
+  var R = { W: W, all: all, el: el, am: am, dm: dm, sm: sm, cq: cq,
+    inc: opMqSort(g('inc'), [function (r) { return r.safe; }, function (r) { return opMqR1(r.d); }, function (r) { return r.gapC.length; }, function (r) { return r.n; }], 1),
+    busy: opMqSort(g('busy'), [function (r) { return r.safe; }, function (r) { return opMqR1(r.d); }], 1),
+    two: opMqSort(g('two'), [function (r) { return r.n; }, function (r) { return r.since; }], 0),
+    dec: opMqSort(g('dec'), [function (r) { return r.a; }, function (r) { return -opMqR1(r.d); }, function (r) { return -r.n; }], 0),
+    keep: g('keep'), hold: g('hold'),
+    few: all.filter(function (r) { return !r.el; }).sort(function (a, b) { return b.n - a.n || a.u.localeCompare(b.u, 'en', { numeric: true }); }) };
+  R.map = {}; el.forEach(function (r) { R.map[r.u] = r; });
+  return (RC[ym] = R);
 }
-function opMqArrow(r) { return r.inp === 'up' ? '↑' : r.inp === 'dn' ? '↓' : r.inp === 'na' ? '' : '→'; }
-function opMqFteTxt(r) { return '折算人力 ' + r.fte.toFixed(1) + ' ' + opMqArrow(r) + (r.fm !== null ? '（中位數 ' + r.fm.toFixed(1) + '）' : ''); }
+function opMqWinLab(W) { return opYmTw(W[0]) + '–' + opYmTw(W[W.length - 1]) + '（' + W.length + ' 個完整月）'; }
+/* 四格圖：橫軸有紀錄月數，縱軸每個有紀錄月的件數 */
+function opMqQuad(host, R) {
+  var ns = 'http://www.w3.org/2000/svg', w = 600, h = 320, L = 44, T = 14, B = 40, Rr = 16, pw = w - L - Rr, ph = h - T - B, xm = R.W.length, ym = Math.max(2, Math.ceil(Math.max.apply(null, R.el.map(function (r) { return r.d; }).concat([1])) + 0.5));
+  var X = function (v) { return L + v / xm * pw; }, Y = function (v) { return T + ph - v / ym * ph; };
+  var s = document.createElementNS(ns, 'svg'); s.setAttribute('viewBox', '0 0 ' + w + ' ' + h); s.setAttribute('class', 'op-quad'); s.setAttribute('role', 'img'); s.setAttribute('aria-label', '病房四格圖：橫軸有紀錄月數，縱軸每個有紀錄月的件數');
+  var el = function (t, a, txt) { var e = document.createElementNS(ns, t); Object.keys(a).forEach(function (k) { e.setAttribute(k, a[k]); }); if (txt !== undefined) e.textContent = txt; s.appendChild(e); return e; };
+  var qx = X(R.am), qy = Y(R.dm);
+  el('rect', { x: L, y: T, width: qx - L, height: qy - T, fill: '#fffaf0' }); el('rect', { x: qx, y: T, width: L + pw - qx, height: qy - T, fill: '#faf5ff' });
+  el('rect', { x: L, y: qy, width: qx - L, height: T + ph - qy, fill: '#fffff0' }); el('rect', { x: qx, y: qy, width: L + pw - qx, height: T + ph - qy, fill: '#ebf8ff' });
+  el('line', { x1: L, y1: T + ph, x2: L + pw, y2: T + ph, stroke: '#a0aec0' }); el('line', { x1: L, y1: T, x2: L, y2: T + ph, stroke: '#a0aec0' });
+  el('line', { x1: qx, y1: T, x2: qx, y2: T + ph, stroke: '#4a5568', 'stroke-dasharray': '4 3' }); el('line', { x1: L, y1: qy, x2: L + pw, y2: qy, stroke: '#4a5568', 'stroke-dasharray': '4 3' });
+  for (var i = 0; i <= xm; i += 2) el('text', { x: X(i), y: T + ph + 14, 'font-size': 10, 'text-anchor': 'middle', fill: '#4a5568' }, String(i));
+  for (var j = 0; j <= ym; j++) el('text', { x: L - 6, y: Y(j) + 3, 'font-size': 10, 'text-anchor': 'end', fill: '#4a5568' }, String(j));
+  el('text', { x: L + pw / 2, y: h - 6, 'font-size': 11, 'text-anchor': 'middle', fill: '#2d3748' }, '藥師投入：12 個月中有紀錄的月數（右＝常去）');
+  var yl = el('text', { x: 12, y: T + ph / 2, 'font-size': 11, 'text-anchor': 'middle', fill: '#2d3748', transform: 'rotate(-90 12 ' + (T + ph / 2) + ')' }, '問題密度：有紀錄月平均件數');
+  var lab = [['增加照護班次', L + 6, T + 14, 'start'], ['維持（常去、問題多）', L + pw - 6, T + 14, 'end'], ['先照護兩週', L + 6, T + ph - 6, 'start'], ['可減少', L + pw - 6, T + ph - 6, 'end']];
+  lab.forEach(function (t) { el('text', { x: t[1], y: t[2], 'font-size': 11, 'font-weight': 700, 'text-anchor': t[3], fill: '#4a5568' }, t[0]); });
+  var seen = {};
+  R.el.forEach(function (r) {
+    var cx = X(r.a), cy = Y(r.d), k = Math.round(cx / 6) + ',' + Math.round(cy / 6), off = (seen[k] = (seen[k] || 0) + 1) - 1;
+    el('circle', { cx: cx, cy: cy, r: 5, fill: MQR_COL[r.c] || '#718096', stroke: r.safe ? '#c53030' : '#fff', 'stroke-width': r.safe ? 2 : 1 }).appendChild(document.createElementNS(ns, 'title')).textContent = r.u + '：' + r.n + ' 件／' + r.a + ' 個月（每月 ' + r.d.toFixed(1) + '）→ ' + MQR[r.c];
+    el('text', { x: cx + 7, y: cy + 3 + off * 11, 'font-size': 10, fill: '#1a202c' }, r.u);
+  });
+  var w0 = axEl('div', 'op-quadw'); w0.appendChild(s); host.appendChild(w0); return w0;
+}
 function opMqMonth(box, M0) {
   var M = M0, k = 'all:全院', MS = mqMonths(M0), done = MS.done, ym = MQ.ym, base = mqBack(ym, 12).filter(function (y) { return done.indexOf(y) >= 0; }), hl = [];
   var hlHost = axEl('div', 'op-hlhost'); box.appendChild(hlHost);
@@ -13780,67 +13777,51 @@ function opMqMonth(box, M0) {
   c1.foot(ALL.st === '累積中' ? ['本月訊號凍結：本頁只供補登，不判讀單位負荷'] : ALL.st === '可初讀' ? ['可看件數與單位分布；比率與訊號保留判讀'] : ALL.low ? ['件數低於中位數一半：先確認是否尚未補齊，再判讀'] : ['資料可判讀'],
     '已登錄件數 ÷ 自身前 12 個完整月中位數：≥80% 已成熟、50–79% 可初讀、<50% 累積中；月份結束滿 90 天視為已成熟。月中位數 <10 的場域沿用全院狀態。時間戳記因 2026-11 批次寫入已不代表原始登錄時間，故不用登錄延遲。門檻為起始值，無文獻或院內規定依據。');
   if (ALL.st === '累積中') hl.push({ what: '本月資料累積中（' + allN + '／中位數 ' + allMed + '）', next: opNx('MQ_M1_IMM', '本頁只供補登，下月再判讀') });
-  /* M2 照護班次調度（v7.4.6） */
+  /* M2 照護班次調度（v7.4.8：滾動 12 個月 × 病房相對排序） */
   var wr = opMqUnitRows(M, ym, base, '病房', 'ward:').filter(function (r) { return r.n || r.act; }), dr = opMqUnitRows(M, ym, base, '科別', 'dept:').filter(function (r) { return r.n || r.act; });
   wr = wr.sort(function (a, b) { return b.n - a.n || a.name.localeCompare(b.name); }); dr = dr.sort(function (a, b) { return b.n - a.n; });
-  var GG = opMqMonthGroups(M, ym), DEC = opMqDecs(), qn = +ym.slice(5, 7) - (Math.ceil(+ym.slice(5, 7) / 3) - 1) * 3, nAct = GG.inc.length + GG.two.length + GG.dec.length;
-  var c2 = opCard(box, 'opM2', 'M2｜下個月哪些病房要調整照護班次？', { st: OP.mqFrozen ? 'bad' : nAct ? 'warn' : 'ok', stTxt: OP.mqFrozen ? '凍結' : nAct ? nAct + ' 個病房' : '無需調整', sub: ccYmLab(ym) + '（本季第 ' + qn + ' 個月）｜每個病房跟自己前 12 個完整月比：問題量＝件數，藥師投入＝折算人力。依登錄資料推估，是否執行由組長決定。' });
-  var mNext = function (r, def, code) {
-    var a = opMqActive(DEC, r.u, ym), t;
-    if (a && a.c === r.c) t = opNx('MQ_M2_RUN', '已調整，繼續觀察');
-    else t = opNx(code, def) + (r.inQ >= 2 ? '（本季第 ' + r.inQ + ' 個月）→ ' + opNx('MQ_M2_MEET', '列入本季季會') : '');
-    return t;
-  };
-  var mNote = function (r) {
-    var a = opMqActive(DEC, r.u, ym), x = [];
-    x.push('中位數 ' + (r.med === null ? '—' : r.med));
-    x.push(opMqFteTxt(r));
-    x.push('高警訊 ' + r.hr + (r.hm !== null ? '（中位數 ' + r.hm + '）' : ''));
-    if (r.rej || r.o3) x.push('不接受 ' + r.rej + '、未解決 ' + r.o3);
-    if (r.inQ) x.push('本季第 ' + r.inQ + ' 個月');
-    if (r.gapN && r.gapN.length) x.push('本季要補：' + r.gapN.map(function (g) { return g.name + (g.n ? '（已有 ' + g.n + ' 件）' : ''); }).join('、'));
-    if (a) x.push('執行中：' + a.txt + '（自 ' + opYmTw(a.from) + ' 起）');
-    if (r.tie) x.push('並列：順序無意義，由組長決定');
-    return x.join('｜');
-  };
-  var grp = function (title, list, code, def) {
-    var w = axEl('div', 'op-mgrp'); w.appendChild(axEl('h4', '', title + '（' + list.length + '）'));
-    if (!list.length) { w.appendChild(axEl('p', 'ax-muted', '無')); return w; }
-    opLoadBars(w, list.map(function (r) { return { name: r.rank + '. ' + r.u + (r.tie ? '＝' : ''), n: r.n, med: r.med, flag: true, note: r.why + '｜' + mNote(r) + '→ ' + mNext(r, def, code) }; }));
-    return w;
-  };
-  if (OP.mqFrozen) c2.body.appendChild(axEl('p', 'ax-muted', '本月資料累積中，不下調度結論；請先補登。'));
+  var RR = opMqRoll12(M, ym), RP = RR ? opMqRoll12(M, mqPrevYm(RR.W[RR.W.length - 1])) : null, DEC = opMqDecs();
+  var c2 = opCard(box, 'opM2', 'M2｜哪些病房要調整照護班次？', { st: !RR ? 'na' : RR.inc.length || RR.dec.length ? 'warn' : 'ok', stTxt: !RR ? '完整月不足 6 個' : '增加 ' + RR.inc.length + '｜可減少 ' + RR.dec.length, sub: RR ? '滾動 ' + opMqWinLab(RR.W) + '，每月重算｜比較群：12 個月 ≥5 件的 ' + RR.el.length + ' 個病房｜依登錄資料推估，是否執行由組長決定' : '' });
+  var mv = function (r) { if (!RP) return ''; var p = RP.map[r.u]; return !p ? '（上月未入比較群）' : p.c !== r.c ? '（上月：' + MQR[p.c] + '）' : ''; };
+  var act = function (r) { var a = opMqActive(DEC, r.u, ym); return a ? '｜執行中：' + a.txt + '（自 ' + opYmTw(a.from) + ' 起）' : ''; };
+  var nxt = function (r, code, def) { var a = opMqActive(DEC, r.u, ym); return a && opMqDecCode(a.txt) === ({ inc: 'inc', two: 'two', dec: 'dec' }[r.c] || 'keep') ? opNx('MQ_M2_RUN', '已調整，繼續觀察') : opNx(code, def); };
+  var line = function (r) { return r.n + ' 件／' + r.a + ' 個月（每月 ' + r.d.toFixed(1) + ' 件）｜高警訊 ' + r.hr + '、不接受 ' + r.rej + '、未解決 ' + r.o3 + (r.fillTxt ? '｜主責卡：' + r.fillTxt : '') + (r.why ? '｜' + r.why : '') + mv(r) + act(r) + (r.tie ? '｜並列：順序無意義，由組長決定' : ''); };
+  if (!RR) c2.body.appendChild(axEl('p', 'ax-muted', '完整月不足 6 個，不排序。'));
   else {
+    opMqQuad(c2.body, RR);
     var g2 = axEl('div', 'op-two'); c2.body.appendChild(g2);
-    g2.appendChild(grp('增加照護班次', GG.inc, 'MQ_M2_INC', '下月增加照護班次'));
-    g2.appendChild(grp('先照護兩週再決定', GG.two, 'MQ_M2_TWO', '先排兩週照護班次，再看件數決定'));
-    g2.appendChild(grp('減少照護班次', GG.dec, 'MQ_M2_DEC', '下月可減少照護班次，移給「增加」的病房'));
-    var naAll = GG.na, naKey = naAll.filter(function (r) { return r.vol === 'hi' || r.vol === 'lo'; }), bl = 0, tn = 0; GG.all.forEach(function (r) { bl += r.blank; tn += r.n; });
-    var oth = GG.keep.concat(naKey).concat(GG.all.filter(function (r) { return r.c === 'none' && r.lowRun; }));
-    if (naAll.length) c2.body.appendChild(axEl('p', 'pcs-note', '登錄者未填：住院 ' + bl + '／' + tn + ' 件；' + naAll.length + ' 個病房未填超過 20%，不下增減結論（' + naAll.map(function (r) { return r.u; }).join('、') + '）。補填後重新整理即更新。'));
-    if (oth.length) c2.body.appendChild(opTable(['其他需知道的病房', '本月', '說明'], oth.map(function (r) { var ac = opMqActive(DEC, r.u, ym); return [r.u, r.n, (r.c === 'na' ? MQC.na + '：' : r.c === 'keep' ? MQC.keep + '：' : '') + r.why + (ac ? '｜執行中：' + ac.txt + '（自 ' + opYmTw(ac.from) + ' 起）' : '')]; })));
+    var col = function (title, list, code, def, extra) {
+      var w = axEl('div', 'op-mgrp'); w.appendChild(axEl('h4', '', title + '（' + list.length + '）')); g2.appendChild(w);
+      if (!list.length) { w.appendChild(axEl('p', 'ax-muted', '無')); return; }
+      opLoadBars(w, list.map(function (r) { return { name: r.rank + '. ' + r.u + (r.tie ? '＝' : ''), n: r.n, med: null, flag: true, note: line(r) + ' → ' + nxt(r, code, def) + (extra ? extra(r) : '') }; }));
+    };
+    col('優先增加照護班次（去了問題多、去得少）', RR.inc, 'MQ_M2_INC', '下月增加照護班次', function (r) { return r.fillTxt ? '；增加的班次優先補做主責卡' : ''; });
+    col('可減少照護班次（常去、問題少）', RR.dec, 'MQ_M2_DEC', '下月可減少照護班次，移給「增加」的病房');
+    col('先照護兩週再決定（去得少、問題也少）', RR.two, 'MQ_M2_TWO', '先排兩週照護班次，再看件數決定', function (r) { return r.since ? '；最近 ' + r.since + ' 個月無紀錄' : ''; });
+    col('維持（常去、問題仍多；前 3 名季會討論醫師端對策）', RR.busy, 'MQ_M2_KEEP', '維持照護班次', function (r) { return (r.rank <= 3 ? '；' + opNx('MQ_M2_BUSY', '季會討論醫師端對策（CDSS 規則、教學、處方集）') : '') + (r.fillTxt ? '；班次內補做主責卡' : ''); });
+    var kh = RR.keep.concat(RR.hold);
+    if (kh.length) c2.body.appendChild(opTable(['原可減少、改為維持', '12 個月', '理由'], kh.map(function (r) { return [r.u, r.n + ' 件／' + r.a + ' 個月', MQR[r.c] + '：' + r.why + act(r)]; })));
+    var tb = opTable(['病房', '12 個月件數', '有紀錄月數', '每月件數', '高警訊', '不接受＋未解決', '最近無紀錄月數', '分類', '上月分類'], RR.el.slice().sort(function (a, b) { return b.n - a.n || a.u.localeCompare(b.u, 'en', { numeric: true }); }).map(function (r) { var p = RP && RP.map[r.u]; return [r.u, r.n, r.a, r.d.toFixed(1), r.hr, r.rej + r.o3, r.since, MQR[r.c], p ? MQR[p.c] : '—']; }));
+    var few = RR.few.length ? opTable(['12 個月 <5 件（不排序）', '件數', '有紀錄月數'], RR.few.map(function (r) { return [r.u, r.n, r.a]; })) : axEl('p', 'ax-muted', '無');
+    opFold(c2.body, '全部病房明細（比較群 ' + RR.el.length + '，另 ' + RR.few.length + ' 個件數不足）', [tb, few]);
+    /* 本月逐案：有不接受或未解決的病房 */
+    var cur = opMqW(M, ym), ca = Object.keys(cur).filter(function (u) { return cur[u].rej + cur[u].o3 > 0; }).sort(function (a, b) { return (cur[b].hr - cur[a].hr) || (cur[b].rej + cur[b].o3 - cur[a].rej - cur[a].o3); });
+    c2.body.appendChild(axEl('h4', 'op-gh', '本月要逐案處理（' + ccYmLab(ym) + '）'));
+    c2.body.appendChild(ca.length ? opTable(['病房', '不接受', '未解決', '同月高警訊藥品筆數'], ca.map(function (u) { return [u, cur[u].rej, cur[u].o3, cur[u].hr]; })) : axEl('p', 'ax-muted', '本月沒有不接受或未解決的住院案件。'));
   }
-  var allW = GG.all.slice().sort(function (a, b) { return b.n - a.n || a.u.localeCompare(b.u, 'en', { numeric: true }); });
-  var detail = opTable(['病房', '本月件數', '自身中位數', '問題量', '折算人力（中位數）', '投入', '高警訊（中位數）', '不接受＋未解決', '登錄者未填', '月結論'], allW.map(function (r) {
-    return [r.u, r.n, r.med === null ? '—' : r.med, { hi: '高', lo: '低', flat: '持平', na: '—' }[r.vol], r.fte.toFixed(2) + (r.fm !== null ? '（' + r.fm.toFixed(2) + '）' : ''), { up: '增', dn: '減', flat: '持平', na: '—' }[r.inp], r.hr + (r.hm !== null ? '（' + r.hm + '）' : ''), r.rej + r.o3, r.blank, OP.mqFrozen ? '凍結' : r.c === 'none' ? '—' : MQC[r.c]];
-  }));
   var pd = axEl('div', ''); opLoadBars(pd, dr.slice(0, 12).map(function (r) { return { name: r.name, n: r.n, med: r.med, note: '高警訊 ' + r.hr + (r.rej ? '｜不接受 ' + r.rej : '') + (r.o3 ? '｜未解決 ' + r.o3 : '') }; }));
-  if (dr.length > 12) pd.appendChild(opTable(['其餘科別', '本月', '中位數', '高警訊'], dr.slice(12).filter(function (r) { return r.n; }).map(function (r) { return [r.name, r.n, r.med, r.hr]; })));
-  opFold(c2.body, '全部病房明細（' + allW.length + '）', [detail]);
-  opFold(c2.body, '科別（含門急診與住院；沒有病房分母，不做調度判定）', [pd]);
+  opFold(c2.body, '科別（含門急診與住院；本月件數，刻線＝自身 12 個月中位數；不做調度排序）', [pd]);
   var nx2 = [];
-  if (!OP.mqFrozen) {
-    GG.inc.slice(0, 3).forEach(function (r) { nx2.push(r.u + '：' + r.why + ' → ' + mNext(r, '下月增加照護班次', 'MQ_M2_INC')); });
-    GG.two.slice(0, 2).forEach(function (r) { nx2.push(r.u + '：' + r.why + ' → ' + mNext(r, '先排兩週照護班次，再看件數決定', 'MQ_M2_TWO')); });
-    GG.dec.slice(0, 2).forEach(function (r) { nx2.push(r.u + '：' + r.why + ' → ' + mNext(r, '下月可減少照護班次，移給「增加」的病房', 'MQ_M2_DEC')); });
-    if (GG.na.length) nx2.push('登錄者資料不足 ' + GG.na.length + ' 個病房（' + GG.na.map(function (r) { return r.u; }).join('、') + '）→ ' + opNx('MQ_M2_NA', '藥師以「編輯回覆」補填登錄者，再判讀'));
+  if (RR) {
+    RR.inc.slice(0, 3).forEach(function (r) { nx2.push(r.u + '（' + r.n + ' 件／' + r.a + ' 個月）→ ' + nxt(r, 'MQ_M2_INC', '下月增加照護班次')); });
+    RR.dec.slice(0, 3).forEach(function (r) { nx2.push(r.u + '（' + r.n + ' 件／' + r.a + ' 個月）→ ' + nxt(r, 'MQ_M2_DEC', '下月可減少照護班次，移給「增加」的病房')); });
+    if (ca.length) nx2.push('本月不接受或未解決：' + ca.slice(0, 4).join('、') + ' → ' + opNx('MQ_M4_REJ', '挑個案於晨會討論（不歸因個人）'));
   }
-  c2.foot(OP.mqFrozen ? ['資料累積中，不下調度結論'] : nx2.length ? nx2 : ['各病房維持現行照護班次'],
-    '問題量：高＝≥5 件且 ≥自身中位數 2 倍；低＝中位數 ≥2 且 ≤中位數一半。藥師投入（折算人力，一位藥師當月在 n 個病房有登錄，每病房計 1÷n）：增＝≥中位數 1.5 倍；減＝≤一半。問題高＋投入持平或減→增加；問題高＋投入增→維持；問題低＋投入減→先照護兩週；問題低＋投入持平或增連續 3 個月→減少；中位數 ≥1 且本月 0 件→先照護兩週。高警訊藥品類別筆數高於自身中位數不列減少；登錄者未填 >20% 不下結論。排序：增加＝高警訊＋不接受＋未解決 → 超出中位數倍數 → 本季要補佐證卡 → 本季累計月數；先照護兩週＝自身中位數（過去量）→ 連續 0 件月數；減少＝折算人力 → 問題倍數低者 → 連續月數。第 1 鍵差 ≤1 件且其餘相同標「並列」。沒有住院人日，只能跟自己比：一直忙、一直缺人的病房不會亮燈；藥師去了但沒登錄會被當成沒去。所有門檻為起始值，無文獻或院內依據。');
-  if (!OP.mqFrozen) {
-    GG.inc.slice(0, 2).forEach(function (r) { hl.push({ what: r.u + ' 問題 ' + r.n + ' 件（自身中位數 ' + r.med + '）、投入未增', next: mNext(r, '下月增加照護班次', 'MQ_M2_INC_HL') }); });
-    if (GG.na.length >= 3 && hl.length < 3) hl.push({ what: GG.na.length + ' 個病房登錄者未填超過 20%，無法判斷藥師投入', next: opNx('MQ_M2_NA', '藥師以「編輯回覆」補填登錄者，再判讀') });
-    if (hl.length < 3) GG.two.slice(0, 1).forEach(function (r) { hl.push({ what: r.u + ' ' + r.why, next: mNext(r, '先排兩週照護班次，再看件數決定', 'MQ_M2_TWO') }); });
+  c2.foot(nx2.length ? nx2 : ['各病房維持現行照護班次'],
+    '藥師投入＝滾動 12 個完整月中該病房有紀錄的月數；問題密度＝件數 ÷ 有紀錄月數（藥師有去的月份平均每月找到幾件）。比較群為 12 個月 ≥5 件的病房，兩軸以比較群中位數為界（有紀錄月數中位數 ' + (RR ? RR.am : '—') + '、每月件數中位數 ' + (RR ? RR.dm.toFixed(1) : '—') + '；等於中位數算高）。可減少的病房若高警訊＋不接受＋未解決占件數高於病房中位數，改為維持；若主責疾病佐證卡有缺口，改為「維持，先補佐證」。排序：增加＝高警訊＋不接受＋未解決 → 每月件數 → 主責卡缺口張數 → 件數；可減少＝有紀錄月數 → 每月件數低者 → 件數低者；先照護兩週＝件數 → 最近無紀錄月數；第 1 鍵差 ≤1 且其餘相同標「並列」。限制：藥師去了但整月沒找到問題會被當成沒去；沒有住院人日，大病房件數天生多；登錄者欄 115/11 起才完整，暫不使用。所有界線為起始值，無文獻或院內依據。');
+  if (RR) {
+    RR.inc.slice(0, 2).forEach(function (r) { hl.push({ what: r.u + ' 去了每月 ' + r.d.toFixed(1) + ' 件、12 個月只有 ' + r.a + ' 個月有紀錄', next: nxt(r, 'MQ_M2_INC_HL', '下月增加照護班次') }); });
+    if (hl.length < 3) RR.dec.slice(0, 1).forEach(function (r) { hl.push({ what: r.u + ' 12 個月中 ' + r.a + ' 個月有紀錄、每月 ' + r.d.toFixed(1) + ' 件', next: nxt(r, 'MQ_M2_DEC', '下月可減少照護班次，移給「增加」的病房') }); });
   }
   /* M3 覆蓋空窗 */
   var zr = wr.filter(function (r) { return !r.n && r.act && (r.med || 0) >= 1; }).map(function (r) { return { name: r.name, z: opMqZeroRun(M, ym, base, '病房', r.name), med: r.med }; }).sort(function (a, b) { return b.z - a.z; });
@@ -13923,52 +13904,49 @@ function opMqQuarter(box, M0) {
   c1.body.appendChild(opTable(['服務線', '本季件數', '評鑑條文'], cnt.map(function (x) { return [x.s.name, x.n, OP_CLAUSE[OP_SVC_CLAUSE[x.s.svc]] ? OP_CLAUSE[OP_SVC_CLAUSE[x.s.svc]].no : '—']; })));
   c1.body.appendChild(axEl('p', 'pcx-pn', '疾病：' + dl.filter(function (d) { return d.n; }).length + ' 個有紀錄、' + dl.filter(function (d) { return !d.n; }).length + ' 個本季 0 件。ICU 與藥師門診：非表單服務線選項，本頁不涵蓋（2.5.10 優良 6、7）。'));
   c1.foot(gap.length ? gap.map(function (x) { return x.s.name + ' 本季 0 件 → ' + opNx('MQ_Q1_GAP_ALL', '全院各班次內補做（服務線無法對應單一病房）'); }) : ['維持現行'], '評鑑上「有服務無紀錄」與「無服務」在佐證上相同。', opClauseTxt('REV'));
-  /* Q2 下一季照護班次（v7.4.6）：彙整本季 3 個月的月結論，佐證卡狀態調整 */
-  var QD = opMqDecs(), pq = mqPrevQ(q), qAll = mqQMonths(q), qDone = qAll.filter(function (y) { return MS.done.indexOf(y) >= 0; }), cards = opMqDisCards(M, q);
+  /* Q2 下一季照護班次（v7.4.8：季末滾動 12 個月排序定格＋季內 3 個月穩定度） */
+  var QD = opMqDecs(), pq = mqPrevQ(q), qAll = mqQMonths(q), qDone = qAll.filter(function (y) { return MS.done.indexOf(y) >= 0; }), cards = opMqDisCards(M, q), run = qDone.length < 3;
   var pqMs = mqQMonths(pq).filter(function (y) { return MS.done.indexOf(y) >= 0; }), Z0 = { n: 0, fte: 0, hr: 0, rej: 0, o3: 0 };
-  var qSum = function (ms, u) { var o = { n: 0, fte: 0, hr: 0, rej: 0, o3: 0 }; ms.forEach(function (y) { var w = opMqW(M, y)[u] || Z0; ['n', 'fte', 'hr', 'rej', 'o3'].forEach(function (k) { o[k] += w[k]; }); }); return o; };
-  var rollD = opMqRoll(q).filter(function (y) { return MS.done.indexOf(y) >= 0; }), hos = opMqSum(M, rollD, ['all:全院']), hosW = { n: 0, hr: 0 };
-  rollD.forEach(function (y) { var W = opMqW(M, y); Object.keys(W).forEach(function (u) { hosW.n += W[u].n; hosW.hr += W[u].hr; }); });
-  var q2rows = opMqWards(M, qDone.length ? qDone : [qAll[0]]).map(function (u) {
-    var m3 = qAll.map(function (y) { if (qDone.indexOf(y) < 0) return { y: y, c: MS.all.indexOf(y) >= 0 ? 'run' : 'nd' }; opMqMonthGroups(M, y); var j = opMqJudge(M, y, u); return { y: y, c: j.c, rk: /^(inc|two|dec)$/.test(j.c) ? j.rank : null }; });
-    var cnt = {}; m3.forEach(function (x) { cnt[x.c] = (cnt[x.c] || 0) + 1; });
-    var S = qSum(qDone, u), p4 = [], qq = q; for (var i = 0; i < 4; i++) { qq = mqPrevQ(qq); p4.push(qSum(mqQMonths(qq).filter(function (y) { return MS.done.indexOf(y) >= 0; }), u).n); }
-    var med4 = opMed(p4), RK = opMqSum(M, opMqRoll(q).filter(function (y) { return MS.all.indexOf(y) >= 0; }), ['ward:' + u]), K = opMqSum(M, qDone, ['ward:' + u]);
-    var pInc = pqMs.filter(function (y) { return opMqJudge(M, y, u).c === 'inc'; }).length >= 2;
-    var c = cnt.inc >= 2 ? 'inc' : cnt.dec === 3 && !pInc ? 'dec' : (cnt.two >= 2 || (!S.n && med4 !== null && med4 > 0 && qDone.length === 3)) ? 'two' : cnt.keep >= 2 ? 'keep' : cnt.na >= 2 ? 'na' : 'none';
-    if (qDone.length < 3) c = 'run';
-    var gc = cards.filter(function (d) { return (d.st === 'gap' || d.st === 'weak') && d.resp.wards.indexOf(u) >= 0; }), gtx = gc.map(function (d) { return d.name + (d.st === 'gap' ? '（缺口）' : '（偏弱）'); }).join('、');
-    var own = cards.filter(function (d) { return d.resp.wards.indexOf(u) >= 0; });
-    var fin = c, next = '', note = '';
-    var prevDec = (QD || []).filter(function (d) { return d.q === pq && d.u === u.toUpperCase(); }).pop(), pin = !!(prevDec && prevDec.c === 'inc' && c === 'inc');
-    if (c === 'inc') { next = pin ? opNx('MQ_Q2_PIN', '季會討論醫師端對策（CDSS 規則、教學、處方集），不再只加班次') : opNx('MQ_Q2_INC', '下一季增加照護班次'); if (gc.length) note = '人力不足且影響評鑑佐證：' + gtx; var S4 = qSum(rollD, u); if (RK.ad >= 5 && hos.ad && RK.a1 / RK.ad < hos.a1 / hos.ad && S4.n >= 5 && hosW.n && S4.hr / S4.n < hosW.hr / hosW.n) note += (note ? '；' : '') + '滾動四季接受率與高警訊占比皆低於全院：先確認是處方問題還是登錄習慣'; }
-    else if (c === 'two') { next = opNx('MQ_Q2_TWO', '下一季先排兩週照護班次，再決定'); if (gc.length) note = '兩週內優先做：' + gtx; }
-    else if (c === 'dec') { if (gc.length) { fin = 'hold'; next = opNx('MQ_Q2_HOLD', '維持，先補佐證'); note = '主責佐證卡有缺口：' + gtx; } else next = opNx('MQ_Q2_DEC', '下一季可減少照護班次，移給「增加」的病房'); }
-    else if ((c === 'keep' || c === 'none') && gc.length) { fin = 'fill'; next = opNx('MQ_Q2_FILL', '班次不變，班次內補做') + '：' + gtx; }
-    else if (c === 'na') next = opNx('MQ_M2_NA', '藥師以「編輯回覆」補填登錄者，再判讀');
-    return { u: u, m3: m3, cnt: cnt, c: c, fin: fin, pin: pin, next: next, note: note, S: S, med4: med4, K: K, gc: gc, own: own, safe: S.hr + S.rej + S.o3, same: c === 'run' || c === 'none' ? 0 : (cnt[c] || 0), roll: RK.n };
+  var qSum = function (ms, u) { var o = { n: 0, a: 0, hr: 0, rej: 0, o3: 0 }; ms.forEach(function (y) { var w = opMqW(M, y)[u] || Z0; o.n += w.n; o.hr += w.hr; o.rej += w.rej; o.o3 += w.o3; if (w.n) o.a++; }); return o; };
+  var RE = opMqRoll12(M, run ? (qDone.length ? qDone[qDone.length - 1] : mqPrevYm(qAll[0])) : qAll[2]), R3 = qAll.map(function (y) { return MS.done.indexOf(y) >= 0 ? opMqRoll12(M, y) : null; });
+  var FIN = { inc: MQR.inc, busy: MQR.busy, two: MQR.two, dec: MQR.dec, keep: MQR.keep, hold: MQR.hold, fill: '維持，班次內補做', few: '件數不足，不排序', run: '本季未完' };
+  var q2rows = !RE ? [] : RE.el.map(function (r) {
+    var m3 = qAll.map(function (y, i) { var X = R3[i]; if (!X) return { y: y, c: 'nd' }; var z = X.map[r.u]; return { y: y, c: z ? z.c : 'few', rk: z && /^(inc|dec|two)$/.test(z.c) ? z.rank : null }; });
+    var same = m3.filter(function (x) { return x.c === r.c; }).length, fin = run ? 'run' : r.c, next = '', note = '';
+    var prevDec = (QD || []).filter(function (d) { return d.q === pq && d.u === r.u.toUpperCase(); }).pop(), pin = !run && !!(prevDec && prevDec.c === 'inc' && r.c === 'inc');
+    if (!run && (r.c === 'busy' || r.c === 'keep') && r.gapC.length) fin = 'fill';
+    if (fin === 'inc') { next = pin ? opNx('MQ_Q2_PIN', '季會討論醫師端對策（CDSS 規則、教學、處方集），不再只加班次') : opNx('MQ_Q2_INC', '下一季增加照護班次'); if (r.fillTxt) note = '人力不足且影響評鑑佐證：' + r.fillTxt; }
+    else if (fin === 'two') { next = opNx('MQ_Q2_TWO', '下一季先排兩週照護班次，再決定'); if (r.fillTxt) note = '兩週內優先做：' + r.fillTxt; }
+    else if (fin === 'dec') next = opNx('MQ_Q2_DEC', '下一季可減少照護班次，移給「增加」的病房');
+    else if (fin === 'hold') { next = opNx('MQ_Q2_HOLD', '維持，先補佐證'); note = '主責卡缺口：' + r.fillTxt; }
+    else if (fin === 'fill') { next = opNx('MQ_Q2_FILL', '班次不變，班次內補做') + '：' + r.fillTxt; }
+    else if (fin === 'busy') next = r.rank <= 3 ? opNx('MQ_M2_BUSY', '季會討論醫師端對策（CDSS 規則、教學、處方集）') : opNx('MQ_Q2_KEEP', '維持照護班次');
+    else if (fin === 'keep') { next = opNx('MQ_Q2_KEEP', '維持照護班次'); note = r.why; }
+    if (!run && same < 2 && /^(inc|dec|two)$/.test(r.c)) note += (note ? '；' : '') + '季內只有 ' + same + ' 個月同分類，結論不穩定';
+    var S = qSum(qDone, r.u);
+    return { u: r.u, r: r, m3: m3, same: same, fin: fin, pin: pin, next: next, note: note, S: S, K: opMqSum(M, qDone, ['ward:' + r.u]), own: cards.filter(function (d) { return d.resp.wards.indexOf(r.u) >= 0; }), safe: S.hr + S.rej + S.o3 };
   });
-  var QG = function (f) { return opMqSort(q2rows.filter(function (r) { return r.fin === f; }), [function (r) { return r.pin ? 1e6 + r.safe : r.safe; }, function (r) { return r.gc.length; }, function (r) { return r.same; }, function (r) { return r.roll; }], 2); };
-  var qInc = QG('inc'), qTwo = QG('two'), qDec = opMqSort(q2rows.filter(function (r) { return r.fin === 'dec'; }), [function (r) { return opMqR1(r.S.fte); }, function (r) { return -opMqR1(r.S.n / Math.max(r.med4 || 0, 1)); }, function (r) { return r.same; }], 0), qHold = QG('hold'), qFill = QG('fill');
-  var nQ2 = qInc.length + qTwo.length + qDec.length + qHold.length + qFill.length, run = qDone.length < 3;
-  var c2q = opCard(box, 'opQ2', 'Q2｜下一季哪些病房要調整照護班次？', { st: run ? 'na' : nQ2 ? 'warn' : 'ok', stTxt: run ? '本季未滿 3 個完整月' : nQ2 ? nQ2 + ' 個病房' : '各病房維持', sub: mqQLab(q) + '｜每列 3 格＝本季 3 個月的月頁結論（數字＝當月名次）；季結論由 3 格得出，再依主責疾病佐證卡調整' });
+  var QS = function (f) { return opMqSort(q2rows.filter(function (x) { return x.fin === f; }), [function (x) { return x.pin ? 1e6 + x.safe : x.safe; }, function (x) { return x.r.gapC.length; }, function (x) { return x.same; }, function (x) { return x.r.n; }], 2); };
+  var qInc = QS('inc'), qTwo = QS('two'), qDec = opMqSort(q2rows.filter(function (x) { return x.fin === 'dec'; }), [function (x) { return x.r.a; }, function (x) { return -opMqR1(x.r.d); }, function (x) { return x.same; }], 0), qHold = QS('hold'), qFill = QS('fill'), qBusy = QS('busy'), qKeep = QS('keep');
+  var nQ2 = qInc.length + qDec.length + qTwo.length;
+  var c2q = opCard(box, 'opQ2', 'Q2｜下一季哪些病房要調整照護班次？', { st: run || !RE ? 'na' : nQ2 ? 'warn' : 'ok', stTxt: !RE ? '完整月不足' : run ? '本季未滿 3 個完整月（暫看）' : '增加 ' + qInc.length + '｜可減少 ' + qDec.length + '｜兩週 ' + qTwo.length, sub: mqQLab(q) + (RE ? '｜季末滾動 ' + opMqWinLab(RE.W) + '｜3 格＝本季各月月底的分類（數字＝當月名次），看結論是否穩定' : '') });
   opPrintBtn(c2q.sec);
-  var blk = function (m3) { var w = axEl('span', 'op-cbs'); m3.forEach(function (x) { var b = axEl('i', 'op-cb op-cb-' + x.c, x.c === 'run' ? '中' : x.c === 'nd' ? '' : MQC_S[x.c] + (x.rk ? x.rk : '')); b.title = ccYmLab(x.y) + '：' + (x.c === 'run' ? '進行中' : x.c === 'nd' ? '無資料' : MQC[x.c]); w.appendChild(b); }); return w; };
-  var FIN = { inc: MQC.inc, two: MQC.two, dec: MQC.dec, hold: '維持，先補佐證', fill: '維持，班次內補做', keep: MQC.keep, na: MQC.na, none: MQC.none, run: '本季未完' };
+  var blk = function (m3) { var w = axEl('span', 'op-cbs'); m3.forEach(function (x) { var b = axEl('i', 'op-cb op-cb-' + x.c, x.c === 'nd' ? '中' : (MQR_S[x.c] || '') + (x.rk ? x.rk : '')); b.title = ccYmLab(x.y) + '：' + (x.c === 'nd' ? '未結束' : x.c === 'few' ? '件數不足' : MQR[x.c]); w.appendChild(b); }); return w; };
   var qTab = function (list) {
-    return opTable(['病房', '本季 3 個月', '本季件數（前 4 季中位數）', '折算人力（季合計）', '每折算人力件數', '高警訊占比', '接受率', '解決率', '主責疾病卡', '季結論'], list.map(function (r) {
-      return { cls: r.pin ? 'op-hi' : '', cells: [r.rank ? r.rank + '. ' + r.u + (r.tie ? '＝' : '') + (r.pin ? '（已調整仍偏高）' : '') : r.u, blk(r.m3), r.S.n + '（' + (r.med4 === null ? '—' : r.med4) + '）', r.S.fte.toFixed(2), r.S.fte ? (r.S.n / r.S.fte).toFixed(1) : '—', r.S.n ? Math.round(r.S.hr / r.S.n * 100) + '%' : '—', opSmall(r.K.a1, r.K.ad), opSmall(r.K.o1, r.K.ok), r.own.length ? r.own.map(function (d) { return d.name + ({ gap: '（缺口）', weak: '（偏弱）', ok: '' })[d.st]; }).join('、') : '—', FIN[r.fin] + (r.note ? '｜' + r.note : '')] };
+    return opTable(['病房', '本季各月分類', '12 個月件數／有紀錄月', '每月件數', '本季件數／有紀錄月', '高警訊＋不接受＋未解決（本季）', '接受率（本季）', '解決率（本季）', '主責疾病卡', '季結論'], list.map(function (x) {
+      return { cls: x.pin ? 'op-hi' : '', cells: [(x.rank ? x.rank + '. ' : '') + x.u + (x.tie ? '＝' : '') + (x.pin ? '（已調整仍偏高）' : ''), blk(x.m3), x.r.n + '／' + x.r.a, x.r.d.toFixed(1), x.S.n + '／' + x.S.a, x.safe, opSmall(x.K.a1, x.K.ad), opSmall(x.K.o1, x.K.ok), x.own.length ? x.own.map(function (d) { return d.name + ({ gap: '（缺口）', weak: '（偏弱）', ok: '' })[d.st]; }).join('、') : '—', FIN[x.fin] + (x.note ? '｜' + x.note : '')] };
     }));
   };
-  [['增加照護班次', qInc], ['先照護兩週再決定', qTwo], ['減少照護班次', qDec], ['維持，先補佐證（原為減少）', qHold], ['維持，班次內補做', qFill]].forEach(function (g) { if (!g[1].length) return; c2q.body.appendChild(axEl('h4', 'op-gh', g[0] + '（' + g[1].length + '）')); c2q.body.appendChild(qTab(g[1])); });
-  var qRest = q2rows.filter(function (r) { return !/^(inc|two|dec|hold|fill)$/.test(r.fin); }).sort(function (a, b) { return b.S.n - a.S.n || a.u.localeCompare(b.u, 'en', { numeric: true }); });
-  if (!nQ2 && !run) c2q.body.appendChild(axEl('p', 'ax-muted', '本季沒有病房需要調整照護班次。'));
-  opFold(c2q.body, '其餘病房（' + qRest.length + '）', [qTab(qRest)]);
+  if (!RE) c2q.body.appendChild(axEl('p', 'ax-muted', '完整月不足 6 個，不排序。'));
+  else {
+    opMqQuad(c2q.body, RE);
+    [['增加照護班次', qInc], ['可減少照護班次', qDec], ['先照護兩週再決定', qTwo], ['維持，先補佐證（原可減少）', qHold], ['維持，班次內補做', qFill], ['維持（常去、問題多；前 3 名季會討論醫師端對策）', qBusy], ['維持照護班次（原可減少，安全訊號高）', qKeep]].forEach(function (g) { if (!g[1].length) return; c2q.body.appendChild(axEl('h4', 'op-gh', g[0] + '（' + g[1].length + '）')); c2q.body.appendChild(qTab(g[1])); });
+    if (run) c2q.body.appendChild(axEl('p', 'pcs-note', '本季未滿 3 個完整月：上表以最近完整月為準，季會請用季末版本。'));
+  }
   var nxq = [];
-  if (run) nxq.push('本季月份未滿 3 個完整月，季結論待季末');
-  else qInc.concat(qTwo, qDec, qHold, qFill).slice(0, 6).forEach(function (r) { nxq.push(r.u + '：' + FIN[r.fin] + (r.note ? '（' + r.note + '）' : '') + ' → ' + r.next); });
-  c2q.foot(nxq.length ? nxq.concat(['季會決議請填「儀表板檢討紀錄」：頁面＝臨床藥學服務、卡片＝Q2、病房、照護班次決議；下一季月頁顯示「執行中」，Q5 顯示前後對照']) : ['各病房維持現行照護班次'],
-    '季結論：本季 ≥2 個月「增加」→增加；3 個月都「減少」且上季不是增加→減少；≥2 個月「先照護兩週」或整季 0 件（前 4 季中位數 >0）→先照護兩週；≥2 個月「維持」→維持。主責疾病卡（主要＋共病，滾動四季 ≥10 件、病房占 ≥20% 且 ≥3 件）有缺口（本季 0 件，或低於前 4 季中位數一半且中位數 ≥4）或偏弱（≥5 件且接受率或解決率 95% CI 上限低於自身滾動四季）時：減少改為「維持，先補佐證」；維持改為「班次內補做」；增加與先照護兩週排序提前。排序：上季已決議增加、本季仍增加者置頂 → 高警訊＋不接受＋未解決（本季合計）→ 主責卡缺口或偏弱張數 → 同一結論月數 → 滾動四季件數；第 1 鍵差 ≤2 件且其餘相同標「並列」。同一筆照會的多個共病會計入多張疾病卡。所有門檻為起始值，無文獻或院內依據。', opClauseTxt('REV'));
+  if (RE && !run) qInc.concat(qDec, qTwo, qHold, qFill).slice(0, 6).forEach(function (x) { nxq.push(x.u + '：' + FIN[x.fin] + (x.note ? '（' + x.note + '）' : '') + ' → ' + x.next); });
+  c2q.foot(nxq.length ? nxq.concat(['季會決議請填「儀表板檢討紀錄」：頁面＝臨床藥學服務、卡片＝Q2、病房、照護班次決議；下一季月頁顯示「執行中」，Q5 顯示前後對照']) : [run ? '季末再判讀' : '各病房維持現行照護班次'],
+    '季結論＝季末月份的滾動 12 個月分類（規則同月頁 M2）。季內 3 個月只有 1 個月同分類者標「不穩定」。主責疾病卡（住院、主要＋共病、滾動四季 ≥10 件，病房占 ≥20% 且 ≥3 件）有缺口或偏弱時：可減少改「維持，先補佐證」；維持改「班次內補做」；增加與先照護兩週附註優先補做。排序：上季已決議增加、本季仍增加者置頂 → 高警訊＋不接受＋未解決（本季）→ 主責卡缺口張數 → 季內同分類月數 → 12 個月件數；可減少＝有紀錄月數 → 每月件數低者；第 1 鍵差 ≤2 且其餘相同標「並列」。同一筆照會的多個共病會計入多張疾病卡。所有界線為起始值，無文獻或院內依據。', opClauseTxt('REV'));
   opDecision(c2q.sec);
   /* Q3 服務線卡 */
   var h3 = axEl('h3', 'op-gh', 'Q3｜服務線佐證卡（每張可單獨列印）'); box.appendChild(h3);
@@ -13989,9 +13967,9 @@ function opMqQuarter(box, M0) {
   else if (!dq.length) c5.body.appendChild(axEl('p', 'ax-muted', '沒有 ' + mqQLab(pq) + '、頁面為臨床藥學服務且填了病房與照護班次決議的紀錄。'));
   else {
     var pS = function (u) { return qSum(pqMs, u); };
-    c5.body.appendChild(opTable(['病房', '上季決議', '上季件數', '本季件數', '上季折算人力', '本季折算人力', '上季高警訊', '本季高警訊', '本季結論'], dq.map(function (d) {
-      var a = pS(d.u), r = q2rows.filter(function (x) { return x.u.toUpperCase() === d.u; })[0], b = r ? r.S : qSum(qDone, d.u);
-      return [d.u, d.txt, a.n, b.n, a.fte.toFixed(2), b.fte.toFixed(2), a.hr, b.hr, r ? FIN[r.fin] + (r.pin ? '（已調整仍偏高）' : '') : '—'];
+    c5.body.appendChild(opTable(['病房', '上季決議', '件數（上季→本季）', '有紀錄月數（上季→本季，滿分 3）', '高警訊＋不接受＋未解決（上季→本季）', '本季結論'], dq.map(function (d) {
+      var a = pS(d.u), r = q2rows.filter(function (x) { return x.u.toUpperCase() === d.u; })[0], b = qSum(qDone, d.u);
+      return [d.u, d.txt, a.n + ' → ' + b.n, a.a + ' → ' + b.a, (a.hr + a.rej + a.o3) + ' → ' + (b.hr + b.rej + b.o3), r ? FIN[r.fin] + (r.pin ? '（已調整仍偏高）' : '') : '件數不足，不排序'];
     })));
   }
   c5.foot(dq.length ? ['逐一 → ' + opNx('MQ_Q5', '季會決定延續、再調整或恢復，填入本季「儀表板檢討紀錄」')] : ['本季決議 → ' + opNx('MQ_Q5_NONE', '會後填入「儀表板檢討紀錄」（頁面、卡片 Q2、病房、照護班次決議）')],
@@ -14344,7 +14322,7 @@ function opHcQuarter(view) {
     '@media print{.op-dec{display:block}.op-pbtn{display:none}.op-fold:not([open])>*:not(summary){display:none}}',
     '.op-lci{position:absolute;top:5px;height:2px;background:#1a202c}.op-lref{position:absolute;top:-4px;bottom:-4px;border-left:2px dashed #c53030}.op-rhi .op-lb{background:#dd6b20}.op-rhi .op-ll{color:#975a16}.op-rlow .op-ll{color:#c53030;font-weight:700}.op-rax{margin:10px 0 2px;font-size:.8rem;font-weight:700;color:#2d3748}',
     '.op-spark{display:inline-flex;align-items:flex-end;gap:2px;height:26px;width:120px}.op-spark i{flex:1;background:#cbd5e0;min-height:1px;border-radius:1px}.op-spark i.cur{background:#2c7a7b}.op-spark i.low{background:#dd6b20}',
-    '.op-mgrp h4{margin:4px 0}.op-cbs{display:inline-flex;gap:2px}.op-cb{display:inline-block;min-width:30px;padding:1px 3px;border-radius:3px;font-style:normal;font-size:.72rem;text-align:center;background:#edf2f7;color:#4a5568}.op-cb-inc{background:#dd6b20;color:#fff}.op-cb-two{background:#d69e2e;color:#fff}.op-cb-dec{background:#3182ce;color:#fff}.op-cb-keep{background:#a0aec0;color:#fff}.op-cb-na{background:#fff;border:1px dashed #a0aec0}',
+    '.op-mgrp h4{margin:4px 0}.op-cbs{display:inline-flex;gap:2px}.op-cb{display:inline-block;min-width:30px;padding:1px 3px;border-radius:3px;font-style:normal;font-size:.72rem;text-align:center;background:#edf2f7;color:#4a5568}.op-cb-inc{background:#dd6b20;color:#fff}.op-cb-two{background:#d69e2e;color:#fff}.op-cb-dec{background:#3182ce;color:#fff}.op-cb-keep{background:#a0aec0;color:#fff}.op-cb-na{background:#fff;border:1px dashed #a0aec0}.op-cb-busy{background:#805ad5;color:#fff}.op-cb-hold,.op-cb-fill{background:#a0aec0;color:#fff}.op-cb-few{background:#fff;border:1px dashed #cbd5e0;color:#a0aec0}.op-quadw{max-width:640px;margin:6px 0 10px}.op-quad{width:100%;height:auto}',
     '.op-m4grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:6px 0 10px}.op-m4grid .op-qv{border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px}.op-m4grid .op-m4on b{color:#c05621}'
   ].join('\n'); document.head.appendChild(css);
 })();
