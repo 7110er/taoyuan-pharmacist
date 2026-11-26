@@ -81,7 +81,7 @@ function opMqWardCards(M, q, u) { return opMqDisCards(M, q).filter(function (d) 
 /* ---------- v7.4.8 照護班次調度：滾動 12 個月 × 病房相對排序（2026-11-26 重擬藍圖） ----------
 * 藥師投入＝12 個完整月中該病房有紀錄的月數（不靠登錄者欄）；問題密度＝件數 ÷ 有紀錄月數。
 * 以 12 個月件數 ≥5 的病房為比較群，兩條軸各以比較群中位數為界（≥中位數＝高）。所有界線為起始值。 */
-var MQR = { inc: '增加照護班次', busy: '維持，季會討論醫師端對策', two: '先照護兩週再決定', dec: '可減少照護班次', keep: '維持照護班次', hold: '維持，先補佐證' };
+var MQR = { inc: '增加照護班次', busy: '維持（常去、問題多）', two: '先照護兩週再決定', dec: '可減少照護班次', keep: '維持照護班次', hold: '維持，先補佐證' };
 var MQR_S = { inc: '增', busy: '多', two: '兩週', dec: '減', keep: '維', hold: '補', few: '少', nd: '' };
 var MQR_COL = { inc: '#dd6b20', busy: '#805ad5', two: '#d69e2e', dec: '#3182ce', keep: '#718096', hold: '#718096' };
 function opMqWin(M, ym) { return mqMonths(M).done.filter(function (y) { return y <= ym; }).slice(-12); }
@@ -127,7 +127,7 @@ for (var i = 0; i <= xm; i += 2) el('text', { x: X(i), y: T + ph + 14, 'font-siz
 for (var j = 0; j <= ym; j++) el('text', { x: L - 6, y: Y(j) + 3, 'font-size': 10, 'text-anchor': 'end', fill: '#4a5568' }, String(j));
 el('text', { x: L + pw / 2, y: h - 6, 'font-size': 11, 'text-anchor': 'middle', fill: '#2d3748' }, '藥師投入：12 個月中有紀錄的月數（右＝常去）');
 var yl = el('text', { x: 12, y: T + ph / 2, 'font-size': 11, 'text-anchor': 'middle', fill: '#2d3748', transform: 'rotate(-90 12 ' + (T + ph / 2) + ')' }, '問題密度：有紀錄月平均件數');
-var lab = [['增加照護班次', L + 6, T + 14, 'start'], ['維持，討論醫師端', L + pw - 6, T + 14, 'end'], ['先照護兩週', L + 6, T + ph - 6, 'start'], ['可減少', L + pw - 6, T + ph - 6, 'end']];
+var lab = [['增加照護班次', L + 6, T + 14, 'start'], ['維持（常去、問題多）', L + pw - 6, T + 14, 'end'], ['先照護兩週', L + 6, T + ph - 6, 'start'], ['可減少', L + pw - 6, T + ph - 6, 'end']];
 lab.forEach(function (t) { el('text', { x: t[1], y: t[2], 'font-size': 11, 'font-weight': 700, 'text-anchor': t[3], fill: '#4a5568' }, t[0]); });
 var seen = {};
 R.el.forEach(function (r) {
@@ -174,7 +174,7 @@ opLoadBars(w, list.map(function (r) { return { name: r.rank + '. ' + r.u + (r.ti
 col('優先增加照護班次（去了問題多、去得少）', RR.inc, 'MQ_M2_INC', '下月增加照護班次', function (r) { return r.fillTxt ? '；增加的班次優先補做主責卡' : ''; });
 col('可減少照護班次（常去、問題少）', RR.dec, 'MQ_M2_DEC', '下月可減少照護班次，移給「增加」的病房');
 col('先照護兩週再決定（去得少、問題也少）', RR.two, 'MQ_M2_TWO', '先排兩週照護班次，再看件數決定', function (r) { return r.since ? '；最近 ' + r.since + ' 個月無紀錄' : ''; });
-col('維持，季會討論醫師端對策（常去、問題仍多）', RR.busy, 'MQ_M2_BUSY', '季會討論醫師端對策（CDSS 規則、教學、處方集）', function (r) { return r.fillTxt ? '；班次內補做主責卡' : ''; });
+col('維持（常去、問題仍多；前 3 名季會討論醫師端對策）', RR.busy, 'MQ_M2_KEEP', '維持照護班次', function (r) { return (r.rank <= 3 ? '；' + opNx('MQ_M2_BUSY', '季會討論醫師端對策（CDSS 規則、教學、處方集）') : '') + (r.fillTxt ? '；班次內補做主責卡' : ''); });
 var kh = RR.keep.concat(RR.hold);
 if (kh.length) c2.body.appendChild(opTable(['原可減少、改為維持', '12 個月', '理由'], kh.map(function (r) { return [r.u, r.n + ' 件／' + r.a + ' 個月', MQR[r.c] + '：' + r.why + act(r)]; })));
 var tb = opTable(['病房', '12 個月件數', '有紀錄月數', '每月件數', '高警訊', '不接受＋未解決', '最近無紀錄月數', '分類', '上月分類'], RR.el.slice().sort(function (a, b) { return b.n - a.n || a.u.localeCompare(b.u, 'en', { numeric: true }); }).map(function (r) { var p = RP && RP.map[r.u]; return [r.u, r.n, r.a, r.d.toFixed(1), r.hr, r.rej + r.o3, r.since, MQR[r.c], p ? MQR[p.c] : '—']; }));
@@ -295,7 +295,7 @@ else if (fin === 'two') { next = opNx('MQ_Q2_TWO', '下一季先排兩週照護�
 else if (fin === 'dec') next = opNx('MQ_Q2_DEC', '下一季可減少照護班次，移給「增加」的病房');
 else if (fin === 'hold') { next = opNx('MQ_Q2_HOLD', '維持，先補佐證'); note = '主責卡缺口：' + r.fillTxt; }
 else if (fin === 'fill') { next = opNx('MQ_Q2_FILL', '班次不變，班次內補做') + '：' + r.fillTxt; }
-else if (fin === 'busy') next = opNx('MQ_M2_BUSY', '季會討論醫師端對策（CDSS 規則、教學、處方集）');
+else if (fin === 'busy') next = r.rank <= 3 ? opNx('MQ_M2_BUSY', '季會討論醫師端對策（CDSS 規則、教學、處方集）') : opNx('MQ_Q2_KEEP', '維持照護班次');
 else if (fin === 'keep') { next = opNx('MQ_Q2_KEEP', '維持照護班次'); note = r.why; }
 if (!run && same < 2 && /^(inc|dec|two)$/.test(r.c)) note += (note ? '；' : '') + '季內只有 ' + same + ' 個月同分類，結論不穩定';
 var S = qSum(qDone, r.u);
@@ -315,7 +315,7 @@ return { cls: x.pin ? 'op-hi' : '', cells: [(x.rank ? x.rank + '. ' : '') + x.u 
 if (!RE) c2q.body.appendChild(axEl('p', 'ax-muted', '完整月不足 6 個，不排序。'));
 else {
 opMqQuad(c2q.body, RE);
-[['增加照護班次', qInc], ['可減少照護班次', qDec], ['先照護兩週再決定', qTwo], ['維持，先補佐證（原可減少）', qHold], ['維持，班次內補做', qFill], ['維持，季會討論醫師端對策', qBusy], ['維持照護班次（原可減少，安全訊號高）', qKeep]].forEach(function (g) { if (!g[1].length) return; c2q.body.appendChild(axEl('h4', 'op-gh', g[0] + '（' + g[1].length + '）')); c2q.body.appendChild(qTab(g[1])); });
+[['增加照護班次', qInc], ['可減少照護班次', qDec], ['先照護兩週再決定', qTwo], ['維持，先補佐證（原可減少）', qHold], ['維持，班次內補做', qFill], ['維持（常去、問題多；前 3 名季會討論醫師端對策）', qBusy], ['維持照護班次（原可減少，安全訊號高）', qKeep]].forEach(function (g) { if (!g[1].length) return; c2q.body.appendChild(axEl('h4', 'op-gh', g[0] + '（' + g[1].length + '）')); c2q.body.appendChild(qTab(g[1])); });
 if (run) c2q.body.appendChild(axEl('p', 'pcs-note', '本季未滿 3 個完整月：上表以最近完整月為準，季會請用季末版本。'));
 }
 var nxq = [];
