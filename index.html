@@ -1506,7 +1506,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '7.4.6';
+var APP_VERSION = '7.4.7';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -13492,6 +13492,7 @@ function hcxMount(box) {
    卡片：標題為問句；固定一張圖或表＋狀態＋「下一步」規則提示＋判讀前提。只提示，不派工、不追蹤、不結案。
    小分母（三頁統一）：0＝—；1–4 只列件數（累積中）；5–19 比率附 95% 信賴區間；≥20 比率。
    評鑑條文：醫院評鑑基準－研修格式 108.11（109 年草案）第 2.5 章；本院現行版本條號【未經查證】。
+   v7.4.7（2026-11-26）：Q5 在「儀表板檢討紀錄」尚無資料列時，不誤報缺欄。
    v7.4.6（2026-11-26）：臨床藥學服務照護班次調度——月頁 M2 依問題量×折算人力下結論（增加／先照護兩週／減少／維持），登錄者未填 >20% 不判定；季頁 Q2 彙整 3 個月結論並依主責疾病佐證卡調整，Q4 加主責病房，Q5 上季病房決議前後對照，月頁顯示「執行中」。
    v7.4.5（2026-11-26）：連貫照護季頁 Q1–Q7（服務量、服務線、疾病、用藥負擔、高齡、問題原因、上季決議）；讀取「儀表板檢討紀錄」。
    v7.4.4（2026-11-26）：連貫照護月頁重組（M2 工作量對人力、M3 比率橫條圖、M4 含進行中月份存量）。
@@ -13500,7 +13501,7 @@ function hcxMount(box) {
    v7.4.1（2026-11-25）：「下一步」提示文字與評鑑條文改讀設定分頁「儀表板下一步規則」「儀表板評鑑條文對應」；
    分頁未開放、讀取失敗或儲存格空白時，一律用本檔內建文字。觸發條件與門檻仍在程式內，改分頁不影響判定。
    ===================================================================== */
-var OP = { ver: '7.4.6', mqFrozen: false };
+var OP = { ver: '7.4.7', mqFrozen: false };
 var OP_CLAUSE = {
   TDM: { no: '2.5.10 符合 1；優良 3', t: '提供療劑監測（TDM）服務；有後續追蹤評估，建議獲醫師接受' },
   DDI: { no: '2.5.10 符合 3', t: '有藥品交互作用評估機制（紀錄、通知、檢討改進、預防）' },
@@ -13695,7 +13696,7 @@ function opMqDecCode(t) { t = String(t || ''); return /增加/.test(t) ? 'inc' :
 function opMqDecs() {
   var R = OP.review, out = []; if (!R) return null;
   var ci = function (re) { return axCol(R.cols, re); }, iq = ci(/^季別/), ip = ci(/^頁面/), iw = ci(/^病房/), id = ci(/^照護班次決議/), ix = ci(/^決議/);
-  if (iq < 0 || iw < 0 || id < 0) { out.noCol = true; return out; }
+  if (iq < 0 || iw < 0 || id < 0) { if (R.cols.length && R.rows.length) out.noCol = true; return out; }
   R.rows.forEach(function (r) {
     var q = opQNorm(r[iq]), w = String(r[iw] == null ? '' : r[iw]).trim().toUpperCase(), c = opMqDecCode(r[id]);
     if (!q || !w || !c) return; if (ip >= 0 && r[ip] && !/臨床藥學/.test(String(r[ip]))) return;
