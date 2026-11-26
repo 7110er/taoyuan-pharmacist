@@ -1506,7 +1506,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '7.4.4';
+var APP_VERSION = '7.4.5';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -13492,13 +13492,14 @@ function hcxMount(box) {
    卡片：標題為問句；固定一張圖或表＋狀態＋「下一步」規則提示＋判讀前提。只提示，不派工、不追蹤、不結案。
    小分母（三頁統一）：0＝—；1–4 只列件數（累積中）；5–19 比率附 95% 信賴區間；≥20 比率。
    評鑑條文：醫院評鑑基準－研修格式 108.11（109 年草案）第 2.5 章；本院現行版本條號【未經查證】。
+   v7.4.5（2026-11-26）：連貫照護季頁 Q1–Q7（服務量、服務線、疾病、用藥負擔、高齡、問題原因、上季決議）；讀取「儀表板檢討紀錄」。
    v7.4.4（2026-11-26）：連貫照護月頁重組（M2 工作量對人力、M3 比率橫條圖、M4 含進行中月份存量）。
    v7.4.3（2026-11-26）：連貫照護頁刪除審視相關指標（每位病人平均審視次數、每人日審視涵蓋率）；M3 偏低只看處方優化。
    v7.4.2（2026-11-26）：設定讀取逾時不再放棄（見 opCfgLoad）。
    v7.4.1（2026-11-25）：「下一步」提示文字與評鑑條文改讀設定分頁「儀表板下一步規則」「儀表板評鑑條文對應」；
    分頁未開放、讀取失敗或儲存格空白時，一律用本檔內建文字。觸發條件與門檻仍在程式內，改分頁不影響判定。
    ===================================================================== */
-var OP = { ver: '7.4.4', mqFrozen: false };
+var OP = { ver: '7.4.5', mqFrozen: false };
 var OP_CLAUSE = {
   TDM: { no: '2.5.10 符合 1；優良 3', t: '提供療劑監測（TDM）服務；有後續追蹤評估，建議獲醫師接受' },
   DDI: { no: '2.5.10 符合 3', t: '有藥品交互作用評估機制（紀錄、通知、檢討改進、預防）' },
@@ -13516,7 +13517,8 @@ var OP_SVC_CLAUSE = { '治療監測（含TDM）': 'TDM', '交互作用': 'DDI', 
 function opClauseTxt(k) { var c = OP_CLAUSE[k]; return c ? '評鑑條文 ' + c.no + '：' + c.t + '（' + (c.ver || OP.clauseVer) + '）' : ''; }
 /* ---------- v7.4.1 設定分頁：下一步規則、評鑑條文對應 ---------- */
 OP.rules = {}; OP.cfgSt = 'init'; OP.cfgP = null; OP.clauseVer = '條號依 109 年草案，現行版本【未經查證】';
-OP.CFG_T = { rule: ['儀表板下一步規則', '下一步規則'], clause: ['儀表板評鑑條文對應', '評鑑條文對應'] };
+OP.CFG_T = { rule: ['儀表板下一步規則', '下一步規則'], clause: ['儀表板評鑑條文對應', '評鑑條文對應'], review: ['儀表板檢討紀錄', '檢討紀錄'] };
+OP.review = null;
 function opNx(id, def) { var t = OP.rules[id]; return t ? t : def; }
 function opCfgApply(R, C) {
   var nr = 0, nc = 0;
@@ -13527,11 +13529,11 @@ function opCfgApply(R, C) {
 /* v7.4.2：讀取不設硬性放棄；逾時只決定「這次開頁要不要先用內建文字」，資料晚到仍套用，下次產生卡片即生效 */
 function opCfgLoad() {
   if (OP.cfgP) return OP.cfgP;
-  var kr = kdFindKey(OP.CFG_T.rule), kc = kdFindKey(OP.CFG_T.clause);
-  if (!kr && !kc) { OP.cfgSt = '設定分頁未開放（用內建文字）'; OP.cfgDone = true; return (OP.cfgP = Promise.resolve()); }
+  var kr = kdFindKey(OP.CFG_T.rule), kc = kdFindKey(OP.CFG_T.clause), kv = kdFindKey(OP.CFG_T.review);
+  if (!kr && !kc && !kv) { OP.cfgSt = '設定分頁未開放（用內建文字）'; OP.cfgDone = true; return (OP.cfgP = Promise.resolve()); }
   var get = function (k) { return k ? axLoad(k).then(function (x) { return x; }, function () { return null; }) : Promise.resolve(null); };
   OP.cfgSt = '讀取中';
-  var all = Promise.all([get(kr), get(kc)]).then(function (z) { var n = opCfgApply(z[0], z[1]); OP.cfgDone = true; OP.cfgSt = (z[0] || z[1]) ? '規則 ' + n[0] + '、條文 ' + n[1] : '讀取失敗（用內建文字）'; });
+  var all = Promise.all([get(kr), get(kc), get(kv)]).then(function (z) { var n = opCfgApply(z[0], z[1]); OP.review = z[2] || null; OP.cfgDone = true; OP.cfgSt = (z[0] || z[1]) ? '規則 ' + n[0] + '、條文 ' + n[1] : '讀取失敗（用內建文字）'; });
   OP.cfgP = Promise.race([all, new Promise(function (r) { setTimeout(function () { if (!OP.cfgDone) OP.cfgSt = '讀取逾時（先用內建文字；讀到後，切換月／季頁即套用）'; r(); }, 15000); })]);
   return OP.cfgP;
 }
@@ -13860,32 +13862,96 @@ function opCcMonth(view) {
   opHighlights(hlHost, hl, '本月重點｜' + ccYmLab(ym));
 }
 function opCcQuarter(view) {
-  var Y = ccxQMonths(CCX.q).filter(function (m) { return CCX.M.months.indexOf(m) >= 0; }), Cq = CCX.cq ? ccxQMonths(CCX.cq) : null;
-  var dimCard = function (ax, dim, q, cl, lab) {
+  /* v7.4.5：季頁 Q1–Q7（做了多少 → 做了什麼 → 結果 → 高齡 → 卡在哪 → 上季決議）；每卡可單獨列印 */
+  var q = CCX.q, cq = CCX.cq, P1 = ccxPrevQ(q), P2 = ccxPrevQ(P1);
+  var qm = function (z) { return ccxQMonths(z).filter(function (m) { return CCX.M.months.indexOf(m) >= 0; }); };
+  var Y = qm(q), Cq = cq ? qm(cq) : null, q8 = [q]; for (var i = 0; i < 7; i++) q8.unshift(ccxPrevQ(q8[0]));
+  var roll = [].concat(qm(q8[4]), qm(q8[5]), qm(q8[6]), qm(q8[7]));
+  var card = function (ax, title, st, stTxt, sub) { var c = opCard(view, ax, title, { st: st, stTxt: stTxt, cls: 'op-qcard', sub: sub }); opPrintBtn(c.sec); return c; };
+  var fin = function (c, next, pre, cl) { c.foot(next, pre, cl); opDecision(c.sec); };
+  var vq = function (id, z) { var ms = qm(z); if (ms.length < 3) return null; var o = ccxPeriod(id, ms); return o && o.v !== undefined && !(o.ex && o.ex.length) ? o.v : null; };
+  var exN = function (o) { return o && o.ex && o.ex.length ? '｜排除 ' + o.ex.join('、') : ''; };
+  var prior4 = function (z) { var bs = [], w = z; for (var k = 0; k < 4; k++) { w = ccxPrevQ(w); bs.push(w); } return bs; };
+  /* Q1 服務量 */
+  var disQ = function (ms) { var s = 0, k = 0; ms.forEach(function (m) { var r = opCcRow(m), v = r ? ccV(r, '藥師照會醫療端接受率｜出院人數') : null; if (v !== null) { s += +v; k++; } }); return k ? s : null; };
+  var Q1M = [
+    { lab: '出院人數', f: disQ, fmt: function (v) { return Math.round(v) + ' 人'; }, judge: null },
+    { lab: '每百位出院病人照會件數', f: function (ms) { var o = ccxPeriod('consult', ms); return o && !(o.ex && o.ex.length) ? o.v : null; }, fmt: function (v) { return ccFmt(ccxInd('consult'), v); }, judge: function (v, b) { return v < b * 0.9; } },
+    { lab: '高齡訪視完成率', f: function (ms) { return ccxVisit(ms).v; }, fmt: function (v) { return ccPct(v); }, judge: function (v, b) { return v < b - 0.1; } }
+  ];
+  var fq = function (m, z) { var ms = qm(z); return ms.length === 3 ? m.f(ms) : null; };
+  var baseAt = function (m, z) { return opMed(prior4(z).map(function (w) { return fq(m, w); })); };
+  var lowAt = function (m, z) { if (!m.judge) return false; var v = fq(m, z), b = baseAt(m, z); return v !== null && b !== null && m.judge(v, b); };
+  var q1rows = Q1M.map(function (m) {
+    var vals = q8.map(function (z) { return fq(m, z); }), b = baseAt(m, q), cur = vals[7], l1 = lowAt(m, q); m.low2 = l1 && lowAt(m, P1);
+    var sp = axEl('span', 'op-spark'), mx = Math.max.apply(null, vals.filter(function (v) { return v !== null; }).concat([0])) || 1;
+    vals.forEach(function (v, k) { var e = axEl('i', k === 7 ? (m.low2 ? 'cur low' : 'cur') : ''); e.style.height = (v === null ? 0 : Math.max(4, v / mx * 100)) + '%'; e.title = ccxQLab(q8[k]) + '：' + (v === null ? '—' : m.fmt(v)); sp.appendChild(e); });
+    return { cls: m.low2 ? 'op-hi' : '', cells: [m.lab, sp, cur === null ? '—' : m.fmt(cur), b === null ? '—' : m.fmt(b), !m.judge ? '僅供解讀分母' : m.low2 ? '連續 2 季低於基線' : l1 ? '本季低於基線' : '在基線內'] };
+  });
+  var low1 = Q1M.filter(function (m) { return m.low2; });
+  var c1 = card('opCQ1', 'Q1｜這一季服務了多少病人？', low1.length ? 'warn' : 'ok', low1.length ? '連續 2 季低於基線' : '在基線內', ccxQLab(q) + '｜小長條＝近 8 季，最右為本季；基線＝前 4 季中位數');
+  c1.body.appendChild(opTable(['指標', '近 8 季', '本季', '前 4 季中位數', '判讀'], q1rows));
+  fin(c1, low1.length ? low1.map(function (m) { return m.lab + ' 連續 2 季低於基線 → ' + opNx('CC_Q1_LOW', '季會討論人力配置'); }) : ['維持現行'], '只計 3 個月月報齊全的季。照會密度「低於」＝<基線 90%；訪視完成率「低於」＝低於基線 10 個百分點（起始值，無文獻依據）。', opClauseTxt('CON'));
+  /* Q2、Q3 服務線與疾病（沿用 v7.4.0 Q-A、Q-B） */
+  var dimCard = function (ax, dim, title, cl, lab) {
     var g = ccxDim(dim, Y), h = Cq ? ccxDim(dim, Cq) : {}, tot = Object.keys(g).reduce(function (s, x) { return s + g[x].n; }, 0), na = g['未填'] ? g['未填'].n : 0, ks = Object.keys(g).filter(function (x) { return x !== '未填'; }).sort(function (a, b) { return g[b].n - g[a].n; });
-    var c = opCard(view, ax, q, { st: !tot ? 'na' : ks.length ? 'ok' : 'warn', stTxt: !tot ? '本季無照會' : '已填 ' + (tot - na) + '／' + tot, cls: 'op-qcard', sub: lab + '｜欄位新增於 2026-11，填寫中' });
-    opPrintBtn(c.sec);
-    if (!ks.length) c.body.appendChild(axEl('p', 'ax-muted', '本季照會 ' + tot + ' 件，「' + dim + '」尚未填寫（未填 ' + na + '）。欄位填寫後自動產生各類別卡。'));
+    var c = card(ax, title, !tot ? 'na' : ks.length ? 'ok' : 'warn', !tot ? '本季無照會' : '已填 ' + (tot - na) + '／' + tot, lab + '｜欄位新增於 2026-11，填寫中');
+    if (!ks.length) c.body.appendChild(axEl('p', 'ax-muted', '本季照會 ' + tot + ' 件，「' + dim + '」尚未填寫（未填 ' + na + '）。欄位填寫後自動產生各類別。'));
     else c.body.appendChild(opTable(['類別', '本季件數', '接受率（接受 ÷ 接受＋不接受）', '對照季件數'], ks.map(function (x) { var o = g[x]; return [x, o.n, opSmall(o.a, o.a + o.x), h[x] ? h[x].n : (Cq ? '欄位新增前' : '—')]; })));
-    c.foot(!ks.length ? ['請整合病房藥師於「照會統整」補填「' + dim + '」'] : ['某類別接受率偏低或件數集中 → ' + opNx('CC_Q_SEL', '季會選題')], '起填前的季顯示「欄位新增前」，不顯示 0。', cl ? opClauseTxt(cl) : '');
-    opDecision(c.sec);
+    fin(c, !ks.length ? ['請整合病房藥師於「照會統整」補填「' + dim + '」'] : ['某類別接受率偏低或件數集中 → ' + opNx('CC_Q_SEL', '季會選題')], '起填前的季顯示「欄位新增前」，不顯示 0。', cl ? opClauseTxt(cl) : '');
   };
-  dimCard('opCQs', '臨床藥事服務', 'Q-A｜整合病房各服務線做了多少？結果如何？', 'CON', '服務線（照會統整「臨床藥事服務」）');
-  dimCard('opCQd', '主要影響疾病照護', 'Q-B｜整合病房各疾病的照會量與接受情形？', '', '疾病（照會統整「主要影響疾病照護」）');
-  var e = function (id) { var o = ccxPeriod(id, Y); return o && o.n ? opSmall(o.x, Math.round(o.n)) : o && o.v !== null && o.v !== undefined ? ccFmt(o.ind, o.v) : '—'; }, v = ccxVisit(Y);
-  var c = opCard(view, 'opCQe', 'Q-C｜評鑑佐證：用藥連貫性與高齡用藥', { st: 'ok', stTxt: ccxQLab(CCX.q), cls: 'op-qcard' }); opPrintBtn(c.sec);
-  c.body.appendChild(opTable(['條文', '佐證數據（本季）'], [
-    [OP_CLAUSE.CON.no + ' 用藥連貫性服務', '處方優化 ' + e('optim') + '｜減藥 ' + e('deprx')],
-    [OP_CLAUSE.GER.no + ' 高齡多重用藥', 'ACB 改善 ' + e('acb') + '｜ARS 改善 ' + e('ars') + '｜訪視完成 ' + (v.d ? opSmall(v.done, v.d) : '—')],
-    [OP_CLAUSE.REV.no + ' 定期評估檢討', '本頁每月監測＋每季檢討（列印版附會議判讀與決議欄）']
-  ]));
-  c.foot(['季會確認佐證數據並於決議欄記錄改善方向'], '條號依 109 年草案，現行版本【未經查證】。');
-  opDecision(c.sec);
+  dimCard('opCQs', '臨床藥事服務', 'Q2｜各服務線做了多少？醫師接受嗎？', 'CON', '服務線（照會統整「臨床藥事服務」）');
+  dimCard('opCQd', '主要影響疾病照護', 'Q3｜哪些疾病的用藥問題最多？', 'CON', '疾病（照會統整「主要影響疾病照護」）');
+  /* Q4 病人用藥負擔 */
+  var row4 = function (id, lab) { var ind = ccxInd(id), f = function (o) { return !o || o.v === null || o.v === undefined ? '—' : (ind.type === 'p' ? opSmall(o.x, Math.round(o.n)) : ccFmt(ind, o.v)) + exN(o); }; return [lab, f(ccxPeriod(id, Y)), Cq ? f(ccxPeriod(id, Cq)) : '—', f(ccxPeriod(id, roll))]; };
+  var down = ['optim', 'deprx'].filter(function (id) { var a = vq(id, q), b = vq(id, P1), c = vq(id, P2); return a !== null && b !== null && c !== null && a < b && b < c; });
+  var losB = opMed(prior4(q).map(function (w) { return vq('los', w); })), losV = vq('los', q), losHi = losV !== null && losB !== null && losV > losB * 1.1;
+  var c4 = card('opCQ4', 'Q4｜病人出院時用藥負擔下降了嗎？', down.length || losHi ? 'warn' : 'ok', down.length ? '連續 2 季下降' : losHi ? '住院天數上升' : '在基線內', ccxQLab(q) + (Cq ? ' 對照 ' + ccxQLab(cq) : '') + '｜比率＝三個月分子合計 ÷ 分母合計；滾動四季含本季');
+  c4.body.appendChild(opTable(['指標', '本季', '對照季', '滾動四季'], [row4('optim', '處方優化病人比率'), row4('deprx', '減藥病人比率'), row4('pills', '每人口服顆數減少量'), row4('freq', '服藥次數改善病人比率'), row4('los', '平均住院天數（平衡指標）')]));
+  fin(c4, down.map(function (id) { return ccxInd(id).name + ' 連續 2 季下降 → ' + opNx('CC_Q4_DOWN', '選為改善主題'); }).concat(losHi ? ['平均住院天數高於前 4 季中位數 10% 以上 → ' + opNx('CC_Q4_LOS', '回查個案')] : []).concat(down.length || losHi ? [] : ['維持現行']), '只計月報齊全的季；資料品質排除的月份不納入並在數字後標示，有排除月份的季不做「連續下降」判定。「優化處方」「減藥」判定規則以月報公式為準【未經查證】。沒有對照病房，只與自身過去比較，不能推論為藥事介入的效果。', opClauseTxt('CON'));
+  /* Q5 高齡 */
+  var pool = function (ms) { var acc = {}, ord = []; ms.forEach(function (m) { opCcStrata(m).forEach(function (s) { var k = s.axis + '|' + s.lab; if (!acc[k]) { acc[k] = { axis: s.axis, lab: s.lab, hi: s.hi, p: 0, o: 0, has: false }; ord.push(k); } var o = acc[k]; o.p += s.p; if (s.o !== null) { o.o += s.o; o.has = true; } }); }); return ord.map(function (k) { var o = acc[k]; if (!o.has) o.o = null; return o; }); };
+  var SQ = pool(Y), low5 = [];
+  var AXQ = ['年齡', '口服顆數'].map(function (axn) { var rs = SQ.filter(function (s) { return s.axis === axn; }), p = 0, o = 0; rs.forEach(function (s) { if (s.o !== null) { p += s.p; o += s.o; } }); return { axn: axn, rs: rs, p: p, o: o, ref: p ? o / p : null }; }).filter(function (g) { return g.rs.length; });
+  AXQ.forEach(function (g) { g.rs.forEach(function (s) { if (s.hi && s.p >= 5 && g.ref !== null && s.o !== null && ccWilson(s.o, s.p)[1] < g.ref) low5.push(s); }); });
+  var gr = function (id) { var a = ccxPeriod(id, Y), b = Cq ? ccxPeriod(id, Cq) : null, f = function (o) { return o && o.n ? opSmall(o.x, Math.round(o.n)) : '—'; }; return [ccxInd(id).short.replace(' 改善', '') + ' 改善（≥65 歲）', f(a), f(b)]; };
+  var rs5 = {}; (CCX.M.agg || []).forEach(function (r) { if (r.dim === '訪視狀態' && /^不進行訪視/.test(r.cat) && Y.indexOf(r.ym) >= 0) { var kk = r.cat.replace(/^不進行訪視\s*,?\s*/, '').trim() || '未註明'; rs5[kk] = (rs5[kk] || 0) + r.n; } });
+  var rk = Object.keys(rs5).sort(function (a, b) { return rs5[b] - rs5[a]; }), rt = rk.reduce(function (s, k) { return s + rs5[k]; }, 0);
+  var c5 = card('opCQ5', 'Q5｜高齡病人的用藥負擔有處理到嗎？', low5.length ? 'warn' : 'ok', low5.length ? low5.length + ' 層偏低' : '無偏低', ccxQLab(q) + '｜高負擔層處方優化比率只與同一分層合計比較');
+  AXQ.forEach(function (g) { c5.body.appendChild(axEl('div', 'op-rax', g.axn + '｜本季合計 ' + ccPct(g.ref) + '（' + g.o + '／' + g.p + '）')); opRateBars(c5.body, g.rs.map(function (s) { return { name: s.lab, x: s.o, n: s.p, hi: s.hi, low: low5.indexOf(s) >= 0 }; }), g.ref); });
+  c5.body.appendChild(opTable(['高齡用藥量表', '本季', '對照季'], [gr('acb'), gr('ars'), gr('hk'), gr('tw')]));
+  if (rk.length) c5.body.appendChild(axEl('p', 'pcx-pn', '本季不進行訪視 ' + rt + ' 人：' + rk.slice(0, 5).map(function (k) { return k + ' ' + rs5[k] + '（' + ccPct(rs5[k] / rt, 0) + '）'; }).join('、')));
+  fin(c5, low5.length ? low5.slice(0, 2).map(function (s) { return s.axis + '「' + s.lab + '」處方優化 ' + opSmallV(s.o || 0, s.p) + ' → ' + opNx('CC_Q5_LOW', '列為下季優先對象'); }) : ['維持現行'], '高負擔層＝≥85 歲、口服 ≥15 顆。年齡層「優化處方人數」判定規則與全體不同，只做層內比較。HK、TW 量表全名與計分規則【未經查證】；≥85 歲分界【未經查證】。', opClauseTxt('GER'));
+  /* Q6 卡在哪 */
+  var topN = function (dim, k) { var g = ccxDim(dim, Y), t = Object.keys(g).reduce(function (s, x) { return s + g[x].n; }, 0); return { t: t, rows: Object.keys(g).filter(function (x) { return x !== '未填'; }).sort(function (a, b) { return g[b].n - g[a].n; }).slice(0, k).map(function (x) { return [x, g[x].n, t ? ccPct(g[x].n / t, 0) : '—']; }) }; };
+  var cs = ccxConsult(Y), rp = ccxDim('照會結果', Y), noRep = rp['未回覆'] ? rp['未回覆'].n : 0;
+  var rc = ccxDim('原因類別', Y), rcT = Object.keys(rc).reduce(function (s, x) { return s + rc[x].n; }, 0), rcTop = Object.keys(rc).filter(function (x) { return x !== '未填' && rc[x].n >= 5 && rcT && rc[x].n / rcT >= 0.2; }).sort(function (a, b) { return rc[b].n - rc[a].n; }).slice(0, 2);
+  var c6 = card('opCQ6', 'Q6｜問題卡在哪裡？', rcTop.length || cs.x >= 2 ? 'warn' : 'ok', rcTop.length ? rcTop.length + ' 個原因集中' : cs.x >= 2 ? '不接受 ' + cs.x + ' 件' : '無集中', ccxQLab(q) + '｜照會統整');
+  c6.body.appendChild(opTable(['照會處理', '本季'], [['照會件數', cs.n], ['接受率（接受 ÷ 接受＋不接受）', opSmall(cs.a, cs.d)], ['不接受', cs.x], ['未回覆（照會結果空白）', noRep]]));
+  var tp = topN('問題類別', 3), tc = topN('原因類別', 3), tr = topN('介入結果', 3);
+  if (tp.rows.length) c6.body.appendChild(opTable(['問題類別（PCNE）前 3', '件數', '占比'], tp.rows));
+  if (tc.rows.length) c6.body.appendChild(opTable(['原因類別前 3', '件數', '占比'], tc.rows));
+  if (tr.rows.length) c6.body.appendChild(opTable(['介入結果前 3', '件數', '占比'], tr.rows));
+  fin(c6, rcTop.map(function (x) { return '原因「' + x + '」本季 ' + rc[x].n + ' 件（' + ccPct(rc[x].n / rcT, 0) + '）→ ' + opNx('CC_Q6_RC', '評估提教學、MUE 或 CDSS 規則'); }).concat(cs.x >= 2 ? ['不接受 ' + cs.x + ' 件 → ' + opNx('CC_Q6_REJ', '挑個案於科內討論（不歸因個人）')] : []).concat(rcTop.length || cs.x >= 2 ? [] : ['維持現行']), '占比＝該類件數 ÷ 本季總件數；組成不預設好壞方向。「原因集中」＝單一原因 ≥5 件且占 ≥20%；不接受 ≥2 件列出（起始值，無文獻依據）。未回覆不入接受率分母。', opClauseTxt('REV'));
+  /* Q7 上季決議 */
+  var qNorm = function (s) { s = String(s == null ? '' : s).replace(/\s+/g, ''); var m = /^(\d{4})-?Q([1-4])$/i.exec(s); if (m) return m[1] + '-Q' + m[2]; m = /^(\d{3})(?:年)?(?:Q|第)([1-4])/i.exec(s); return m ? (+m[1] + 1911) + '-Q' + m[2] : ''; };
+  var R = OP.review, dec = [];
+  if (R) { var ci = function (re) { return axCol(R.cols, re); }, iq = ci(/^季別/), ip = ci(/^頁面/), ic = ci(/^卡片/), ij = ci(/^會議判讀/), id = ci(/^決議/), ik = ci(/^對應指標/); if (iq >= 0 && id >= 0) R.rows.forEach(function (r) { if (qNorm(r[iq]) !== P1) return; if (ip >= 0 && r[ip] && !/連貫照護/.test(String(r[ip]))) return; dec.push(r); });
+    var fmtI = function (k, z) { var ind = ccxInd(String(k || '').trim()); if (!ind) return null; var ms = qm(z); if (ms.length < 3) return '—'; var o = ccxPeriod(ind.id, ms); return !o || o.v === null || o.v === undefined ? '—' : ccFmt(ind, o.v) + exN(o); };
+    var c7 = card('opCQ7', 'Q7｜上一季決定的事，這一季有變化嗎？', dec.length ? 'ok' : 'na', dec.length ? '上季決議 ' + dec.length + ' 項' : '上季無決議紀錄', '上季＝' + ccxQLab(P1) + '｜資料：設定試算表「儀表板檢討紀錄」');
+    if (dec.length) c7.body.appendChild(opTable(['卡片', '上季判讀', '上季決議', '對應指標', '上季', '本季'], dec.map(function (r) { var k = ik >= 0 ? r[ik] : '', a = fmtI(k, P1), b = fmtI(k, q); return [ic >= 0 ? r[ic] : '—', ij >= 0 ? r[ij] : '—', r[id], k || '—', a === null ? '—' : a, b === null ? '—' : b]; })));
+    else c7.body.appendChild(axEl('p', 'ax-muted', '「儀表板檢討紀錄」沒有 ' + ccxQLab(P1) + '、頁面為連貫照護整合成效的決議。本季會議決議請填入該分頁，下一季本卡自動顯示。'));
+    fin(c7, dec.length ? ['逐項 → ' + opNx('CC_Q7', '季會決定延續、調整或結束，並記入本季檢討紀錄')] : ['本季決議 → ' + opNx('CC_Q7_NONE', '會後填入「儀表板檢討紀錄」')], '系統只顯示人工紀錄，不追蹤、不結案。季別寫 2026-Q3 或 115Q3；「對應指標」填指標代碼（consult、visit、optim、deprx、pills、freq、acb、ars、hk、tw、los、accept）才會帶出上季與本季數值。', opClauseTxt('REV'));
+  } else {
+    var c7b = card('opCQ7', 'Q7｜上一季決定的事，這一季有變化嗎？', 'na', '紀錄分頁未開放', '資料：設定試算表「儀表板檢討紀錄」');
+    c7b.body.appendChild(axEl('p', 'ax-muted', '「儀表板檢討紀錄」分頁未開放或讀取失敗，本卡暫不顯示上季決議。'));
+    fin(c7b, ['管理者開放「儀表板檢討紀錄」分頁'], '系統只顯示人工紀錄，不追蹤、不結案。', opClauseTxt('REV'));
+  }
 }
 (function () {
   var oM = ccxMonth, oQ = ccxQuarter;
   ccxMonth = function (view, ctl) { var tmp = document.createElement('div'); oM(tmp, ctl); try { if (CCX.ym) opCcMonth(view); } catch (e) { if (window.console) console.error(e); view.appendChild(axEl('div', 'state', '第一層卡片產生失敗：' + (e && e.message || e))); } opFold(view, '第二層：完整指標、處理鏈、管制圖與對帳（原 M1–M5）', Array.prototype.slice.call(tmp.childNodes)); };
-  ccxQuarter = function (view, ctl) { var tmp = document.createElement('div'); oQ(tmp, ctl); try { if (CCX.q) opCcQuarter(view); } catch (e) { if (window.console) console.error(e); view.appendChild(axEl('div', 'state', '佐證卡產生失敗：' + (e && e.message || e))); } opFold(view, '完整季檢討（原 Q1–Q8）', Array.prototype.slice.call(tmp.childNodes)); };
+  ccxQuarter = function (view, ctl) { var tmp = document.createElement('div'); oQ(tmp, ctl); try { if (CCX.q) opCcQuarter(view); } catch (e) { if (window.console) console.error(e); view.appendChild(axEl('div', 'state', '季檢討卡產生失敗：' + (e && e.message || e))); } opFold(view, '第二層：完整季檢討、管制圖與資料可信度（原 Q1–Q8）', Array.prototype.slice.call(tmp.childNodes)); };
 })();
 
 /* =====================================================================
@@ -14018,6 +14084,7 @@ function opHcQuarter(view) {
     '.op-pbtn{margin-left:auto}.op-dec{display:none;margin-top:10px}.op-dec-box{height:90px;border:1px solid #a0aec0;border-radius:4px}',
     '@media print{.op-dec{display:block}.op-pbtn{display:none}.op-fold:not([open])>*:not(summary){display:none}}',
     '.op-lci{position:absolute;top:5px;height:2px;background:#1a202c}.op-lref{position:absolute;top:-4px;bottom:-4px;border-left:2px dashed #c53030}.op-rhi .op-lb{background:#dd6b20}.op-rhi .op-ll{color:#975a16}.op-rlow .op-ll{color:#c53030;font-weight:700}.op-rax{margin:10px 0 2px;font-size:.8rem;font-weight:700;color:#2d3748}',
+    '.op-spark{display:inline-flex;align-items:flex-end;gap:2px;height:26px;width:120px}.op-spark i{flex:1;background:#cbd5e0;min-height:1px;border-radius:1px}.op-spark i.cur{background:#2c7a7b}.op-spark i.low{background:#dd6b20}',
     '.op-m4grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:6px 0 10px}.op-m4grid .op-qv{border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px}.op-m4grid .op-m4on b{color:#c05621}'
   ].join('\n'); document.head.appendChild(css);
 })();
