@@ -1506,7 +1506,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '7.4.1';
+var APP_VERSION = '7.4.3';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -6275,10 +6275,6 @@ var CC_IND = [
     def: '藥師對醫療端的照會件數 ÷ 當月出院人數 × 100。分子是「件」不是「人」，同一病人可多次照會，因此可超過 100。原試算表「照會率」即此值，但以百分比呈現容易被誤讀為「有幾成病人被照會」，本頁改為每百人件數。' },
   { id: 'accept', grp: 'proc', name: '照會醫療端完全接受率', short: '完全接受率', type: 'p', num: '藥師照會醫療端接受率｜接受數', den: '藥師照會醫療端接受率｜照會數', dir: 1, flag: 'accept',
     def: '醫療端完全接受件數 ÷ 照會件數。原試算表「接受率」把「部分接受」以 0.5 件計入；本頁以完全接受判讀，部分接受與不接受列於明細。' },
-  { id: 'reviews', grp: 'proc', name: '每位病人平均審視次數', short: '審視次數', type: 'u', unit: '次／人', num: '總審視次數｜總', den: '住院病人人數｜總', dir: 1, flag: 'review',
-    def: '總審視次數 ÷ 住院病人人數（依出院月份）。' },
-  { id: 'cover', grp: 'proc', name: '每人日審視涵蓋率（近似）', short: '每日涵蓋', type: 'u', scale: 100, unit: '%', num: '總審視次數｜總', denFn: function (r) { var a = ccV(r, '藥師照會醫療端接受率｜出院人數'), b = ccV(r, '住院天數平均'); return a !== null && b !== null ? a * b : null; }, dir: 1, flag: 'review',
-    def: '總審視次數 ÷（出院人數 × 平均住院天數），以「出院人數 × 平均住院天數」近似住院人日。原試算表「每日照護率」＝平均審視次數 ÷ 住院天數「中位數」，分子平均、分母中位數，住院天數右偏時必然高估，已有多個月份超過 100%，本頁停用該定義。' },
   { id: 'optim', grp: 'out', name: '處方優化病人比率', short: '處方優化', type: 'p', num: '優化處方人數｜總', den: '住院病人人數｜總', dir: 1, flag: 'review',
     def: '當月出院病人中，處方經優化的人數 ÷ 住院病人人數。「優化處方」判定規則以來源「分析(一)」公式為準【未經查證】。' },
   { id: 'deprx', grp: 'out', name: '減藥病人比率（口服顆數）', short: '減藥人比率', type: 'p', num: '口服顆數｜減藥人數', den: '口服顆數｜總人數', dir: 1,
@@ -6300,7 +6296,7 @@ var CC_IND = [
   { id: 'los', grp: 'bal', name: '平均住院天數', short: '住院天數', type: 'i', unit: '天', val: '住院天數平均', dir: 0,
     def: '平衡指標：藥事介入不應延長住院。I-MR 管制圖，平均值受極端住院日影響，請同時參考中位數。' }
 ];
-var CC_KPI = ['accept', 'optim', 'deprx', 'reviews', 'consult', 'acb', 'visit', 'los'];
+var CC_KPI = ['accept', 'optim', 'deprx', 'consult', 'acb', 'visit', 'los'];
 
 /* ---------- 基本工具 ---------- */
 function ccNum(v) {
@@ -6391,12 +6387,12 @@ function ccFlags(M) {
     if (p !== null && p < 0) add(ym, 'accept', '「部分接受」為負值（' + p + '）', '不納入接受率管制界限');
     var tot = ccV(r, '總審視次數｜總'), pts = ccV(r, '住院病人人數｜總'), sub = CC_SRC4.map(function (s) { return ccV(r, '總審視次數｜' + s); });
     var subSum = sub.every(function (x) { return x !== null; }) ? sub.reduce(function (s, x) { return s + x; }, 0) : null;
-    if (pts && tot === 0) add(ym, 'review', '住院病人 ' + pts + ' 人但「總審視次數」為 0', '不納入審視次數、處方優化相關管制界限');
-    else if (tot && subSum === 0) add(ym, 'review', '「總審視次數」' + tot + ' 次，但 ER／ICU／OPD／UD 分項全為 0', '不納入審視次數、處方優化相關管制界限');
-    else if (tot !== null && subSum !== null && Math.abs(subSum - tot) > 0.5) add(ym, 'review', '審視次數分項加總 ' + subSum + ' ≠ 總計 ' + tot, '不納入審視次數、處方優化相關管制界限');
+    if (pts && tot === 0) add(ym, 'review', '住院病人 ' + pts + ' 人但「總審視次數」為 0', '不納入處方優化相關管制界限');
+    else if (tot && subSum === 0) add(ym, 'review', '「總審視次數」' + tot + ' 次，但 ER／ICU／OPD／UD 分項全為 0', '不納入處方優化相關管制界限');
+    else if (tot !== null && subSum !== null && Math.abs(subSum - tot) > 0.5) add(ym, 'review', '審視次數分項加總 ' + subSum + ' ≠ 總計 ' + tot, '不納入處方優化相關管制界限');
     var mx = ccV(r, '口服顆數｜MAX 平均'), dc = ccV(r, '口服顆數｜出院 平均');
     if (mx !== null && dc !== null && dc > mx + 0.005) add(ym, 'pills', '出院平均顆數 ' + dc + ' 高於住院最高平均 ' + mx + '（邏輯上不可能）', '不納入顆數減少量管制界限');
-    var cr = ccV(r, '連續照護平均審視次數｜每日照護率'); if (cr !== null && cr > 1.0005) add(ym, 'info', '原「每日照護率」' + ccPct(cr) + '，超過 100%（定義為平均÷中位數）', '已改用每人日審視涵蓋率');
+    var cr = ccV(r, '連續照護平均審視次數｜每日照護率'); if (cr !== null && cr > 1.0005) add(ym, 'info', '原「每日照護率」' + ccPct(cr) + '，超過 100%（定義為平均÷中位數）', '本頁不採用');
     var pb = CC_PILL.map(function (b) { return ccV(r, '住院病人人數｜' + b); });
     if (pts && pb.every(function (x) { return x !== null; })) { var ps = pb.reduce(function (s, x) { return s + x; }, 0); if (ps > pts) add(ym, 'info', '用藥顆數各層人數合計 ' + ps + ' 多於住院病人 ' + pts + '（重複計數）', '分層比較請保守解讀'); }
     var ot = ccV(r, '優化處方人數｜總'), oa = ccV(r, '優化處方人數｜sum'), ol = ccV(r, '優化處方人數｜<65');
@@ -6688,8 +6684,8 @@ function ccDeprxCard(host, M, end, FL, rerender) {
 function ccStratCard(host, M, end, FL, rerender) {
   var rows = ccWinRows(M, end); if (!rows.length) return;
   var sec = axEl('section', 'chart ax-card cc-card'); sec.dataset.ax = 'ccStrat'; host.appendChild(sec);
-  ccSecHead(sec, '分層比較：誰得到較多審視、誰的處方被優化', ccYmLab(rows[0].ym) + '－' + ccYmLab(rows[rows.length - 1].ym) + '｜分子分母合併後計算',
-    '<b>計算</b>：統計期間內各月分子、分母分別加總後相除（不是各月比率的平均），橫線為 Wilson 95% 信賴區間；區間重疊時不宜斷言差異。<br><b>入院來源</b>：審視次數或優化處方資料缺漏的月份（見「資料品質」）不納入。<br><b>年齡層與用藥顆數層</b>：來源試算表中這兩個區塊的「優化處方人數」合計多於全體（例：年齡層合計常為全體的 1.5–2 倍），判定規則與全體不一致【未經查證】，因此只做層內比較，不與上方全體比率對照。年齡層分界「>85」與「75-84」之間是否包含 85 歲，需核對「分析(一)」公式【未經查證】。');
+  ccSecHead(sec, '分層比較：誰的處方被優化', ccYmLab(rows[0].ym) + '－' + ccYmLab(rows[rows.length - 1].ym) + '｜分子分母合併後計算',
+    '<b>計算</b>：統計期間內各月分子、分母分別加總後相除（不是各月比率的平均），橫線為 Wilson 95% 信賴區間；區間重疊時不宜斷言差異。<br><b>入院來源</b>：優化處方資料缺漏的月份（見「資料品質」）不納入。<br><b>年齡層與用藥顆數層</b>：來源試算表中這兩個區塊的「優化處方人數」合計多於全體（例：年齡層合計常為全體的 1.5–2 倍），判定規則與全體不一致【未經查證】，因此只做層內比較，不與上方全體比率對照。年齡層分界「>85」與「75-84」之間是否包含 85 歲，需核對「分析(一)」公式【未經查證】。');
   var tb = axEl('div', 'cc-toolbar'); tb.appendChild(ccWinSel(function () { rerender('win'); })); sec.appendChild(tb);
   var grid = axEl('div', 'cc-strat'); sec.appendChild(grid);
   function block(title, strata, labFn, revOk, useFlag) {
@@ -6699,7 +6695,6 @@ function ccStratCard(host, M, end, FL, rerender) {
       rows.forEach(function (r) {
         if (useFlag && FL.byYm[r.ym] && FL.byYm[r.ym].review) return;
         var k = ccV(r, '住院病人人數｜' + s), x = ccV(r, '優化處方人數｜' + s); if (!k || x === null) return; n += k; o += x;
-        var v = revOk ? ccV(r, '總審視次數｜' + s) : null; if (v !== null) { rv += v; rn += k; }
       });
       return { s: s, n: n, o: o, rv: rn ? rv / rn : null, ci: ccWilson(o, n) };
     }).filter(function (d) { return d.n; });
@@ -6709,8 +6704,8 @@ function ccStratCard(host, M, end, FL, rerender) {
       var r = axEl('div', 'cc-srow'); r.appendChild(axEl('span', 'cc-sl', labFn(d.s)));
       var b = axEl('div', 'cc-sbar'); var f = axEl('i', 'cc-sfill'); f.style.width = (d.o / d.n / mx * 100) + '%'; b.appendChild(f);
       var w = axEl('i', 'cc-sci'); w.style.left = (d.ci[0] / mx * 100) + '%'; w.style.width = Math.max(.5, (d.ci[1] - d.ci[0]) / mx * 100) + '%'; b.appendChild(w); r.appendChild(b);
-      r.appendChild(axEl('span', 'cc-sv', ccPct(d.o / d.n) + '｜' + d.o + '／' + d.n + (d.rv !== null ? '｜審視 ' + d.rv.toFixed(1) + ' 次／人' : '')));
-      r.title = labFn(d.s) + '：處方優化 ' + d.o + '／' + d.n + '＝' + ccPct(d.o / d.n) + '（95% CI ' + ccPct(d.ci[0]) + '–' + ccPct(d.ci[1]) + '）' + (d.rv !== null ? '；平均審視 ' + d.rv.toFixed(2) + ' 次' : '');
+      r.appendChild(axEl('span', 'cc-sv', ccPct(d.o / d.n) + '｜' + d.o + '／' + d.n));
+      r.title = labFn(d.s) + '：處方優化 ' + d.o + '／' + d.n + '＝' + ccPct(d.o / d.n) + '（95% CI ' + ccPct(d.ci[0]) + '–' + ccPct(d.ci[1]) + '）';
       col.appendChild(r);
     });
     return col;
@@ -6810,7 +6805,7 @@ function ccDqCard(host, M, end, FL) {
     '<b>檢查規則</b>（每次載入即時重算）：照會的接受／部分接受紀錄方式改變或負值；審視次數總計與 ER／ICU／OPD／UD 分項不一致或為 0；出院顆數高於住院最高；原「每日照護率」超過 100%；用藥顆數分層合計多於住院人數；年齡層優化處方人數合計與全體不一致；出院人數與住院病人人數不一致。<br><b>處理</b>：前三類月份在對應指標的管制圖以空心點顯示、不納入界限；其餘只提醒。<br><b>來源維護建議</b>：「月成效」110 年至今的各月數值為逐月貼上的靜態值，只有「本月成效」欄是公式，歷史月份無法回溯驗證；請保留每月由「分析(一)」產生的原始彙總，或改以公式依出院月份直接計算。');
   var groups = {}; L.forEach(function (x) { var k = x.scope + '\u0001' + x.msg.replace(/[\d.]+/g, '#'); (groups[k] = groups[k] || { scope: x.scope, act: x.act, sample: x.msg, yms: [] }).yms.push(x.ym); });
   var t = axEl('table', 'ax-gtab cc-tab'); t.innerHTML = '<thead><tr><th>類型</th><th>月份</th><th>說明（舉例）</th><th>處理</th></tr></thead>'; var tbo = document.createElement('tbody');
-  var lab = { accept: '照會接受紀錄', review: '審視次數', pills: '口服顆數', info: '定義／一致性', def: '定義不一致' };
+  var lab = { accept: '照會接受紀錄', review: '月報分項一致性', pills: '口服顆數', info: '定義／一致性', def: '定義不一致' };
   Object.keys(groups).sort(function (a, b) { return groups[b].yms.length - groups[a].yms.length; }).forEach(function (k) {
     var g = groups[k], tr = document.createElement('tr'); tr.appendChild(axEl('th', '', lab[g.scope] || g.scope));
     tr.appendChild(axEl('td', '', g.yms.length > 6 ? g.yms.length + ' 個月（' + ccYmShort(g.yms[0]) + '–' + ccYmShort(g.yms[g.yms.length - 1]) + '）' : g.yms.map(ccYmShort).join('、')));
@@ -12797,7 +12792,7 @@ function ccxRecon(yms) {
 }
 function ccxSignals(yms, cmp) {
   var out = [];
-  ['consult', 'cover', 'visit', 'accept', 'optim', 'deprx', 'acb', 'los'].forEach(function (id) {
+  ['consult', 'visit', 'accept', 'optim', 'deprx', 'acb', 'los'].forEach(function (id) {
     var ind = ccxInd(id); if (!ind) return; var R = ccRun(ind, CCX.M, CCX.end, CCX.FL);
     R.pts.forEach(function (p) { if (yms.indexOf(p.ym) < 0 || !p.sig || !p.sig.length) return; out.push(['特殊原因變異', ind.name, ccYmLab(p.ym) + '：' + ccFmt(ind, p.v), p.sig.join('、')]); });
     if (ind.type === 'p') R.pts.forEach(function (p) { if (yms.indexOf(p.ym) >= 0 && p.n && p.n < 20) out.push(['小分母（<20）', ind.name, ccYmLab(p.ym) + '：' + p.x + '／' + p.n, '比率不判讀方向']); });
@@ -12844,13 +12839,13 @@ function ccxMonth(view, ctl) {
   if (!CCX.ym || ms.indexOf(CCX.ym) < 0) CCX.ym = ms[ms.length - 1];
   ctl.appendChild(axSelect('月份', ms.slice().reverse().map(function (m) { return { v: m, t: ccYmLab(m) }; }), CCX.ym, function (v) { CCX.ym = v; ccxDraw(); }));
   var ym = CCX.ym;
-  var s1 = ccxSec(view, 'cxM1', 'M1 本月核心數字｜' + ccYmLab(ym), '每磚：本月值、分子／分母、中心線（CL）、管制判讀', '<b>W1</b> 每百位出院病人照會件數｜<b>A1</b> 接受率（照會統整，接受÷接受＋不接受）｜<b>E1</b> 處方優化病人比率｜<b>E2</b> 減藥病人比率｜<b>W3</b> 高齡訪視完成率｜<b>W2</b> 每人日審視涵蓋率。定義見季檢視「指標定義」。');
+  var s1 = ccxSec(view, 'cxM1', 'M1 本月核心數字｜' + ccYmLab(ym), '每磚：本月值、分子／分母、中心線（CL）、管制判讀', '<b>W1</b> 每百位出院病人照會件數｜<b>A1</b> 接受率（照會統整，接受÷接受＋不接受）｜<b>E1</b> 處方優化病人比率｜<b>E2</b> 減藥病人比率｜<b>W3</b> 高齡訪視完成率。定義見季檢視「指標定義」。');
   var g = axEl('div', 'cc-kpis'); s1.appendChild(g);
   ccxTile(g, 'consult', ym, 'W1 照會密度');
   var c = ccxConsult([ym]), ta = axEl('article', 'cc-kpi stable'); ta.appendChild(axEl('span', 'cc-kpi-l', 'A1 接受率')); ta.appendChild(axEl('span', 'cc-kpi-v', c.v !== null ? ccPct(c.v) : '—')); ta.appendChild(axEl('span', 'cc-kpi-m', c.d ? c.a + '／' + c.d + (c.d >= 5 ? '｜95% CI ' + ccPct(c.ci[0], 0) + '–' + ccPct(c.ci[1], 0) : '') : '本月無照會統整資料')); ta.appendChild(ccChip({ cls: 'na', txt: c.d < 20 ? '分母 <20，不判讀方向' : '照會統整' })); g.appendChild(ta);
-  ccxTile(g, 'optim', ym, 'E1 處方優化'); ccxTile(g, 'deprx', ym, 'E2 減藥人比率'); ccxTile(g, 'visit', ym, 'W3 訪視完成'); ccxTile(g, 'cover', ym, 'W2 每日涵蓋');
+  ccxTile(g, 'optim', ym, 'E1 處方優化'); ccxTile(g, 'deprx', ym, 'E2 減藥人比率'); ccxTile(g, 'visit', ym, 'W3 訪視完成');
   var lg = axEl('div', 'cc-legend'); lg.innerHTML = '<span><i class="cc-dot good"></i>特殊原因｜改善</span><span><i class="cc-dot bad"></i>特殊原因｜惡化</span><span><i class="cc-dot neu"></i>特殊原因｜無好壞方向</span><span><i class="cc-dot stable"></i>共同原因變異</span><span><i class="cc-dot na"></i>資料缺漏／基線不足</span>'; s1.appendChild(lg);
-  var s2 = ccxSec(view, 'cxM2', 'M2 服務量與涵蓋趨勢', '管制圖；基線為近 24 個有效月', '管制界限計算與判讀規則同分析檢視「SPC 管制圖」。'); ccxSpc(s2, ['consult', 'cover', 'visit']);
+  var s2 = ccxSec(view, 'cxM2', 'M2 服務量趨勢', '管制圖；基線為近 24 個有效月', '管制界限計算與判讀規則同分析檢視「SPC 管制圖」。'); ccxSpc(s2, ['consult', 'visit']);
   var s3 = ccxSec(view, 'cxM3', 'M3 照會處理鏈｜' + ccYmLab(ym), '問題 → 原因 → 介入 → 結果；各列前 5 類', '依照會日期歸月；件數少於 20 的接受率不判讀方向。'); ccxChain(s3, [ym], 5);
   var s4 = ccxSec(view, 'cxM4', 'M4 病人層結果', '處方優化與減藥；住院期間最高對出院的口服顆數', '減藥以「每人每日口服顆數」判定，與以品項數定義的多重用藥不可直接比較。');
   var row = CCX.M.rows.filter(function (r) { return r.ym === ym; })[0];
@@ -12872,7 +12867,7 @@ function ccxQuarter(view, ctl) {
   var cmp = function (a, b, fmt) { var d = a !== null && b !== null && b !== undefined ? a - b : null; return d === null ? '—' : (d > 0 ? '+' : '') + fmt(d); };
   /* Q1 */
   var s1 = ccxSec(view, 'cxQ1', 'Q1 本季對照季核心比較｜' + lab, '比率＝三個月分子合計 ÷ 分母合計；平均值型＝三個月平均', '<b>A1</b> 照會統整：接受 ÷（接受＋不接受）｜<b>A1c</b> 月報：完全接受件數 ÷ 照會件數（原「接受率」將部分接受計 0.5 件，已停用）｜<b>B1</b> 平均住院天數為平衡指標，不預設好壞方向。數值上升或下降不等於品質改善或惡化，請同時看 Q7、Q8。');
-  var rowsQ = [['W1 照會密度', 'consult'], ['W2 每人日審視涵蓋率', 'cover'], ['W3 高齡訪視完成率', 'visit'], ['A1c 完全接受占比（月報）', 'accept'], ['E1 處方優化病人比率', 'optim'], ['E2 減藥病人比率', 'deprx'], ['B1 平均住院天數', 'los']].map(function (x) {
+  var rowsQ = [['W1 照會密度', 'consult'], ['W3 高齡訪視完成率', 'visit'], ['A1c 完全接受占比（月報）', 'accept'], ['E1 處方優化病人比率', 'optim'], ['E2 減藥病人比率', 'deprx'], ['B1 平均住院天數', 'los']].map(function (x) {
     var a = x[1] === 'visit' ? (function () { var v = ccxVisit(Y); return { ind: ccxInd('visit'), x: v.done, n: v.d, v: v.v }; })() : ccxPeriod(x[1], Y);
     var b = C ? (x[1] === 'visit' ? (function () { var v = ccxVisit(C); return { ind: ccxInd('visit'), x: v.done, n: v.d, v: v.v }; })() : ccxPeriod(x[1], C)) : null;
     var ind = a.ind, f = function (v) { return v === null || v === undefined ? '—' : ccFmt(ind, v); };
@@ -12927,7 +12922,7 @@ function ccxQuarter(view, ctl) {
   s8.appendChild(axEl('div', 'ax-ftitle', '三來源照會件數對帳')); s8.appendChild(ccxRecon(Y));
   var ex = []; Y.forEach(function (ym) { var f = CCX.FL.byYm[ym]; if (f) Object.keys(f).forEach(function (k) { ex.push([ccYmLab(ym), f[k]]); }); }); if (ex.length) { s8.appendChild(axEl('div', 'ax-ftitle', '本季資料品質事項')); s8.appendChild(ccxTab(['月份', '說明'], ex)); }
   var dl = axEl('dl', 'mq-dict');
-  [['W1 每百位出院病人照會件數', ccxInd('consult').def], ['W2 每人日審視涵蓋率（近似）', ccxInd('cover').def], ['W3 高齡病人訪視完成率', ccxInd('visit').def], ['A1 接受率（主指標，F1）', '接受 ÷（接受＋不接受）；未回覆與空值不入分母。整合病房以「照會統整」計算；全院以 PCNE-DRPs 表單 A1 ÷（A1＋A2）計算，兩者分列。'], ['A1c 完全接受占比', ccxInd('accept').def], ['E1 處方優化病人比率', ccxInd('optim').def], ['E2 減藥病人比率', ccxInd('deprx').def], ['E3 ACB 改善比率', ccxInd('acb').def], ['B1 平均住院天數', ccxInd('los').def]].forEach(function (x) { dl.appendChild(axEl('dt', '', x[0])); dl.appendChild(axEl('dd', '', x[1])); });
+  [['W1 每百位出院病人照會件數', ccxInd('consult').def], ['W3 高齡病人訪視完成率', ccxInd('visit').def], ['A1 接受率（主指標，F1）', '接受 ÷（接受＋不接受）；未回覆與空值不入分母。整合病房以「照會統整」計算；全院以 PCNE-DRPs 表單 A1 ÷（A1＋A2）計算，兩者分列。'], ['A1c 完全接受占比', ccxInd('accept').def], ['E1 處方優化病人比率', ccxInd('optim').def], ['E2 減藥病人比率', ccxInd('deprx').def], ['E3 ACB 改善比率', ccxInd('acb').def], ['B1 平均住院天數', ccxInd('los').def]].forEach(function (x) { dl.appendChild(axEl('dt', '', x[0])); dl.appendChild(axEl('dd', '', x[1])); });
   s8.appendChild(dl);
 }
 
@@ -12941,7 +12936,7 @@ function ccxAnalysisFix(box) {
     var a = sum(CC_SRC4, true), b = sum(CC_AGE.concat(['<65']), false), c = sum(CC_PILL, false);
     var w = axEl('div', 'ccx-recon'); w.appendChild(axEl('div', 'ax-ftitle', '對帳：各分層合計 vs 全體（同一統計期間）'));
     var chk = function (o) { return o.n === tn && o.x === tx ? '相符' : '不符'; };
-    w.appendChild(ccxTab(['分層', '優化人數合計', '住院病人合計', '全體（優化／住院）', '差額（住院／優化，人）', '狀態'], [['依入院來源（排除審視資料缺漏月份）', a.x, a.n, tx + '／' + tn, (tn - a.n) + '／' + (tx - a.x), chk(a)], ['依年齡層', b.x, b.n, tx + '／' + tn, (tn - b.n) + '／' + (tx - b.x), chk(b)], ['依出院用藥顆數', c.x, c.n, tx + '／' + tn, (tn - c.n) + '／' + (tx - c.x), chk(c)]].map(function (r) { return { cls: r[5] === '不符' ? 'cc-low' : '', cells: r }; })));
+    w.appendChild(ccxTab(['分層', '優化人數合計', '住院病人合計', '全體（優化／住院）', '差額（住院／優化，人）', '狀態'], [['依入院來源（排除資料缺漏月份）', a.x, a.n, tx + '／' + tn, (tn - a.n) + '／' + (tx - a.x), chk(a)], ['依年齡層', b.x, b.n, tx + '／' + tn, (tn - b.n) + '／' + (tx - b.x), chk(b)], ['依出院用藥顆數', c.x, c.n, tx + '／' + tn, (tn - c.n) + '／' + (tx - c.x), chk(c)]].map(function (r) { return { cls: r[5] === '不符' ? 'cc-low' : '', cells: r }; })));
     w.appendChild(axEl('p', 'ax-muted', '不符時只作層內比較，不跨層比較。入院來源差額＝未歸類或因資料品質排除的人次【資料不足，無法確認】；根因在月報各區塊判定規則，需填報者確認。'));
     st.appendChild(w);
   }
@@ -13497,10 +13492,12 @@ function hcxMount(box) {
    卡片：標題為問句；固定一張圖或表＋狀態＋「下一步」規則提示＋判讀前提。只提示，不派工、不追蹤、不結案。
    小分母（三頁統一）：0＝—；1–4 只列件數（累積中）；5–19 比率附 95% 信賴區間；≥20 比率。
    評鑑條文：醫院評鑑基準－研修格式 108.11（109 年草案）第 2.5 章；本院現行版本條號【未經查證】。
+   v7.4.3（2026-11-26）：連貫照護頁刪除審視相關指標（每位病人平均審視次數、每人日審視涵蓋率）；M3 偏低只看處方優化。
+   v7.4.2（2026-11-26）：設定讀取逾時不再放棄（見 opCfgLoad）。
    v7.4.1（2026-11-25）：「下一步」提示文字與評鑑條文改讀設定分頁「儀表板下一步規則」「儀表板評鑑條文對應」；
    分頁未開放、讀取失敗或儲存格空白時，一律用本檔內建文字。觸發條件與門檻仍在程式內，改分頁不影響判定。
    ===================================================================== */
-var OP = { ver: '7.4.1', mqFrozen: false };
+var OP = { ver: '7.4.3', mqFrozen: false };
 var OP_CLAUSE = {
   TDM: { no: '2.5.10 符合 1；優良 3', t: '提供療劑監測（TDM）服務；有後續追蹤評估，建議獲醫師接受' },
   DDI: { no: '2.5.10 符合 3', t: '有藥品交互作用評估機制（紀錄、通知、檢討改進、預防）' },
@@ -13520,17 +13517,21 @@ function opClauseTxt(k) { var c = OP_CLAUSE[k]; return c ? '評鑑條文 ' + c.n
 OP.rules = {}; OP.cfgSt = 'init'; OP.cfgP = null; OP.clauseVer = '條號依 109 年草案，現行版本【未經查證】';
 OP.CFG_T = { rule: ['儀表板下一步規則', '下一步規則'], clause: ['儀表板評鑑條文對應', '評鑑條文對應'] };
 function opNx(id, def) { var t = OP.rules[id]; return t ? t : def; }
+function opCfgApply(R, C) {
+  var nr = 0, nc = 0;
+  if (R) { var ci = axCol(R.cols, /^規則代碼/), ti = axCol(R.cols, /^下一步提示/); if (ci >= 0 && ti >= 0) R.rows.forEach(function (r) { var id = String(r[ci] == null ? '' : r[ci]).trim(), t = String(r[ti] == null ? '' : r[ti]).replace(/\s+/g, ' ').trim(); if (/^[A-Z0-9_]+$/.test(id) && t && t.length <= 120) { OP.rules[id] = t; nr++; } }); }
+  if (C) { var ki = axCol(C.cols, /^代碼/), ni = axCol(C.cols, /^條號/), xi = axCol(C.cols, /^條文要點/), vi = axCol(C.cols, /^基準版本註記/); if (ki >= 0) C.rows.forEach(function (r) { var k = String(r[ki] == null ? '' : r[ki]).trim(); if (!/^[A-Z0-9_]+$/.test(k)) return; var o = OP_CLAUSE[k] || (OP_CLAUSE[k] = { no: '', t: '' }), g = function (i) { return i >= 0 ? String(r[i] == null ? '' : r[i]).trim() : ''; }; if (g(ni)) o.no = g(ni); if (g(xi)) o.t = g(xi); if (g(vi)) o.ver = g(vi); nc++; }); }
+  return [nr, nc];
+}
+/* v7.4.2：讀取不設硬性放棄；逾時只決定「這次開頁要不要先用內建文字」，資料晚到仍套用，下次產生卡片即生效 */
 function opCfgLoad() {
   if (OP.cfgP) return OP.cfgP;
   var kr = kdFindKey(OP.CFG_T.rule), kc = kdFindKey(OP.CFG_T.clause);
-  var lim = function (p) { return Promise.race([p, new Promise(function (r) { setTimeout(function () { r(null); }, 8000); })]); };
-  var ld = function (k) { return k ? lim(axLoad(k).then(function (x) { return x; }, function () { return null; })) : Promise.resolve(null); };
-  OP.cfgP = Promise.all([ld(kr), ld(kc)]).then(function (z) {
-    var R = z[0], C = z[1], nr = 0, nc = 0;
-    if (R) { var ci = axCol(R.cols, /^規則代碼/), ti = axCol(R.cols, /^下一步提示/); if (ci >= 0 && ti >= 0) R.rows.forEach(function (r) { var id = String(r[ci] == null ? '' : r[ci]).trim(), t = String(r[ti] == null ? '' : r[ti]).replace(/\s+/g, ' ').trim(); if (/^[A-Z0-9_]+$/.test(id) && t && t.length <= 120) { OP.rules[id] = t; nr++; } }); }
-    if (C) { var ki = axCol(C.cols, /^代碼/), ni = axCol(C.cols, /^條號/), xi = axCol(C.cols, /^條文要點/), vi = axCol(C.cols, /^基準版本註記/); if (ki >= 0) C.rows.forEach(function (r) { var k = String(r[ki] == null ? '' : r[ki]).trim(); if (!/^[A-Z0-9_]+$/.test(k)) return; var o = OP_CLAUSE[k] || (OP_CLAUSE[k] = { no: '', t: '' }), g = function (i) { return i >= 0 ? String(r[i] == null ? '' : r[i]).trim() : ''; }; if (g(ni)) o.no = g(ni); if (g(xi)) o.t = g(xi); if (g(vi)) o.ver = g(vi); nc++; }); }
-    OP.cfgSt = (kr || kc) ? '規則 ' + nr + '、條文 ' + nc : '設定分頁未開放（用內建文字）';
-  }, function () { OP.cfgSt = '讀取失敗（用內建文字）'; });
+  if (!kr && !kc) { OP.cfgSt = '設定分頁未開放（用內建文字）'; OP.cfgDone = true; return (OP.cfgP = Promise.resolve()); }
+  var get = function (k) { return k ? axLoad(k).then(function (x) { return x; }, function () { return null; }) : Promise.resolve(null); };
+  OP.cfgSt = '讀取中';
+  var all = Promise.all([get(kr), get(kc)]).then(function (z) { var n = opCfgApply(z[0], z[1]); OP.cfgDone = true; OP.cfgSt = (z[0] || z[1]) ? '規則 ' + n[0] + '、條文 ' + n[1] : '讀取失敗（用內建文字）'; });
+  OP.cfgP = Promise.race([all, new Promise(function (r) { setTimeout(function () { if (!OP.cfgDone) OP.cfgSt = '讀取逾時（先用內建文字；讀到後，切換月／季頁即套用）'; r(); }, 15000); })]);
   return OP.cfgP;
 }
 
@@ -13766,8 +13767,8 @@ function opCcRow(ym) { return CCX.M.rows.filter(function (r) { return r.ym === y
 function opCcStrata(ym) {
   var r = opCcRow(ym); if (!r) return [];
   var g = function (k) { var v = ccV(r, k); return v === null ? null : +v; }, out = [];
-  var tot = { p: g('住院病人人數｜總'), v: g('總審視次數｜總'), o: g('優化處方人數｜總') };
-  var add = function (axis, lab, key, hi) { var p = g('住院病人人數｜' + key), v = g('總審視次數｜' + key), o = g('優化處方人數｜' + key); if (p === null && v === null) return; out.push({ axis: axis, lab: lab, p: p || 0, v: v, o: o, hi: hi, avg: p ? (v === null ? null : v / p) : null }); };
+  var tot = { p: g('住院病人人數｜總'), o: g('優化處方人數｜總') };
+  var add = function (axis, lab, key, hi) { var p = g('住院病人人數｜' + key), o = g('優化處方人數｜' + key); if (p === null && o === null) return; out.push({ axis: axis, lab: lab, p: p || 0, o: o, hi: hi }); };
   CC_AGE.forEach(function (s) { add('年齡', ccAgeLab(s), s, s === '>85'); }); add('年齡', '<65 歲', '<65', false);
   CC_PILL.forEach(function (s) { add('口服顆數', s, s, /^(>=20|15-19)/.test(s)); });
   CC_SRC4.forEach(function (s) { add('入院來源', { ER: '急診入院', ICU: '加護病房轉入', OPD: '門診入院', UD: '其他' }[s] || s, s, s === 'ICU'); });
@@ -13781,29 +13782,27 @@ function opCcMonth(view) {
   c1.body.appendChild(opTable(['來源', '最新完整月', '落後'], src.map(function (x) { var l = lag(x[1]); return [x[0], x[1] ? ccYmLab(x[1]) : '無', l === null ? '—' : l + ' 個月']; })));
   c1.foot(late.length ? late.map(function (x) { return x[0] + ' 落後 ' + lag(x[1]) + ' 個月 → ' + opNx('CC_M1_LATE', '本頁只供補登，請負責同仁補齊'); }) : ['資料可判讀'], '落後超過 1 個月時，該來源的指標不判讀。');
   if (late.length) hl.push({ what: late.map(function (x) { return x[0]; }).join('、') + ' 落後', next: opNx('CC_M1_LATE_HL', '補齊後再判讀') });
-  /* M2 涵蓋 */
-  var base = CCX.M.months.filter(function (m) { return m < ym; }).slice(-12), cov = ccxPeriod('cover', [ym]), covB = opMed(base.map(function (m) { var o = ccxPeriod('cover', [m]); return o ? o.v : null; })), vis = ccxVisit([ym]), visB = opMed(base.map(function (m) { var v = ccxVisit([m]); return v.v; }));
-  var lowC = cov && cov.v !== null && covB !== null && cov.v < covB * 0.9, lowV = vis.v !== null && visB !== null && vis.d >= 5 && vis.v < visB - 0.1;
-  var c2 = opCard(view, 'opC2', 'M2｜該看的病人看到了嗎？', { st: lowC || lowV ? 'warn' : 'ok', stTxt: lowC || lowV ? '低於自身基線' : '在基線內', sub: ccYmLab(ym) + '｜工作項目：審視、訪視、照會' });
-  var cI = ccxInd('cover');
+  /* M2 訪視與照會（v7.4.3：審視相關指標依使用者裁決刪除） */
+  var base = CCX.M.months.filter(function (m) { return m < ym; }).slice(-12), vis = ccxVisit([ym]), visB = opMed(base.map(function (m) { var v = ccxVisit([m]); return v.v; }));
+  var lowV = vis.v !== null && visB !== null && vis.d >= 5 && vis.v < visB - 0.1;
+  var c2 = opCard(view, 'opC2', 'M2｜該訪視的高齡病人訪視到了嗎？照會量正常嗎？', { st: lowV ? 'warn' : 'ok', stTxt: lowV ? '低於自身基線' : '在基線內', sub: ccYmLab(ym) + '｜工作項目：訪視、照會' });
   c2.body.appendChild(opTable(['工作項目', '本月', '前 12 個月中位數'], [
-    ['每人日審視涵蓋率（近似，W2）', cov && cov.v !== null ? ccFmt(cI, cov.v) : '—', covB === null ? '—' : ccFmt(cI, covB)],
     ['高齡訪視完成率（W3）', vis.d ? opSmall(vis.done, vis.d) : '—', visB === null ? '—' : (visB * 100).toFixed(1) + '%'],
     ['照會件數（照會統整）', String(ccxConsult([ym]).n), String(opMed(base.map(function (m) { return ccxConsult([m]).n; })) || '—')]
   ]));
-  c2.foot([lowC ? '審視涵蓋率低於基線 → ' + opNx('CC_M2_COV', '組長檢視該月排班與人力') : '', lowV ? '訪視完成率低於基線 10 個百分點以上 → ' + opNx('CC_M2_VIS', '檢視未訪視原因（M4）') : ''].filter(Boolean).concat(lowC || lowV ? [] : ['維持現行']), '涵蓋率＝總審視次數 ÷（出院人數 × 平均住院天數），為近似值。基線＝前 12 個月中位數；「低於」＝涵蓋率 <基線 90% 或訪視完成率低於基線 10 個百分點（起始值，無文獻依據）。', opClauseTxt('CON'));
-  if (lowC || lowV) hl.push({ what: (lowC ? '審視涵蓋率' : '訪視完成率') + '低於基線', next: opNx('CC_M2_HL', '組長檢視排班') });
-  /* M3 病人分層＋高齡用藥負擔 */
-  var S = opCcStrata(ym), T = S.tot || {}, avgAll = T.p && T.v !== null ? T.v / T.p : null, optAll = T.p ? (T.o || 0) / T.p : null;
-  var low = S.filter(function (s) { return s.hi && s.p >= 5 && ((avgAll !== null && s.avg !== null && s.avg < avgAll * 0.8) || (optAll !== null && s.o !== null && ccWilson(s.o, s.p)[1] < optAll)); });
-  var c3 = opCard(view, 'opC3', 'M3｜哪一層病人沒被顧到？用藥負擔最重的有處理到嗎？', { st: low.length ? 'warn' : S.length ? 'ok' : 'na', stTxt: low.length ? low.length + ' 層偏低' : S.length ? '無偏低' : '月報無分層', sub: '病人分層（年齡、口服顆數、入院來源）× 審視次數與處方優化；高負擔層＝≥85 歲、口服 ≥15 顆、加護病房轉入' });
-  var rows = S.map(function (s) { return { cls: s.hi ? 'op-hi' : '', cells: [s.axis + '｜' + s.lab + (s.hi ? '（高負擔）' : ''), s.p, s.avg === null ? '—' : s.avg.toFixed(1), s.o === null ? '—' : opSmall(s.o, s.p)] }; });
-  rows.push({ cls: 'op-sum', cells: ['全部住院病人', T.p || 0, avgAll === null ? '—' : avgAll.toFixed(1), optAll === null ? '—' : opSmall(T.o || 0, T.p)] });
-  c3.body.appendChild(opTable(['分層', '病人數', '每人審視次數', '處方優化病人比率'], rows));
+  c2.foot(lowV ? ['訪視完成率低於基線 10 個百分點以上 → ' + opNx('CC_M2_VIS', '檢視未訪視原因（M4）')] : ['維持現行'], '基線＝前 12 個月中位數；「低於」＝本月分母 ≥5 且訪視完成率低於基線 10 個百分點（起始值，無文獻依據）。', opClauseTxt('CON'));
+  if (lowV) hl.push({ what: '訪視完成率低於基線', next: opNx('CC_M2_HL', '組長檢視排班') });
+  /* M3 病人分層＋高齡用藥負擔（v7.4.3：偏低只看處方優化病人比率） */
+  var S = opCcStrata(ym), T = S.tot || {}, optAll = T.p ? (T.o || 0) / T.p : null;
+  var low = S.filter(function (s) { return s.hi && s.p >= 5 && optAll !== null && s.o !== null && ccWilson(s.o, s.p)[1] < optAll; });
+  var c3 = opCard(view, 'opC3', 'M3｜哪一層病人沒被顧到？用藥負擔最重的有處理到嗎？', { st: low.length ? 'warn' : S.length ? 'ok' : 'na', stTxt: low.length ? low.length + ' 層偏低' : S.length ? '無偏低' : '月報無分層', sub: '病人分層（年齡、口服顆數、入院來源）× 處方優化；高負擔層＝≥85 歲、口服 ≥15 顆、加護病房轉入' });
+  var rows = S.map(function (s) { return { cls: s.hi ? 'op-hi' : '', cells: [s.axis + '｜' + s.lab + (s.hi ? '（高負擔）' : ''), s.p, s.o === null ? '—' : opSmall(s.o, s.p)] }; });
+  rows.push({ cls: 'op-sum', cells: ['全部住院病人', T.p || 0, optAll === null ? '—' : opSmall(T.o || 0, T.p)] });
+  c3.body.appendChild(opTable(['分層', '病人數', '處方優化病人比率'], rows));
   var ger = [['acb', 'ACB 抗膽鹼負荷改善'], ['ars', 'ARS 抗膽鹼風險改善'], ['hk', 'HK 量表改善'], ['tw', 'TW 量表改善'], ['deprx', '減藥病人比率']].map(function (z) { var o = ccxPeriod(z[0], [ym]); return [z[1] + '（≥65 歲）', o && o.n ? opSmall(o.x, Math.round(o.n)) : '—']; });
   c3.body.appendChild(opTable(['高齡用藥負擔', '本月'], ger));
-  c3.foot(low.length ? low.map(function (s) { return s.axis + '「' + s.lab + '」每人審視 ' + (s.avg === null ? '—' : s.avg.toFixed(1)) + ' 次、處方優化 ' + opSmallV(s.o || 0, s.p) + ' → ' + opNx('CC_M3_LOW', '次月優先審視該層'); }) : ['維持現行'], '「偏低」＝高負擔層病人數 ≥5，且每人審視次數 <全體 80%，或處方優化比率 95% CI 上限低於全體。各分層互有重疊，不可相加。', opClauseTxt('GER'));
-  low.slice(0, 1).forEach(function (s) { hl.push({ what: s.axis + '「' + s.lab + '」審視或優化偏低', next: opNx('CC_M3_LOW', '次月優先審視該層') }); });
+  c3.foot(low.length ? low.map(function (s) { return s.axis + '「' + s.lab + '」處方優化 ' + opSmallV(s.o || 0, s.p) + ' → ' + opNx('CC_M3_LOW', '次月優先審視該層'); }) : ['維持現行'], '「偏低」＝高負擔層病人數 ≥5，且處方優化比率 95% CI 上限低於全體。各分層互有重疊，不可相加。', opClauseTxt('GER'));
+  low.slice(0, 1).forEach(function (s) { hl.push({ what: s.axis + '「' + s.lab + '」處方優化偏低', next: opNx('CC_M3_LOW', '次月優先審視該層') }); });
   /* M4 未完成 */
   var res = ccxDim('照會結果', [ym]), noRep = res['未回覆'] ? res['未回覆'].n : 0, rs = {}; (CCX.M.agg || []).forEach(function (r) { if (r.dim === '訪視狀態' && r.ym === ym && /^不進行訪視/.test(r.cat)) { var kk = r.cat.replace(/^不進行訪視\s*,?\s*/, '').trim() || '未註明'; rs[kk] = (rs[kk] || 0) + r.n; } });
   var c4 = opCard(view, 'opC4', 'M4｜哪些照會還沒結？哪些該訪視未訪？', { st: noRep || vis.miss ? 'warn' : 'ok', stTxt: noRep + vis.miss ? (noRep + vis.miss) + ' 件待處理' : '無待處理', sub: ccYmLab(ym) });
@@ -13829,7 +13828,7 @@ function opCcQuarter(view) {
   var e = function (id) { var o = ccxPeriod(id, Y); return o && o.n ? opSmall(o.x, Math.round(o.n)) : o && o.v !== null && o.v !== undefined ? ccFmt(o.ind, o.v) : '—'; }, v = ccxVisit(Y);
   var c = opCard(view, 'opCQe', 'Q-C｜評鑑佐證：用藥連貫性與高齡用藥', { st: 'ok', stTxt: ccxQLab(CCX.q), cls: 'op-qcard' }); opPrintBtn(c.sec);
   c.body.appendChild(opTable(['條文', '佐證數據（本季）'], [
-    [OP_CLAUSE.CON.no + ' 用藥連貫性審視', '每人日審視涵蓋率 ' + e('cover') + '｜處方優化 ' + e('optim') + '｜減藥 ' + e('deprx')],
+    [OP_CLAUSE.CON.no + ' 用藥連貫性服務', '處方優化 ' + e('optim') + '｜減藥 ' + e('deprx')],
     [OP_CLAUSE.GER.no + ' 高齡多重用藥', 'ACB 改善 ' + e('acb') + '｜ARS 改善 ' + e('ars') + '｜訪視完成 ' + (v.d ? opSmall(v.done, v.d) : '—')],
     [OP_CLAUSE.REV.no + ' 定期評估檢討', '本頁每月監測＋每季檢討（列印版附會議判讀與決議欄）']
   ]));
@@ -13973,12 +13972,13 @@ function opHcQuarter(view) {
     '@media print{.op-dec{display:block}.op-pbtn{display:none}.op-fold:not([open])>*:not(summary){display:none}}'
   ].join('\n'); document.head.appendChild(css);
 })();
-/* v7.4.1：開啟三頁前先讀設定分頁（每次瀏覽一次；最多等 8 秒，失敗用內建文字） */
+/* v7.4.2：進入儀表板區即在背景讀設定分頁（每次瀏覽一次）；開三頁時若仍在讀取，最多等 15 秒，逾時先用內建文字 */
 (function () {
   var o = openDashboard, re = /臨床藥學服務|連貫照護整合成效|全人用藥教育/;
   openDashboard = function (id) {
     var self = this, a = arguments;
-    if (!OP.cfgP && S.catalog && re.test((typeof dashName === 'function' && dashName(id)) || '')) return opCfgLoad().then(function () { return o.apply(self, a); });
+    if (!OP.cfgP && S.catalog) opCfgLoad();
+    if (OP.cfgP && !OP.cfgDone && re.test((typeof dashName === 'function' && dashName(id)) || '')) return OP.cfgP.then(function () { return o.apply(self, a); });
     return o.apply(self, a);
   };
 })();
