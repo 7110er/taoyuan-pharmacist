@@ -2,7 +2,7 @@
 * TX_RULES：系統句型（整句），任何位置都套用；TX_WORDS：短詞，只套用在標題、按鈕、說明列，不碰表格儲存格與文字回饋。
 * 各卡的計算說明與限制（.op-pre、.op-cl）集中到頁底「怎麼算、有什麼限制」。 */
 var TX_RULES = [
-[/（?條號依 109 年草案，現行版本【未經查證】）?/g, ''], [/【未經查證】/g, ''],
+[/（?條號依 109 年草案，現行版本【未經查證】）?/g, ''], [/【未經查證】/g, ''], [/【分界未經查證】/g, '（分界暫定）'], [/【累積中】/g, '【件數仍少】'],
 [/只提示，不指派、不追蹤；規則與門檻見各卡「判讀前提」。/g, ''], [/只提示，不指派、不追蹤。?/g, ''],
 [/系統只顯示人工紀錄，不追蹤、不結案。?/g, ''], [/依登錄資料推估，是否執行由組長決定。?/g, ''], [/｜?依登錄資料推估，是否執行由組長決定/g, ''],
 [/（只標示，不下結論）/g, ''], [/只標示需要討論的事實，不下結論；/g, ''],
@@ -20,13 +20,15 @@ var TX_RULES = [
 [/處方優化病人比率/g, '處方改善病人比率'], [/改用表格檢視查看全部/g, '改用表格檢視全部'], [/對齊檢查/g, '對照檢查'],
 [/本月訊號與資料可信度/g, '本月要留意的變化與資料完整度'], [/評核進度（三態，依期程）/g, '評核進度：委員會已判定／教師已評、待委員會／尚未評核（依期程）'],
 [/團體 CBME 成效（正式 G01）/g, '本期應達能力的達標比率（委員會判定）'], [/G02 項目層配對轉移（CCC 對 CCC）/g, '同一位學員前後兩期的等級變化（皆為委員會判定）'],
-[/非公版期程/g, '非全國版期程'], [/公版/g, '全國版'], [/資料對帳/g, '數字核對'], [/只顯示彙總；/g, '只顯示統計數字；']
+[/非公版期程/g, '非全國版期程'], [/公版/g, '全國版'], [/資料對帳/g, '數字核對'], [/只顯示彙總；/g, '只顯示統計數字；'],
+[/（僅供參照）/g, '（參考用）'], [/僅供參照/g, '參考用'], [/僅供參考/g, '參考用'], [/僅供解讀分母/g, '解讀分母用'], [/欄位新增於/g, '表單題目新增於'], [/欄位新增前/g, '表單改版前'], [/無此欄位/g, '無此題目'], [/、追蹤欄位/g, '、追蹤題目'], [/單位欄位/g, '單位資料'], [/核對碼與彙總時間/g, '資料更新時間'], [/月報核對碼/g, '資料版本碼'], [/，?不歸因個人/g, '，以流程檢討為主'], [/G05 驗證達標與再評量完成/g, '再評量完成且達標'], [/同期群/g, '同屆'], [/分面/g, '分組'], [/四個維度/g, '四個條件']
 ];
 var TX_WORDS = [[/亮點規則說明/g, '標示規則說明'], [/深度照護亮點/g, '深度照護表現'], [/亮點/g, '表現突出'], [/同期群/g, '同屆'], [/同期參照/g, '同屆參照'], [/分面/g, '分組'], [/維度/g, '條件'], [/可顯示圖表/g, '選擇要看的圖表'], [/彙總/g, '統計'], [/後台/g, '系統'], [/訊號/g, '警示'], [/可信度/g, '完整度'], [/已成熟/g, '已登錄完成'], [/可初讀/g, '可初步判讀'], [/^累積中$/g, '仍在補登']];
-var TX_SKIP = 'TD,TEXTAREA,INPUT,SCRIPT,STYLE,BLOCKQUOTE';
-function txSkip(n) { for (var p = n.parentNode; p && p.nodeType === 1; p = p.parentNode) { if (TX_SKIP.indexOf(p.tagName) >= 0 && p.tagName !== 'TD') return 1; if (p.classList && (p.classList.contains('ax-q') || p.classList.contains('ax-fbbody') || p.classList.contains('ilp-q'))) return 1; if (p.id === 'charts' || p.id === 'dashPanel') break; } return 0; }
+var TX_SKIP = /^(TEXTAREA|INPUT|SCRIPT|STYLE|BLOCKQUOTE)$/;
+function txSkip(n) { for (var p = n.parentNode; p && p.nodeType === 1; p = p.parentNode) { if (TX_SKIP.test(p.tagName)) return 1; if (p.classList && (p.classList.contains('ax-q') || p.classList.contains('ax-fbbody') || p.classList.contains('ilp-q'))) return 1; if (p.id === 'charts' || p.id === 'dashPanel') break; } return 0; }
 function txInCell(n) { for (var p = n.parentNode; p && p.nodeType === 1; p = p.parentNode) { if (p.tagName === 'TD') return 1; if (p.id === 'charts' || p.id === 'dashPanel') break; } return 0; }
 function txText(root) {
+root.normalize();
 var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), n, list = [];
 while ((n = w.nextNode())) if (/[一-鿿]/.test(n.nodeValue)) list.push(n);
 list.forEach(function (t) {
@@ -61,7 +63,7 @@ var TX = { busy: false, t: 0 };
 function txRun() { var root = document.getElementById('charts'), pan = document.getElementById('dashPanel') || root; if (!root || TX.busy) return; TX.busy = true; try { txText(pan); txMethod(root); } catch (e) { if (window.console) console.error(e); } TX.busy = false; }
 function txInit() {
 var root = document.getElementById('dashPanel') || document.getElementById('charts'); if (!root || TX.obs) return;
-TX.obs = new MutationObserver(function () { if (TX.busy) return; clearTimeout(TX.t); TX.t = setTimeout(txRun, 60); });
+TX.obs = new MutationObserver(function () { if (TX.busy || TX.t) return; TX.t = setTimeout(function () { TX.t = 0; txRun(); }, 150); });
 TX.obs.observe(root, { childList: true, subtree: true, characterData: true });
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', txInit); else txInit();
