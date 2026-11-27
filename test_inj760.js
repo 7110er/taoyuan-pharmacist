@@ -310,7 +310,8 @@ if (c2) box.insertBefore(cr.sec, c2.nextSibling);
 /* Q5：前後對照加啞鈴圖 */
 if (c5 && ctx.dq && ctx.dq.length) { var b5 = c5.querySelector('.op-b'), o5 = [].slice.call(b5.childNodes), h5 = axEl('div', ''); b5.insertBefore(h5, b5.firstChild); vzDumbbell(h5, ctx.dq.map(function (d) { return { name: d.u + '（' + d.txt.replace(/照護班次|再決定/g, '') + '）', a: ctx.qSum(ctx.pqMs, d.u).n, b: ctx.qSum(ctx.qDone, d.u).n }; }), { aLab: '決議季件數', bLab: '本季件數', label: '上季決議病房前後件數' }); vzFoldNodes(b5, '前後對照明細表', o5); }
 /* 第 3 層：全部佐證卡 */
-var heads = [].slice.call(box.querySelectorAll(':scope > h3.op-gh')), all = heads.concat(cards).sort(function (a, b) { return a.compareDocumentPosition(b) & 2 ? 1 : -1; });
+var wrap = function (c) { var w = c; while (w.parentNode && w.parentNode !== box && w.parentNode.tagName === 'DETAILS') w = w.parentNode; return w.parentNode === box ? w : c; };
+var heads = [].slice.call(box.querySelectorAll(':scope > h3.op-gh')), all = heads.concat(cards.map(wrap)).filter(function (n, i, a) { return a.indexOf(n) === i; }).sort(function (a, b) { return a.compareDocumentPosition(b) & 2 ? 1 : -1; });
 var oldFold = [].slice.call(box.querySelectorAll(':scope > details.op-fold')).filter(function (d) { return !d.classList.contains('vz-fold'); })[0];
 if (all.length) vzFoldNodes(box, '全部佐證卡（服務線、疾病、高齡；每張可單獨列印）', all, oldFold || null);
 }
