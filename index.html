@@ -1506,7 +1506,7 @@ var IN_APP = (function () {
   return /\bLine\/|FBAN|FBAV|FB_IAB|Instagram|MicroMessenger|KAKAOTALK|; wv\)/i.test(ua);
 })();
 var IN_APP_MSG = '目前在 App 內建瀏覽器中開啟，Google 不允許在此登入。請點右上角「⋯」或分享選單，選擇「以瀏覽器開啟」（iPhone 用 Safari、Android 用 Chrome）後再登入。';
-var APP_VERSION = '7.4.9';
+var APP_VERSION = '7.5.0';
 var $ = function (id) { return document.getElementById(id); };
 var S = {
   session: null, user: null, catalog: null, data: {}, loadingKeys: {}, failedKeys: {},
@@ -13492,6 +13492,7 @@ function hcxMount(box) {
    卡片：標題為問句；固定一張圖或表＋狀態＋「下一步」規則提示＋判讀前提。只提示，不派工、不追蹤、不結案。
    小分母（三頁統一）：0＝—；1–4 只列件數（累積中）；5–19 比率附 95% 信賴區間；≥20 比率。
    評鑑條文：醫院評鑑基準－研修格式 108.11（109 年草案）第 2.5 章；本院現行版本條號【未經查證】。
+   v7.5.0（2026-11-27）：全站畫面用語整理（批次 A）——各卡計算說明集中到頁底「怎麼算、有什麼限制」；移除畫面上的施工與免責字樣；代號、統計縮寫、自創詞改為一般用語；「下一步」改「建議處理」，只在有事要做時出現。
    v7.4.9（2026-11-26）：臨床藥學服務季頁加「本季重點」；Q1 改為服務線＋疾病缺口總表並指派由誰補（疾病＝主責病房、服務線＝最常去的前 3 個病房），被指派的可減少病房改為維持；月頁加「本季要補」與進度。
    v7.4.8（2026-11-26）：臨床藥學服務照護班次調度改為滾動 12 個月 × 病房相對排序（有紀錄月數 × 每月件數四格圖）；取代 v7.4.6–7.4.7 單月自身基線規則。
    v7.4.5（2026-11-26）：連貫照護季頁 Q1–Q7（服務量、服務線、疾病、用藥負擔、高齡、問題原因、上季決議）；讀取「儀表板檢討紀錄」。
@@ -13501,7 +13502,7 @@ function hcxMount(box) {
    v7.4.1（2026-11-25）：「下一步」提示文字與評鑑條文改讀設定分頁「儀表板下一步規則」「儀表板評鑑條文對應」；
    分頁未開放、讀取失敗或儲存格空白時，一律用本檔內建文字。觸發條件與門檻仍在程式內，改分頁不影響判定。
    ===================================================================== */
-var OP = { ver: '7.4.9', mqFrozen: false };
+var OP = { ver: '7.5.0', mqFrozen: false };
 var OP_CLAUSE = {
   TDM: { no: '2.5.10 符合 1；優良 3', t: '提供療劑監測（TDM）服務；有後續追蹤評估，建議獲醫師接受' },
   DDI: { no: '2.5.10 符合 3', t: '有藥品交互作用評估機制（紀錄、通知、檢討改進、預防）' },
@@ -13516,9 +13517,9 @@ var OP_CLAUSE = {
   NOTE: { no: '2.5.10 優良 6、7', t: '加護病房專責藥師、藥師門診：非表單服務線選項，本頁不涵蓋' }
 };
 var OP_SVC_CLAUSE = { '治療監測（含TDM）': 'TDM', '交互作用': 'DDI', '藥品選用與處方適當性': 'APP', '個別化治療與劑量調整': 'IND', '不良反應與用藥安全': 'ADR', '用藥連貫性（轉銜核對）': 'CON' };
-function opClauseTxt(k) { var c = OP_CLAUSE[k]; return c ? '評鑑條文 ' + c.no + '：' + c.t + '（' + (c.ver || OP.clauseVer) + '）' : ''; }
+function opClauseTxt(k) { var c = OP_CLAUSE[k], v = c && (c.ver || OP.clauseVer); return c ? '評鑑條文 ' + c.no + '：' + c.t + (v ? '（' + v + '）' : '') : ''; }
 /* ---------- v7.4.1 設定分頁：下一步規則、評鑑條文對應 ---------- */
-OP.rules = {}; OP.cfgSt = 'init'; OP.cfgP = null; OP.clauseVer = '條號依 109 年草案，現行版本【未經查證】';
+OP.rules = {}; OP.cfgSt = 'init'; OP.cfgP = null; OP.clauseVer = '';
 OP.CFG_T = { rule: ['儀表板下一步規則', '下一步規則'], clause: ['儀表板評鑑條文對應', '評鑑條文對應'], review: ['儀表板檢討紀錄', '檢討紀錄'] };
 OP.review = null;
 function opNx(id, def) { var t = OP.rules[id]; return t ? t : def; }
@@ -13544,7 +13545,7 @@ function opCfgLoad() {
 function opCI(x, n) { var c = ccWilson(x, n); return Math.round(c[0] * 100) + '–' + Math.round(c[1] * 100) + '%'; }
 function opSmall(x, n) {
   if (!n) return '—';
-  if (n < 5) return x + '／' + n + '（累積中）';
+  if (n < 5) return x + '／' + n + '（未滿 5 件，暫不算比率）';
   var p = (x / n * 100).toFixed(1) + '%';
   return n < 20 ? p + '（' + x + '／' + n + '，95% CI ' + opCI(x, n) + '）' : p + '（' + x + '／' + n + '）';
 }
@@ -13555,19 +13556,89 @@ function opMonthEndAge(ym) { var y = +ym.slice(0, 4), m = +ym.slice(5, 7), e = n
 /* 資料成熟度：本月已登錄 ÷ 自身前 12 個完整月中位數；月份結束滿 90 天視為已成熟（低於中位數一半加註可能未補齊） */
 function opMature(now, med, ym) {
   var age = opMonthEndAge(ym), r = med ? now / med : null;
-  if (age >= 90) return { st: '已成熟', cls: 'ok', r: r, low: r !== null && r < 0.5 };
-  if (r === null) return { st: '可初讀', cls: 'warn', r: r };
-  return r >= 0.8 ? { st: '已成熟', cls: 'ok', r: r } : r >= 0.5 ? { st: '可初讀', cls: 'warn', r: r } : { st: '累積中', cls: 'bad', r: r };
+  if (age >= 90) return { st: '已登錄完成', cls: 'ok', r: r, low: r !== null && r < 0.5 };
+  if (r === null) return { st: '可初步判讀', cls: 'warn', r: r };
+  return r >= 0.8 ? { st: '已登錄完成', cls: 'ok', r: r } : r >= 0.5 ? { st: '可初步判讀', cls: 'warn', r: r } : { st: '仍在補登', cls: 'bad', r: r };
 }
 var OP_STT = { ok: '正常', warn: '留意', bad: '資料不足', na: '尚無資料' };
-/* 卡片：問句標題＋狀態＋內容＋下一步＋判讀前提 */
+/* ---------- v7.5.0 畫面用語整理：只改顯示文字，不動資料與計算 ----------
+ * TX_RULES：系統句型（整句），任何位置都套用；TX_WORDS：短詞，只套用在標題、按鈕、說明列，不碰表格儲存格與文字回饋。
+ * 各卡的計算說明與限制（.op-pre、.op-cl）集中到頁底「怎麼算、有什麼限制」。 */
+var TX_RULES = [
+  [/（?條號依 109 年草案，現行版本【未經查證】）?/g, ''], [/【未經查證】/g, ''], [/【分界未經查證】/g, '（分界暫定）'], [/【累積中】/g, '【件數仍少】'],
+  [/只提示，不指派、不追蹤；規則與門檻見各卡「判讀前提」。/g, ''], [/只提示，不指派、不追蹤。?/g, ''],
+  [/系統只顯示人工紀錄，不追蹤、不結案。?/g, ''], [/依登錄資料推估，是否執行由組長決定。?/g, ''], [/｜?依登錄資料推估，是否執行由組長決定/g, ''],
+  [/（只標示，不下結論）/g, ''], [/只標示需要討論的事實，不下結論；/g, ''],
+  [/（起始值，無文獻依據）/g, '（暫定）'], [/為建議書起始值，無文獻或院內規定依據/g, '為暫定值'],
+  [/所有(門檻|界線)為起始值，無文獻或院內依據。?/g, '門檻為暫定值，將依累積資料調整。'], [/(門檻|界線)為起始值，無文獻或院內依據。?/g, '門檻為暫定值，將依累積資料調整。'],
+  [/起始值，無文獻或院內依據/g, '暫定值'], [/起始設計、無院內依據/g, '暫定做法'], [/起始值/g, '暫定值'],
+  [/（件數少，暫不算比率）/g, '（件數少，暫不算比率）'], [/（累積中）/g, '（未滿 5 件，暫不算比率）'],
+  [/四個維度皆可篩選；列、欄、分面可自由切換（例如分面選「年份」即可跨年比較）。/g, '可依四個條件篩選；要跨年比較，請在「分組」選年份。'],
+  [/四個維度皆可篩選；列、欄、分面可自由切換。/g, '可依四個條件篩選，也可切換列、欄與分組。'],
+  [/（學生教學成效鏡像）|（組別教學成效鏡像，不含填答者姓名）|（教師教學成效鏡像，不含評量者姓名）/g, ''],
+  [/資料：分析_學生成效/g, '資料來源：學生實習評核'], [/資料：分析_組別成效/g, '資料來源：教學單位評核'], [/資料：分析_教師成效/g, '資料來源：教師教學評核'],
+  [/來源：後台「([^」]+)」圖/g, '資料來源：$1'], [/後台原始圖表/g, '原始統計圖'],
+  [/第二層：完整指標、處理鏈、管制圖與對帳（原 M1–M5）/g, '詳細數字與趨勢圖'],
+  [/｜?月報核對碼\s*[0-9a-f]{6,}/g, ''], [/（PcneAgg v[\d.]+）/g, ''], [/需 PcneAgg v[\d.]+ ?重算後顯示/g, '下次資料更新後顯示'], [/PcneAgg v[\d.]+/g, '資料更新'],
+  [/處方優化病人比率/g, '處方改善病人比率'], [/改用表格檢視查看全部/g, '改用表格檢視全部'], [/對齊檢查/g, '對照檢查'],
+  [/本月訊號與資料可信度/g, '本月要留意的變化與資料完整度'], [/評核進度（三態，依期程）/g, '評核進度：委員會已判定／教師已評、待委員會／尚未評核（依期程）'],
+  [/團體 CBME 成效（正式 G01）/g, '本期應達能力的達標比率（委員會判定）'], [/G02 項目層配對轉移（CCC 對 CCC）/g, '同一位學員前後兩期的等級變化（皆為委員會判定）'],
+  [/非公版期程/g, '非全國版期程'], [/公版/g, '全國版'], [/資料對帳/g, '數字核對'], [/只顯示彙總；/g, '只顯示統計數字；'],
+  [/（僅供參照）/g, '（參考用）'], [/僅供參照/g, '參考用'], [/僅供參考/g, '參考用'], [/僅供解讀分母/g, '解讀分母用'], [/欄位新增於/g, '表單題目新增於'], [/欄位新增前/g, '表單改版前'], [/無此欄位/g, '無此題目'], [/、追蹤欄位/g, '、追蹤題目'], [/單位欄位/g, '單位資料'], [/核對碼與彙總時間/g, '資料更新時間'], [/月報核對碼/g, '資料版本碼'], [/｜並列：順序無意義，由組長決定/g, '｜並列'], [/（不歸因個人）/g, '（以流程檢討為主）'], [/不歸因、不排名個別教師/g, '只看群體，不排名個別教師'], [/，?(保留原始呈現|下方保留後台圖表|保留)供核對/g, ''], [/，?僅供核對/g, ''], [/（與上方分析同一來源，供核對）/g, ''], [/供核對/g, '核對用'], [/視為已成熟/g, '視為已登錄完成'], [/資料成熟度/g, '資料登錄完成度'], [/≥80% 已成熟/g, '≥80% 已登錄完成'], [/G05/g, '再評量達標'], [/件數不足，不指派/g, '件數不足，暫不指定病房'], [/件數不足（滾動四季 (\d+) 件），不指派/g, '件數不足（滾動四季 $1 件），暫不指定病房'], [/，?不歸因個人/g, '，以流程檢討為主'], [/G05 驗證達標與再評量完成/g, '再評量完成且達標'], [/同期群/g, '同屆'], [/分面/g, '分組'], [/四個維度/g, '四個條件']
+];
+var TX_WORDS = [[/亮點規則說明/g, '標示規則說明'], [/深度照護亮點/g, '深度照護表現'], [/亮點/g, '表現突出'], [/同期群/g, '同屆'], [/同期參照/g, '同屆參照'], [/分面/g, '分組'], [/維度/g, '條件'], [/可顯示圖表/g, '選擇要看的圖表'], [/彙總/g, '統計'], [/後台/g, '系統'], [/訊號/g, '警示'], [/可信度/g, '完整度'], [/已成熟/g, '已登錄完成'], [/可初讀/g, '可初步判讀'], [/^累積中$/g, '仍在補登']];
+var TX_SKIP = /^(TEXTAREA|INPUT|SCRIPT|STYLE|BLOCKQUOTE)$/;
+function txSkip(n) { for (var p = n.parentNode; p && p.nodeType === 1; p = p.parentNode) { if (TX_SKIP.test(p.tagName)) return 1; if (p.classList && (p.classList.contains('ax-q') || p.classList.contains('ax-fbbody') || p.classList.contains('ilp-q'))) return 1; if (p.id === 'charts' || p.id === 'dashPanel') break; } return 0; }
+function txInCell(n) { for (var p = n.parentNode; p && p.nodeType === 1; p = p.parentNode) { if (p.tagName === 'TD') return 1; if (p.id === 'charts' || p.id === 'dashPanel') break; } return 0; }
+function txText(root) {
+  root.normalize();
+  var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), n, list = [];
+  while ((n = w.nextNode())) if (/[一-鿿]/.test(n.nodeValue)) list.push(n);
+  list.forEach(function (t) {
+    if (txSkip(t)) return; var v = t.nodeValue, o = v;
+    TX_RULES.forEach(function (r) { v = v.replace(r[0], r[1]); });
+    if (!txInCell(t)) TX_WORDS.forEach(function (r) { v = v.replace(r[0], r[1]); });
+    if (v !== o) t.nodeValue = v;
+  });
+  [].forEach.call(root.querySelectorAll('h2,h3,h4,.op-q,.ax-title'), function (h) {
+    var f = h.firstChild; if (f && f.nodeType === 3) { var v = f.nodeValue.replace(/^\s*[MQ]\d+(-\d+)?\s*[｜|]\s*/, '').replace(/^\s*[MQ]\d+(-\d+)?\s+(?=[一-鿿])/, ''); if (v !== f.nodeValue) f.nodeValue = v; }
+    var l = h.lastChild; if (l && l.nodeType === 3) { var u = l.nodeValue.replace(/（[A-Z]\d{1,2}）\s*$/, ''); if (u !== l.nodeValue) l.nodeValue = u; }
+  });
+  [].forEach.call(root.querySelectorAll('[title]'), function (e) { var v = e.title, o = v; TX_RULES.forEach(function (r) { v = v.replace(r[0], r[1]); }); if (v !== o) e.title = v; });
+}
+/* 各卡計算說明集中到頁底 */
+function txMethod(root) {
+  var ps = [].filter.call(root.querySelectorAll('.op-pre,.op-cl'), function (p) { return !p.closest('.tx-method'); });
+  var old = root.querySelector('.tx-method');
+  if (!ps.length) return;
+  var d = old || (function () { var x = document.createElement('details'); x.className = 'chart ax-card tx-method'; x.appendChild(axEl('summary', 'ax-title', '怎麼算、有什麼限制')); var g = axEl('div', 'tx-mb'); x.appendChild(g); x.appendChild(axEl('p', 'tx-foot', '評鑑條號依 109 年評鑑基準草案整理，使用前請以現行基準核對。門檻為暫定值，將依累積資料調整。本頁提供討論參考，工作分派仍由組長決定。')); return x; })();
+  var g = d.querySelector('.tx-mb'), seen = {};
+  [].forEach.call(g.querySelectorAll('p'), function (p) { seen[p.textContent] = 1; });
+  ps.forEach(function (p) {
+    var card = p.closest('.op-card,.ax-card,section'), t = card && card.querySelector('.op-q,.ax-title,h3'), ttl = t ? t.textContent.replace(/\s+/g, ' ').trim() : '';
+    var txt = p.textContent.replace(/^判讀前提：/, '').trim(); p.parentNode.removeChild(p);
+    if (!txt || seen[ttl + txt]) return; seen[ttl + txt] = 1;
+    var row = axEl('p', p.classList.contains('op-cl') ? 'tx-cl' : 'tx-pre'); if (ttl) row.appendChild(axEl('b', '', ttl + '：')); row.appendChild(document.createTextNode(txt)); g.appendChild(row);
+  });
+  root.appendChild(d);
+}
+var TX = { busy: false, t: 0 };
+function txRun() { var root = document.getElementById('charts'), pan = document.getElementById('dashPanel') || root; if (!root || TX.busy) return; TX.busy = true; try { txText(pan); txMethod(root); } catch (e) { if (window.console) console.error(e); } TX.busy = false; }
+function txInit() {
+  var root = document.getElementById('dashPanel') || document.getElementById('charts'); if (!root || TX.obs) return;
+  TX.obs = new MutationObserver(function () { if (TX.busy || TX.t) return; TX.t = setTimeout(function () { TX.t = 0; txRun(); }, 150); });
+  TX.obs.observe(root, { childList: true, subtree: true, characterData: true });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', txInit); else txInit();
+/* 卡片：問句標題＋狀態＋內容＋建議處理；計算說明由 txMethod 集中到頁底 */
 function opCard(host, ax, q, o) {
   o = o || {}; var s = axEl('section', 'chart ax-card op-card' + (o.cls ? ' ' + o.cls : '')); s.dataset.ax = ax; host.appendChild(s);
   var h = axEl('div', 'op-h'); h.appendChild(axEl('h3', 'ax-title op-q', q)); if (o.st) h.appendChild(axEl('span', 'op-st op-' + o.st, o.stTxt || OP_STT[o.st] || o.st)); s.appendChild(h);
   if (o.sub) s.appendChild(axEl('p', 'op-sub', o.sub));
   var b = axEl('div', 'op-b'); s.appendChild(b);
   s.opFoot = function (next, premise, clause) {
-    if (next && next.length) { var n = axEl('div', 'op-next'); n.appendChild(axEl('b', '', '下一步')); var ul = document.createElement('ul'); (Array.isArray(next) ? next : [next]).forEach(function (t) { ul.appendChild(axEl('li', '', t)); }); n.appendChild(ul); s.appendChild(n); }
+    var nx = (Array.isArray(next) ? next : next ? [next] : []).filter(function (t) { return t && !/^(維持現行|各病房維持現行照護班次|本季月份未滿|季末再判讀|資料累積中)/.test(t); });
+    if (nx.length) { var n = axEl('div', 'op-next'); n.appendChild(axEl('b', '', '建議處理')); var ul = document.createElement('ul'); nx.forEach(function (t) { ul.appendChild(axEl('li', '', t)); }); n.appendChild(ul); s.appendChild(n); }
     if (premise) s.appendChild(axEl('p', 'op-pre', '判讀前提：' + premise));
     if (clause) s.appendChild(axEl('p', 'op-cl', clause));
   };
@@ -13594,7 +13665,6 @@ function opHighlights(host, items, title) {
   s.appendChild(axEl('h3', 'ax-title', title || '本月重點'));
   if (!items.length) { s.appendChild(axEl('p', 'ax-muted', '本期無規則命中項目。')); return s; }
   var ol = document.createElement('ol'); items.slice(0, 3).forEach(function (x) { var li = document.createElement('li'); li.appendChild(axEl('b', '', x.what)); li.appendChild(document.createTextNode(' → ' + x.next)); ol.appendChild(li); }); s.appendChild(ol);
-  s.appendChild(axEl('p', 'op-pre', '只提示，不指派、不追蹤；規則與門檻見各卡「判讀前提」。'));
   return s;
 }
 function opDecision(sec) { var d = axEl('div', 'op-dec'); d.appendChild(axEl('b', '', '會議判讀與決議（會議手寫；儀表板不儲存）')); d.appendChild(axEl('div', 'op-dec-box')); sec.appendChild(d); }
@@ -13785,15 +13855,15 @@ function opMqMonth(box, M0) {
   var units = ['急診', '一般病房', '門診', '加護病房'], cu = mqD(M, [ym], k, '照護單位'), allN = mqK(M, [ym], k).n, allMed = opMed(base.map(function (y) { return mqK(M, [y], k).n; })), ALL = opMature(allN, allMed, ym);
   var rows1 = units.map(function (u) { var n = cu[u] ? cu[u].n : 0, md = opMed(base.map(function (y) { var d = mqD(M, [y], k, '照護單位'); return d[u] ? d[u].n : 0; })), m = md !== null && md >= 10 ? opMature(n, md, ym) : { st: ALL.st + '（依全院）', cls: ALL.cls, r: md ? n / md : null }; return [u, String(n), md === null ? '—' : String(md), m.r === null || m.r === undefined ? '—' : Math.round(m.r * 100) + '%', m.st + (m.low ? '，可能未補齊' : '')]; });
   rows1.unshift({ cls: 'op-sum', cells: ['全院', String(allN), allMed === null ? '—' : String(allMed), ALL.r === null ? '—' : Math.round(ALL.r * 100) + '%', ALL.st + (ALL.low ? '，可能未補齊' : '')] });
-  OP.mqFrozen = ALL.st === '累積中';
+  OP.mqFrozen = ALL.st === '仍在補登';
   var q1 = pcgIndSum(M0, 'full', [ym]), wardNa = (pcMon(M0, ym, '病房')['未填病房碼'] || { n: 0 }).n + (pcMon(M0, ym, '病房')['未填'] || { n: 0 }).n, who0 = 0, dsrc = pcMon(M0, ym, '日期來源'), dbad = 0;
   Object.keys(pcMon(M0, ym, '人員×登錄')).forEach(function (x) { if (/^（空白）/.test(x)) who0 += pcMon(M0, ym, '人員×登錄')[x].n; }); Object.keys(dsrc).forEach(function (x) { if (/異常/.test(x)) dbad += dsrc[x].n; });
   var c1 = opCard(box, 'opM1', 'M1｜這個月的資料能看了嗎？', { st: ALL.cls === 'ok' ? 'ok' : ALL.cls === 'warn' ? 'warn' : 'bad', stTxt: ALL.st, sub: ccYmLab(ym) + '｜依照會日期歸月；補登照常歸回照會月份' });
   c1.body.appendChild(opTable(['場域', '本月已登錄', '前 12 個完整月中位數', '比例', '資料成熟度'], rows1));
   c1.body.appendChild(opTable(['資料品質', '本月'], [['紀錄完整率（DQ1）', q1.d ? opSmall(q1.x, q1.d) : '—'], ['病房碼未填（住院）', wardNa + ' 件'], ['登錄者未填', who0 + ' 件'], ['照會日期異常（以時間戳記歸月）', dbad + ' 件']]));
-  c1.foot(ALL.st === '累積中' ? ['本月訊號凍結：本頁只供補登，不判讀單位負荷'] : ALL.st === '可初讀' ? ['可看件數與單位分布；比率與訊號保留判讀'] : ALL.low ? ['件數低於中位數一半：先確認是否尚未補齊，再判讀'] : ['資料可判讀'],
+  c1.foot(ALL.st === '仍在補登' ? ['本月訊號凍結：本頁只供補登，不判讀單位負荷'] : ALL.st === '可初步判讀' ? ['可看件數與單位分布；比率與訊號保留判讀'] : ALL.low ? ['件數低於中位數一半：先確認是否尚未補齊，再判讀'] : ['資料可判讀'],
     '已登錄件數 ÷ 自身前 12 個完整月中位數：≥80% 已成熟、50–79% 可初讀、<50% 累積中；月份結束滿 90 天視為已成熟。月中位數 <10 的場域沿用全院狀態。時間戳記因 2026-11 批次寫入已不代表原始登錄時間，故不用登錄延遲。門檻為起始值，無文獻或院內規定依據。');
-  if (ALL.st === '累積中') hl.push({ what: '本月資料累積中（' + allN + '／中位數 ' + allMed + '）', next: opNx('MQ_M1_IMM', '本頁只供補登，下月再判讀') });
+  if (ALL.st === '仍在補登') hl.push({ what: '本月資料累積中（' + allN + '／中位數 ' + allMed + '）', next: opNx('MQ_M1_IMM', '本頁只供補登，下月再判讀') });
   /* M2 照護班次調度（v7.4.8：滾動 12 個月 × 病房相對排序） */
   var wr = opMqUnitRows(M, ym, base, '病房', 'ward:').filter(function (r) { return r.n || r.act; }), dr = opMqUnitRows(M, ym, base, '科別', 'dept:').filter(function (r) { return r.n || r.act; });
   wr = wr.sort(function (a, b) { return b.n - a.n || a.name.localeCompare(b.name); }); dr = dr.sort(function (a, b) { return b.n - a.n; });
@@ -14362,7 +14432,7 @@ function opHcQuarter(view) {
     '@media print{.op-dec{display:block}.op-pbtn{display:none}.op-fold:not([open])>*:not(summary){display:none}}',
     '.op-lci{position:absolute;top:5px;height:2px;background:#1a202c}.op-lref{position:absolute;top:-4px;bottom:-4px;border-left:2px dashed #c53030}.op-rhi .op-lb{background:#dd6b20}.op-rhi .op-ll{color:#975a16}.op-rlow .op-ll{color:#c53030;font-weight:700}.op-rax{margin:10px 0 2px;font-size:.8rem;font-weight:700;color:#2d3748}',
     '.op-spark{display:inline-flex;align-items:flex-end;gap:2px;height:26px;width:120px}.op-spark i{flex:1;background:#cbd5e0;min-height:1px;border-radius:1px}.op-spark i.cur{background:#2c7a7b}.op-spark i.low{background:#dd6b20}',
-    '.op-mgrp h4{margin:4px 0}.op-cbs{display:inline-flex;gap:2px}.op-cb{display:inline-block;min-width:30px;padding:1px 3px;border-radius:3px;font-style:normal;font-size:.72rem;text-align:center;background:#edf2f7;color:#4a5568}.op-cb-inc{background:#dd6b20;color:#fff}.op-cb-two{background:#d69e2e;color:#fff}.op-cb-dec{background:#3182ce;color:#fff}.op-cb-keep{background:#a0aec0;color:#fff}.op-cb-na{background:#fff;border:1px dashed #a0aec0}.op-cb-busy{background:#805ad5;color:#fff}.op-cb-hold,.op-cb-fill{background:#a0aec0;color:#fff}.op-cb-few{background:#fff;border:1px dashed #cbd5e0;color:#a0aec0}.op-quadw{max-width:640px;margin:6px 0 10px}.op-quad{width:100%;height:auto}',
+    '.tx-method{margin-top:14px}.tx-method summary{cursor:pointer}.tx-mb p{margin:6px 0;font-size:.85rem;line-height:1.55}.tx-mb b{color:#2d3748}.tx-foot{font-size:.8rem;color:#718096;margin-top:8px}.op-mgrp h4{margin:4px 0}.op-cbs{display:inline-flex;gap:2px}.op-cb{display:inline-block;min-width:30px;padding:1px 3px;border-radius:3px;font-style:normal;font-size:.72rem;text-align:center;background:#edf2f7;color:#4a5568}.op-cb-inc{background:#dd6b20;color:#fff}.op-cb-two{background:#d69e2e;color:#fff}.op-cb-dec{background:#3182ce;color:#fff}.op-cb-keep{background:#a0aec0;color:#fff}.op-cb-na{background:#fff;border:1px dashed #a0aec0}.op-cb-busy{background:#805ad5;color:#fff}.op-cb-hold,.op-cb-fill{background:#a0aec0;color:#fff}.op-cb-few{background:#fff;border:1px dashed #cbd5e0;color:#a0aec0}.op-quadw{max-width:640px;margin:6px 0 10px}.op-quad{width:100%;height:auto}',
     '.op-m4grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:6px 0 10px}.op-m4grid .op-qv{border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px}.op-m4grid .op-m4on b{color:#c05621}'
   ].join('\n'); document.head.appendChild(css);
 })();
