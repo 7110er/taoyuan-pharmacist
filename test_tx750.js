@@ -2,7 +2,7 @@
  * TX_RULES：系統句型（整句），任何位置都套用；TX_WORDS：短詞，只套用在標題、按鈕、說明列，不碰表格儲存格與文字回饋。
  * 各卡的計算說明與限制（.op-pre、.op-cl）集中到頁底「怎麼算、有什麼限制」。 */
 var TX_RULES = [
-  [/（?條號依 109 年草案，現行版本【未經查證】）?/g, ''], [/【未經查證】/g, ''],
+  [/（?條號依 109 年草案，現行版本【未經查證】）?/g, ''], [/【未經查證】/g, ''], [/【分界未經查證】/g, '（分界暫定）'], [/【累積中】/g, '【件數仍少】'],
   [/只提示，不指派、不追蹤；規則與門檻見各卡「判讀前提」。/g, ''], [/只提示，不指派、不追蹤。?/g, ''],
   [/系統只顯示人工紀錄，不追蹤、不結案。?/g, ''], [/依登錄資料推估，是否執行由組長決定。?/g, ''], [/｜?依登錄資料推估，是否執行由組長決定/g, ''],
   [/（只標示，不下結論）/g, ''], [/只標示需要討論的事實，不下結論；/g, ''],
@@ -24,10 +24,11 @@ var TX_RULES = [
   [/（僅供參照）/g, '（參考用）'], [/僅供參照/g, '參考用'], [/，?不歸因個人/g, '，以流程檢討為主'], [/G05 驗證達標與再評量完成/g, '再評量完成且達標'], [/同期群/g, '同屆'], [/分面/g, '分組'], [/四個維度/g, '四個條件']
 ];
 var TX_WORDS = [[/亮點規則說明/g, '標示規則說明'], [/深度照護亮點/g, '深度照護表現'], [/亮點/g, '表現突出'], [/同期群/g, '同屆'], [/同期參照/g, '同屆參照'], [/分面/g, '分組'], [/維度/g, '條件'], [/可顯示圖表/g, '選擇要看的圖表'], [/彙總/g, '統計'], [/後台/g, '系統'], [/訊號/g, '警示'], [/可信度/g, '完整度'], [/已成熟/g, '已登錄完成'], [/可初讀/g, '可初步判讀'], [/^累積中$/g, '仍在補登']];
-var TX_SKIP = 'TD,TEXTAREA,INPUT,SCRIPT,STYLE,BLOCKQUOTE';
-function txSkip(n) { for (var p = n.parentNode; p && p.nodeType === 1; p = p.parentNode) { if (TX_SKIP.indexOf(p.tagName) >= 0 && p.tagName !== 'TD') return 1; if (p.classList && (p.classList.contains('ax-q') || p.classList.contains('ax-fbbody') || p.classList.contains('ilp-q'))) return 1; if (p.id === 'charts' || p.id === 'dashPanel') break; } return 0; }
+var TX_SKIP = /^(TEXTAREA|INPUT|SCRIPT|STYLE|BLOCKQUOTE)$/;
+function txSkip(n) { for (var p = n.parentNode; p && p.nodeType === 1; p = p.parentNode) { if (TX_SKIP.test(p.tagName)) return 1; if (p.classList && (p.classList.contains('ax-q') || p.classList.contains('ax-fbbody') || p.classList.contains('ilp-q'))) return 1; if (p.id === 'charts' || p.id === 'dashPanel') break; } return 0; }
 function txInCell(n) { for (var p = n.parentNode; p && p.nodeType === 1; p = p.parentNode) { if (p.tagName === 'TD') return 1; if (p.id === 'charts' || p.id === 'dashPanel') break; } return 0; }
 function txText(root) {
+  root.normalize();
   var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), n, list = [];
   while ((n = w.nextNode())) if (/[一-鿿]/.test(n.nodeValue)) list.push(n);
   list.forEach(function (t) {
